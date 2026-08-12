@@ -1,0 +1,42 @@
+{
+  "painel-comercial": {
+    "width": 2048,
+    "height": 1147
+  },
+  "distribuicao-leads": {
+    "width": 2048,
+    "height": 1002
+  },
+  "pipeline": {
+    "width": 2048,
+    "height": 995
+  },
+  "cliente": {
+    "width": 2048,
+    "height": 995
+  },
+  "simulacao": {
+    "width": 2048,
+    "height": 995
+  },
+  "esteira-juridica": {
+    "width": 2048,
+    "height": 995
+  },
+  "portal-cliente": {
+    "width": 2048,
+    "height": 995
+  },
+  "financeiro": {
+    "width": 2048,
+    "height": 995
+  },
+  "academy": {
+    "width": 2048,
+    "height": 995
+  },
+  "empresas": {
+    "width": 2048,
+    "height": 1222
+  }
+}

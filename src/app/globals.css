@@ -1,0 +1,124 @@
+@import "tailwindcss";
+
+@theme {
+  /* Preto, branco e vermelho com cinzas frios. */
+  --color-ink-950: #0a0a0b;
+  --color-ink-900: #121317;
+  --color-ink-850: #17181d;
+  --color-ink-800: #1d1f25;
+  --color-ink-700: #2a2d35;
+  --color-ink-600: #3a3e48;
+
+  --color-fog-600: #5f6674;
+  --color-fog-500: #7b8393;
+  --color-fog-400: #9aa1b0;
+  --color-fog-300: #c2c7d1;
+  --color-fog-200: #e2e5ea;
+  --color-fog-100: #f1f3f6;
+  --color-bone: #faf9f7;
+
+  --color-brand-500: #c31230;
+  --color-brand-600: #9e0d26;
+  --color-brand-050: #fceef1;
+  /* Vermelho da marca não alcança 4,5:1 como texto sobre preto (fica em
+     ~2,7:1). Este tom claro existe só para texto sobre fundo escuro: dá
+     5,9:1 sobre ink-950 e mantém a leitura da marca. */
+  --color-brand-300: #f0566c;
+
+  /* Verde-petróleo: cor de ação do produto, preservada nas telas. */
+  --color-product-700: #0f766e;
+  --color-product-800: #115e59;
+  --color-product-100: #ccfbf1;
+  --color-product-050: #f0fdfa;
+  --color-canvas: #f7f8fa;
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-fraunces), Georgia, serif;
+
+  /* Teto de 8px em qualquer raio, inclusive nos utilitários maiores. */
+  --radius-lg: 8px;
+  --radius-xl: 8px;
+  --radius-2xl: 8px;
+  --radius-3xl: 8px;
+  --radius-4xl: 8px;
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+
+  body {
+    background-color: var(--color-ink-950);
+    color: var(--color-ink-950);
+    font-family: var(--font-sans);
+    font-feature-settings: "cv02", "cv03", "cv04";
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-brand-500);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background-color: var(--color-brand-500);
+    color: #fff;
+  }
+}
+
+/* `font-display` já é gerado pelo token --font-display do @theme.
+   Aqui entra só o ajuste ótico que o utilitário não cobre. */
+@layer base {
+  .font-display {
+    letter-spacing: -0.025em;
+    font-optical-sizing: auto;
+  }
+}
+
+/* Medida de leitura confortável para blocos de texto corrido. */
+@utility measure {
+  max-width: 62ch;
+}
+
+/* Conteúdo largo (tabela, faixa de telas) rola dentro do próprio contêiner. */
+@utility scroll-x {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@utility rise {
+  animation: rise 0.5s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
