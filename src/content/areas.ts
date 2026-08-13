@@ -93,15 +93,14 @@ export const areas: readonly Area[] = [
         },
       },
       {
-        title: "Simulação que já sai pronta para enviar",
+        title: "Simulação feita na tela, em três tipos de contrato",
         paragraph:
-          "Três tipos de cálculo — veículo, imóvel e empréstimo — com percentual de redução ajustável por caso e quitação opcional. Ao salvar, o relatório em PDF e a imagem-resumo são gerados na mesma ação, com numeração de protocolo própria.",
+          "Veículo, imóvel e empréstimo, com percentual de redução ajustável por caso e quitação opcional. O consultor preenche os dados do contrato e o cálculo acontece ali, sem planilha paralela.",
         items: [
           "Percentual de redução ajustável caso a caso",
           "Quitação antecipada como opção do cálculo",
-          "PDF e imagem-resumo gerados automaticamente ao salvar",
-          "Visualização, download e envio sem sair do cadastro",
           "Importação dos dados da anotação interna da Totalk pelo telefone",
+          "Numeração de protocolo própria por simulação",
         ],
         screenshot: {
           id: "simulacao",
@@ -111,9 +110,38 @@ export const areas: readonly Area[] = [
         },
       },
       {
+        title: "O sistema produz a análise. Ninguém monta arquivo à mão.",
+        paragraph:
+          "Ao salvar a simulação, o próprio sistema gera o relatório completo em PDF e a imagem-resumo na mesma ação — com os dados do cliente, os números do contrato, o protocolo e a marca da sua empresa já aplicados. O consultor não abre editor, não formata nada e não tem como enviar uma versão desatualizada: o arquivo nasce do cálculo que acabou de ser feito.",
+        items: [
+          "Relatório em PDF de três páginas, gerado automaticamente",
+          "Imagem-resumo para enviar direto ao cliente",
+          "Marca da sua empresa aplicada nos dois arquivos",
+          "Protocolo único ligando os arquivos à simulação que os originou",
+          "Visualização, download e envio sem sair do cadastro",
+        ],
+        screenshot: {
+          id: "relatorio-pdf",
+          alt: "Primeira página do relatório em PDF gerado automaticamente pela simulação",
+          caption:
+            "Primeira das três páginas. O documento sai com a marca da empresa que usa o sistema, não com a de quem o desenvolveu.",
+        },
+      },
+      {
+        title: "A peça que o cliente recebe no WhatsApp",
+        paragraph:
+          "A imagem-resumo sai na mesma ação do relatório e é feita para ser lida no celular: economia total, comparação entre a parcela atual e a corrigida, e os dois cenários lado a lado. É o material que faz o cliente entender o caso em dez segundos.",
+        screenshot: {
+          id: "imagem-resumo",
+          alt: "Imagem-resumo da simulação, com economia total, parcelas e os dois cenários comparados",
+          caption:
+            "Mesma simulação, formato diferente: o consultor manda esta imagem e o PDF completo fica anexado ao cadastro.",
+        },
+      },
+      {
         title: "Contrato e recibo por template, não por cópia do anterior",
         paragraph:
-          "Os documentos saem de modelos DOCX ou PDF com variáveis do cliente preenchidas automaticamente. Cada contrato recebe numeração única, então localizar depois não depende de lembrar o nome do arquivo.",
+          "Os documentos também saem do próprio sistema: modelos DOCX ou PDF com as variáveis do cliente preenchidas automaticamente. Cada contrato recebe numeração única, então localizar depois não depende de lembrar o nome do arquivo nem de procurar em pasta compartilhada.",
       },
       {
         title: "Painel que se monta do trabalho do dia",
@@ -344,48 +372,48 @@ export const areas: readonly Area[] = [
     navLabel: "Gestão e segurança",
     cardTitle: "Gestão e segurança",
     cardDescription:
-      "Multiempresa, módulos contratados, permissões, logs, backup diário e implantação.",
-    metaTitle: "CRM multiempresa, permissões, backup e segurança de dados",
+      "Controle do seu ambiente: marca, usuários, módulos, permissões, backup e implantação.",
+    metaTitle: "Controle total do ambiente, permissões, backup e segurança de dados",
     metaDescription:
-      "Isolamento de dados por empresa aplicado no banco, módulos contratados individualmente, permissões por função e departamento, log de auditoria e backup diário com sete dias de restauração.",
+      "Ambiente exclusivo da sua empresa, com a sua marca, módulos que você escolhe, permissões por função e departamento, log de auditoria e backup diário com sete dias de restauração.",
     eyebrow: "Gestão e segurança",
-    headline: "Cada empresa com o próprio ambiente, o próprio conjunto de módulos e a própria marca.",
+    headline: "O ambiente é da sua empresa, e quem administra é ela.",
     lead:
-      "O sistema nasceu multiempresa. Isso não é um recurso adicionado depois — é a forma como os dados são separados desde o banco.",
+      "Marca, usuários, permissões e quais módulos ficam ligados são decisões da sua equipe, tomadas dentro do sistema — sem abrir chamado e sem esperar ninguém.",
     blocks: [
       {
-        title: "Onze módulos ligados por empresa",
+        title: "Você decide o que fica ligado",
         paragraph:
-          "O que não é contratado não fica cinza esperando upgrade: some da barra lateral, e a equipe não perde tempo com tela que não vai usar. Cada empresa também tem situação própria — ativa, teste, suspensa ou cancelada — usuários contratados e limite de armazenamento.",
+          "São onze módulos, e a sua empresa escolhe quais entram. O que não é contratado não fica cinza esperando upgrade: some da barra lateral, e a equipe não perde tempo com tela que não vai usar. Usuários contratados e limite de armazenamento também ficam visíveis para o administrador da sua equipe.",
         items: [
           "Comercial, Jurídico, Financeiro, Simulações, Documentos e Templates",
           "Distribuição de leads, Portal do cliente e Academy",
           "E-mail Outlook e Backups",
-          "Situação, usuários contratados e armazenamento por empresa",
+          "Usuários contratados e armazenamento acompanhados pela sua equipe",
         ],
         screenshot: {
-          id: "empresas",
-          alt: "Gestão multiempresa com módulos, usuários contratados e armazenamento por empresa",
+          id: "empresa",
+          alt: "Tela de configuração da empresa, com marca, usuários, armazenamento e módulos ativos",
           caption:
-            "Módulo desligado desaparece da interface da equipe daquela empresa, em vez de virar convite para upgrade.",
+            "Módulo desligado desaparece da interface da equipe, em vez de virar convite para upgrade.",
         },
       },
       {
-        title: "A marca da sua empresa dentro do sistema",
+        title: "O sistema leva a marca da sua empresa",
         paragraph:
-          "A logo e o nome da sua empresa aparecem na plataforma para toda a equipe. O arquivo da logo fica em armazenamento privado, servido por link temporário, e a troca fica registrada no log de auditoria. A paleta de cores da interface é a do sistema — a personalização hoje é da identidade da empresa, não do tema visual.",
+          "A logo e o nome da sua empresa aparecem na plataforma para toda a equipe, e também nos documentos que o sistema gera — relatório de simulação, imagem-resumo, contrato e recibo saem com a sua identidade, não com a de quem desenvolveu o sistema. O arquivo da logo fica em armazenamento privado, servido por link temporário, e a troca fica registrada no log de auditoria. A paleta de cores da interface é a do sistema; a personalização hoje é da identidade da empresa, não do tema visual.",
       },
       {
-        title: "Perfis e permissões",
+        title: "Perfis e permissões definidos por você",
         paragraph:
-          "Administrador, gestor e consultor têm alcances distintos, cruzados com a área de negócio do usuário. O consultor não navega por tela de financeiro, o jurídico não esbarra em configuração de empresa, e a gestão enxerga o conjunto.",
+          "Administrador, gestor e consultor têm alcances distintos, cruzados com a área de negócio do usuário. O consultor não navega por tela de financeiro, o jurídico não esbarra em configuração da empresa, e a gestão enxerga o conjunto. Quem cria e ajusta os usuários é o supervisor da sua equipe.",
       },
       {
         title: "Segurança, sem promessa que não se cumpre",
         paragraph:
           "O sistema foi desenvolvido com controles alinhados à proteção e à governança de dados. Abaixo está o que existe implementado — sem afirmação de conformidade absoluta e sem selo que não temos.",
         items: [
-          "Isolamento por empresa aplicado no banco, não somente na tela",
+          "Dados da sua empresa isolados no próprio banco, não somente na tela",
           "Documentos e logos em armazenamento privado, com link temporário que expira",
           "Permissão por função e departamento",
           "Log de auditoria com autor e data, mantido sem expiração automática",
@@ -403,9 +431,9 @@ export const areas: readonly Area[] = [
     ],
     faq: [
       {
-        question: "Meus dados ficam separados dos de outra empresa?",
+        question: "Quem tem acesso aos dados da minha operação?",
         answer:
-          "Sim. O sistema é multiempresa desde a base, com isolamento aplicado no próprio banco de dados, não apenas na interface. Cada empresa acessa somente o que é dela.",
+          "A sua equipe, conforme as permissões que o seu supervisor definir. O ambiente é exclusivo da sua empresa, com isolamento aplicado no próprio banco de dados e não apenas na interface, e todo acesso relevante fica registrado no log de auditoria.",
       },
       {
         question: "E se alguém apagar algo por engano?",
@@ -420,7 +448,7 @@ export const areas: readonly Area[] = [
       {
         question: "Consigo contratar só uma parte do sistema?",
         answer:
-          "Sim. São onze módulos ligados por empresa, e o que não foi contratado nem aparece na barra lateral da equipe.",
+          "Sim. São onze módulos, e você escolhe quais entram no seu ambiente. O que não foi contratado nem aparece na barra lateral da equipe.",
       },
     ],
     whatsappMessage:

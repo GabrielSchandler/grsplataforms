@@ -19,6 +19,14 @@
     "width": 2048,
     "height": 995
   },
+  "relatorio-pdf": {
+    "width": 2048,
+    "height": 1837
+  },
+  "imagem-resumo": {
+    "width": 2048,
+    "height": 1534
+  },
   "esteira-juridica": {
     "width": 2048,
     "height": 995
@@ -35,8 +43,8 @@
     "width": 2048,
     "height": 995
   },
-  "empresas": {
+  "empresa": {
     "width": 2048,
-    "height": 1222
+    "height": 1125
   }
 }

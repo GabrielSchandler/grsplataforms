@@ -19,7 +19,7 @@ const fraunces = Fraunces({
 
 const title = `${siteConfig.productName} — sistema de operação do lead ao pós-atendimento`;
 const description =
-  "Comercial, jurídico, financeiro, documentos e treinamento em um só sistema, com a marca da sua empresa. Multiempresa, modular e com esteira jurídica configurável. Agende uma demonstração.";
+  "Comercial, jurídico, financeiro, documentos e treinamento em um só sistema, com a marca da sua empresa. Relatórios e contratos gerados pelo próprio sistema, esteira jurídica configurável e módulos que você escolhe. Agende uma demonstração.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.siteUrl),
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     "CRM para assessoria",
     "CRM com esteira jurídica",
     "software para escritório de advocacia e comercial",
-    "CRM multiempresa",
+    "sistema com relatório de simulação automático",
     "sistema para empresa de revisão de juros",
   ],
   authors: [{ name: siteConfig.vendorName }],

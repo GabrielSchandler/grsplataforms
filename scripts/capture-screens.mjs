@@ -14,7 +14,7 @@
 import { execFileSync } from "node:child_process";
 import { createServer } from "node:http";
 import { createReadStream } from "node:fs";
-import { mkdir, stat, writeFile } from "node:fs/promises";
+import { mkdir, readdir, rm, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { chromium } from "playwright";
 import sharp from "sharp";
@@ -32,11 +32,13 @@ const screens = [
   "pipeline",
   "cliente",
   "simulacao",
+  "relatorio-pdf",
+  "imagem-resumo",
   "esteira-juridica",
   "portal-cliente",
   "financeiro",
   "academy",
-  "empresas",
+  "empresa",
 ];
 
 /** Chama o Next diretamente pelo Node — sem npx e sem shell intermediário. */
@@ -91,6 +93,17 @@ const manifest = {};
 
 async function main() {
   await mkdir(OUT_DIR, { recursive: true });
+
+  // Remove imagens de telas que não existem mais, para o repositório não
+  // acumular arquivo órfão que ninguém referencia.
+  const existentes = await readdir(OUT_DIR).catch(() => []);
+  for (const arquivo of existentes) {
+    const id = arquivo.replace(/\.webp$/, "");
+    if (!screens.includes(id)) {
+      await rm(path.join(OUT_DIR, arquivo), { force: true });
+      console.log(`  removido: ${arquivo} (tela nao existe mais)`);
+    }
+  }
 
   console.log("Gerando build de captura (CAPTURE=1)...");
   nextBuild({ CAPTURE: "1" });

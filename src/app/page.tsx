@@ -41,13 +41,13 @@ const structuredData = {
       url: siteConfig.siteUrl,
       inLanguage: "pt-BR",
       description:
-        "Sistema multiempresa que reúne comercial, jurídico, financeiro, documentos, portal do cliente e treinamento, com módulos contratados por empresa e esteira jurídica configurável.",
+        "Sistema que reúne comercial, jurídico, financeiro, documentos, portal do cliente e treinamento em um ambiente exclusivo da empresa, com módulos escolhidos por ela e esteira jurídica configurável.",
       publisher: { "@id": `${siteConfig.siteUrl}/#organizacao` },
       featureList: [
-        "CRM multiempresa com isolamento de dados",
+        "Ambiente exclusivo por empresa com isolamento de dados no banco",
         "Distribuição de leads com importação incremental de planilhas",
         "Pipeline comercial em Kanban",
-        "Simulações de veículo, imóvel e empréstimo com relatório em PDF",
+        "Simulações de veículo, imóvel e empréstimo com relatório em PDF e imagem-resumo gerados automaticamente",
         "Geração de documentos por template com variáveis",
         "Esteira jurídica configurável por empresa",
         "Portal de acompanhamento do cliente por CPF e protocolo",

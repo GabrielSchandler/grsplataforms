@@ -8,11 +8,12 @@ import {
 } from "./screens-comercial";
 import {
   AcademyScreen,
+  ConfiguracaoEmpresa,
   EsteiraJuridica,
   Financeiro,
-  GestaoEmpresas,
   PortalCliente,
 } from "./screens-operacao";
+import { ImagemResumo, RelatorioPdf } from "./screens-documentos";
 
 export type DemoScreen = {
   id: string;
@@ -54,6 +55,19 @@ export const demoScreens: DemoScreen[] = [
     component: Simulacao,
   },
   {
+    id: "relatorio-pdf",
+    label: "Relatório em PDF",
+    caption:
+      "Gerado pelo sistema ao salvar a simulação, com a marca da sua empresa e protocolo próprio.",
+    component: RelatorioPdf,
+  },
+  {
+    id: "imagem-resumo",
+    label: "Imagem-resumo",
+    caption: "A peça que o consultor envia ao cliente, produzida na mesma ação do relatório.",
+    component: ImagemResumo,
+  },
+  {
     id: "esteira-juridica",
     label: "Esteira jurídica",
     caption: "Etapas criadas pela própria empresa, com documentos esperados por coluna.",
@@ -78,9 +92,10 @@ export const demoScreens: DemoScreen[] = [
     component: AcademyScreen,
   },
   {
-    id: "empresas",
-    label: "Multiempresa",
-    caption: "Módulos, usuários contratados e armazenamento controlados por empresa.",
-    component: GestaoEmpresas,
+    id: "empresa",
+    label: "Sua empresa",
+    caption:
+      "Marca, usuários, armazenamento e módulos ativos — administrados pela sua própria equipe.",
+    component: ConfiguracaoEmpresa,
   },
 ];

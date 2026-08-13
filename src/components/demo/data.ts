@@ -256,6 +256,55 @@ export const legalPipeline = {
   ],
 };
 
+/**
+ * Os dois arquivos que a simulação gera sozinha ao ser salva: o relatório em
+ * PDF e a imagem-resumo.
+ *
+ * Todos os números fecham entre si — parcela × quantidade, diferença mensal,
+ * economia total e quitação — porque comprador de software confere conta, e
+ * exemplo que não bate destrói a credibilidade da tela inteira.
+ *
+ * A financeira é inventada de propósito: material de exemplo sobre juros
+ * abusivos não cita instituição real.
+ */
+export const simulationDocument = {
+  protocol: "202608417",
+  issuedAt: "12/08/2026",
+  client: "Fábio Tanaka",
+  phone: "(11) 90000-0256",
+  lender: "Financeira Meridiano",
+  specialist: "Marina Vasques",
+  type: "Veículo",
+  model: "Honda CB 300R",
+  year: "2019",
+  status: "Aprovado",
+  headline: {
+    totalSaving: "R$ 15.052,80",
+    currentInstallment: "R$ 1.120,00",
+    correctedInstallment: "R$ 806,40",
+    monthlySaving: "R$ 313,60",
+  },
+  current: [
+    { label: "Valor à vista", value: "R$ 34.500,00" },
+    { label: "Entrada", value: "R$ 12.000,00" },
+    { label: "Valor financiado", value: "R$ 22.500,00" },
+    { label: "Quantidade de parcelas", value: "48" },
+    { label: "Valor atual da parcela", value: "R$ 1.120,00" },
+    { label: "Parcelas a pagar", value: "48" },
+  ],
+  projected: [
+    { label: "Economia mensal", value: "R$ 313,60", strong: true },
+    { label: "Total da dívida atual", value: "R$ 53.760,00" },
+    { label: "Total da dívida após revisão", value: "R$ 38.707,20" },
+    { label: "Economia total", value: "R$ 15.052,80", strong: true },
+    { label: "Saldo devedor sem correção", value: "R$ 53.760,00" },
+    { label: "Saldo devedor pós-correção", value: "R$ 38.707,20" },
+    { label: "Valor estimado para quitação", value: "R$ 27.095,04", strong: true },
+  ],
+  disclaimer:
+    "Simulação de caráter estimativo. Os valores partem dos dados informados e o resultado final depende da análise documental e das condições da instituição financeira.",
+};
+
 export const clientPortal = {
   client: "Cleusa A.",
   protocol: "2026-04812",
@@ -333,52 +382,35 @@ export const academy = {
   ],
 };
 
-export const companies = {
-  list: [
-    {
-      name: "Ativa Assessoria",
-      status: "Ativa",
-      users: "18 de 20",
-      storage: "6,2 GB de 10 GB",
-      storagePct: 62,
-      modules: ["Comercial", "Jurídico", "Financeiro", "Simulações", "Documentos", "Academy", "Portal", "Backups"],
-    },
-    {
-      name: "Prisma Consultoria",
-      status: "Ativa",
-      users: "9 de 10",
-      storage: "2,8 GB de 10 GB",
-      storagePct: 28,
-      modules: ["Comercial", "Simulações", "Documentos", "Backups"],
-    },
-    {
-      name: "Nova Rota Serviços",
-      status: "Teste",
-      users: "3 de 5",
-      storage: "0,4 GB de 10 GB",
-      storagePct: 4,
-      modules: ["Comercial", "Documentos"],
-    },
-    {
-      name: "Marco Legal Assessoria",
-      status: "Ativa",
-      users: "12 de 15",
-      storage: "4,1 GB de 10 GB",
-      storagePct: 41,
-      modules: ["Comercial", "Jurídico", "Documentos", "Portal", "E-mail Outlook", "Backups"],
-    },
+/**
+ * Configuração da empresa que usa o sistema — o ambiente é dela, e quem
+ * administra é ela. A tela mostra o que o administrador do cliente controla
+ * sozinho: marca, usuários, armazenamento e quais módulos ficam ligados.
+ */
+export const companySettings = {
+  name: "Ativa Assessoria",
+  legalName: "Ativa Assessoria e Consultoria Ltda",
+  taxId: "00.000.000/0001-00",
+  since: "Ambiente ativo desde 03/2026",
+  users: { used: 18, contracted: 20 },
+  storage: { label: "6,2 GB de 10 GB", pct: 62 },
+  teams: [
+    { name: "Comercial", people: 11 },
+    { name: "Jurídico", people: 4 },
+    { name: "Financeiro", people: 2 },
+    { name: "Administração", people: 1 },
   ],
-  allModules: [
-    "Comercial",
-    "Jurídico",
-    "Financeiro",
-    "Simulações",
-    "Documentos",
-    "Templates",
-    "Distribuição de leads",
-    "Portal do cliente",
-    "Academy",
-    "E-mail Outlook",
-    "Backups",
+  modules: [
+    { name: "Comercial", enabled: true, group: "Operação" },
+    { name: "Jurídico", enabled: true, group: "Operação" },
+    { name: "Financeiro", enabled: true, group: "Operação" },
+    { name: "Simulações", enabled: true, group: "Operação" },
+    { name: "Documentos", enabled: true, group: "Operação" },
+    { name: "Templates", enabled: true, group: "Operação" },
+    { name: "Distribuição de leads", enabled: true, group: "Crescimento" },
+    { name: "Portal do cliente", enabled: true, group: "Crescimento" },
+    { name: "Academy", enabled: true, group: "Crescimento" },
+    { name: "E-mail Outlook", enabled: false, group: "Gestão" },
+    { name: "Backups", enabled: true, group: "Gestão" },
   ],
 };

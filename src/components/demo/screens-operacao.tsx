@@ -10,7 +10,7 @@ import {
   Upload,
 } from "lucide-react";
 import { Avatar, Bar, Button, DemoBadge, Panel, Pill, Screen, Stat } from "./chrome";
-import { academy, clientPortal, companies, finance, legalPipeline } from "./data";
+import { academy, clientPortal, companySettings, finance, legalPipeline } from "./data";
 
 export function EsteiraJuridica() {
   return (
@@ -283,60 +283,111 @@ export function AcademyScreen() {
   );
 }
 
-export function GestaoEmpresas() {
+export function ConfiguracaoEmpresa() {
+  const grupos = ["Operação", "Crescimento", "Gestão"];
+
   return (
     <Screen
       workspace="Gestão"
       active="Empresa"
-      title="Empresas da plataforma"
-      subtitle="Módulos, usuários contratados e armazenamento por empresa"
+      title={companySettings.name}
+      subtitle="Configuração da empresa · administrada pela própria equipe"
+      actions={<Pill tone="teal">Ambiente ativo</Pill>}
     >
-      <div className="space-y-3">
-        {companies.list.map((company) => (
-          <article key={company.name} className="rounded-lg border border-slate-200 bg-white p-4">
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex min-w-0 items-center gap-3">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-slate-100">
-                  <Building2 aria-hidden="true" className="h-4 w-4 text-slate-500" />
-                </div>
-                <div className="min-w-0">
-                  <p className="truncate text-[14px] font-semibold text-slate-950">{company.name}</p>
-                  <p className="mt-0.5 text-[12px] text-slate-500">
-                    {company.users} usuários · {company.storage}
-                  </p>
-                </div>
+      <div className="grid grid-cols-3 gap-4">
+        <Panel title="Identidade" className="col-span-1">
+          <div className="flex items-center gap-3">
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-md bg-slate-100 text-sm font-bold uppercase tracking-wide text-slate-700">
+              AA
+            </div>
+            <div className="min-w-0">
+              <p className="truncate text-[13px] font-semibold text-slate-950">
+                {companySettings.name}
+              </p>
+              <p className="mt-0.5 text-[11px] text-slate-500">Logo exibida no sistema</p>
+            </div>
+          </div>
+          <div className="mt-4 space-y-2 border-t border-slate-100 pt-3">
+            <div>
+              <p className="text-[10px] uppercase tracking-wide text-slate-500">Razão social</p>
+              <p className="text-[12px] text-slate-800">{companySettings.legalName}</p>
+            </div>
+            <div>
+              <p className="text-[10px] uppercase tracking-wide text-slate-500">CNPJ</p>
+              <p className="text-[12px] text-slate-800">{companySettings.taxId}</p>
+            </div>
+            <p className="text-[11px] text-slate-400">{companySettings.since}</p>
+          </div>
+        </Panel>
+
+        <Panel title="Usuários" hint="Criados pelo supervisor">
+          <p className="text-2xl font-semibold text-slate-950">
+            {companySettings.users.used}
+            <span className="text-[13px] font-normal text-slate-500">
+              {" "}
+              de {companySettings.users.contracted} contratados
+            </span>
+          </p>
+          <div className="mt-3">
+            <Bar value={(companySettings.users.used / companySettings.users.contracted) * 100} />
+          </div>
+          <div className="mt-4 space-y-2 border-t border-slate-100 pt-3">
+            {companySettings.teams.map((team) => (
+              <div key={team.name} className="flex items-baseline justify-between gap-2">
+                <span className="text-[12px] text-slate-700">{team.name}</span>
+                <span className="text-[12px] font-semibold text-slate-950">{team.people}</span>
               </div>
-              <Pill tone={company.status === "Teste" ? "amber" : "teal"}>{company.status}</Pill>
-            </div>
+            ))}
+          </div>
+        </Panel>
 
-            <div className="mt-3 max-w-xs">
-              <Bar value={company.storagePct} tone="slate" />
-            </div>
-
-            <div className="mt-3 flex flex-wrap gap-1.5">
-              {companies.allModules.map((module) => {
-                const enabled = company.modules.some((item) => module.startsWith(item));
-
-                return (
-                  <span
-                    key={module}
-                    className={`inline-flex items-center gap-1 rounded border px-1.5 py-0.5 text-[11px] ${
-                      enabled
-                        ? "border-teal-200 bg-teal-50 text-teal-800"
-                        : "border-slate-200 bg-white text-slate-400 line-through"
-                    }`}
-                  >
-                    {enabled ? (
-                      <CircleCheck aria-hidden="true" className="h-3 w-3" />
-                    ) : null}
-                    {module}
-                  </span>
-                );
-              })}
-            </div>
-          </article>
-        ))}
+        <Panel title="Armazenamento">
+          <p className="text-2xl font-semibold text-slate-950">{companySettings.storage.label}</p>
+          <div className="mt-3">
+            <Bar value={companySettings.storage.pct} tone="slate" />
+          </div>
+          <p className="mt-4 border-t border-slate-100 pt-3 text-[12px] leading-relaxed text-slate-600">
+            Documentos, contratos e anexos dos seus clientes, em armazenamento privado com acesso
+            por link temporário.
+          </p>
+        </Panel>
       </div>
+
+      <Panel title="Módulos do seu ambiente" hint="10 de 11 ativos" className="mt-4">
+        <div className="space-y-3">
+          {grupos.map((grupo) => (
+            <div key={grupo}>
+              <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+                {grupo}
+              </p>
+              <div className="mt-1.5 flex flex-wrap gap-1.5">
+                {companySettings.modules
+                  .filter((module) => module.group === grupo)
+                  .map((module) => (
+                    <span
+                      key={module.name}
+                      className={`inline-flex items-center gap-1 rounded border px-2 py-1 text-[11px] ${
+                        module.enabled
+                          ? "border-teal-200 bg-teal-50 text-teal-800"
+                          : "border-slate-200 bg-white text-slate-400"
+                      }`}
+                    >
+                      {module.enabled ? (
+                        <CircleCheck aria-hidden="true" className="h-3 w-3" />
+                      ) : (
+                        <Building2 aria-hidden="true" className="h-3 w-3 opacity-40" />
+                      )}
+                      {module.name}
+                    </span>
+                  ))}
+              </div>
+            </div>
+          ))}
+        </div>
+        <p className="mt-4 border-t border-slate-100 pt-3 text-[12px] text-slate-600">
+          Módulo desligado não aparece na barra lateral da equipe.
+        </p>
+      </Panel>
     </Screen>
   );
 }

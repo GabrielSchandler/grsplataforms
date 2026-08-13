@@ -149,7 +149,7 @@ export const areasIndex = {
   eyebrow: "As cinco áreas",
   title: "O site tem a mesma divisão que o sistema.",
   intro:
-    "Cada área é um conjunto de módulos contratado por empresa. Entre na que interessa para a sua operação — o que não é contratado nem aparece na barra lateral da equipe.",
+    "Cada área é um conjunto de módulos, e você escolhe quais entram no seu ambiente. Entre na que interessa para a sua operação — o que não é contratado nem aparece na barra lateral da equipe.",
 };
 
 export const securityTeaser = {
@@ -159,8 +159,8 @@ export const securityTeaser = {
     "Desenvolvido com controles alinhados à proteção e à governança de dados. Sem promessa de conformidade absoluta e sem selo que não temos.",
   highlights: [
     {
-      title: "Isolamento por empresa",
-      description: "Aplicado no banco de dados, não somente na tela.",
+      title: "Ambiente exclusivo da sua empresa",
+      description: "Isolamento aplicado no banco de dados, não somente na tela.",
     },
     {
       title: "Backup diário automático",
@@ -221,7 +221,7 @@ export const faq = {
     {
       question: "Preciso trocar tudo que já uso de uma vez?",
       answer:
-        "Não. Os módulos são contratados por empresa, então dá para começar pelo comercial e ligar jurídico, financeiro ou Academy depois. O que não foi contratado nem aparece na barra lateral da equipe.",
+        "Não. Você escolhe quais módulos entram, então dá para começar pelo comercial e ligar jurídico, financeiro ou Academy depois. O que não foi contratado nem aparece na barra lateral da equipe.",
     },
     {
       question: "Em quanto tempo minha equipe começa a usar?",
