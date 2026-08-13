@@ -1,5 +1,6 @@
 node_modules/
 .next/
+.next-tooling/
 out/
 .env
 .env.local

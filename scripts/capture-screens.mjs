@@ -46,7 +46,14 @@ function nextBuild(env = {}) {
   execFileSync(
     process.execPath,
     [path.join(ROOT, "node_modules", "next", "dist", "bin", "next"), "build"],
-    { env: { ...process.env, ...env }, stdio: "inherit", cwd: ROOT },
+    {
+      // BUILD_TARGET manda o Next construir em .next-tooling. Sem isso, este
+      // script derruba um `npm run dev` que esteja rodando, porque os dois
+      // escreveriam na mesma pasta .next.
+      env: { ...process.env, BUILD_TARGET: "tooling", ...env },
+      stdio: "inherit",
+      cwd: ROOT,
+    },
   );
 }
 

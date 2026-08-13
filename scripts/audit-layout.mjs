@@ -239,7 +239,8 @@ async function main() {
     execFileSync(
       process.execPath,
       [path.join(ROOT, "node_modules", "next", "dist", "bin", "next"), "build"],
-      { stdio: "inherit", cwd: ROOT },
+      // Constrói em .next-tooling para não atropelar um `npm run dev` aberto.
+      { stdio: "inherit", cwd: ROOT, env: { ...process.env, BUILD_TARGET: "tooling" } },
     );
   }
 
