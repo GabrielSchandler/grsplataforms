@@ -1,23 +1,11 @@
-import {
-  Academy,
-  Dashboards,
-  Implementation,
-  Integrations,
-  Portal,
-  Security,
-} from "@/components/sections/operacao";
 import { Faq, FinalCta } from "@/components/sections/fim";
-import {
-  DemoSection,
-  Journey,
-  Legal,
-  Modules,
-  Simulations,
-  Workspaces,
-} from "@/components/sections/produto";
+import { Implementation, SecurityTeaser } from "@/components/sections/operacao";
+import { AreasIndex, DemoSection, Journey } from "@/components/sections/produto";
 import { BenefitStrip, Hero, Problems } from "@/components/sections/topo";
 import { Footer } from "@/components/site/footer";
 import { Header } from "@/components/site/header";
+import { MobileCta } from "@/components/site/mobile-cta";
+import { areas } from "@/content/areas";
 import { faq, hero } from "@/content/site";
 import { siteConfig } from "@/lib/site-config";
 
@@ -74,6 +62,13 @@ const structuredData = {
         description:
           "Mensalidade por usuário contratado, mais implantação. Valor apresentado em proposta após diagnóstico.",
       },
+      // As páginas de área são as partes documentadas do mesmo software.
+      hasPart: areas.map((area) => ({
+        "@type": "WebPage",
+        "@id": `${siteConfig.siteUrl}/${area.slug}/#pagina`,
+        name: area.metaTitle,
+        url: `${siteConfig.siteUrl}/${area.slug}`,
+      })),
     },
     {
       "@type": "FAQPage",
@@ -106,23 +101,18 @@ export default function Home() {
       <main id="conteudo">
         <Hero />
         <BenefitStrip />
+        {/* O demo é o ativo mais forte da página: vem antes do argumento. */}
+        <DemoSection />
         <Problems />
         <Journey />
-        <DemoSection />
-        <Modules />
-        <Workspaces />
-        <Simulations />
-        <Legal />
-        <Integrations />
-        <Portal />
-        <Dashboards />
-        <Academy />
-        <Security />
+        <AreasIndex />
+        <SecurityTeaser />
         <Implementation />
         <Faq />
         <FinalCta />
       </main>
       <Footer />
+      <MobileCta message={hero.whatsappMessage} />
     </>
   );
 }

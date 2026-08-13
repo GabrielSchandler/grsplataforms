@@ -9,6 +9,7 @@ export function Faq() {
     <Section id="perguntas" tone="bone">
       <Eyebrow tone="bone">{faq.eyebrow}</Eyebrow>
       <SectionTitle className="max-w-3xl text-ink-950">{faq.title}</SectionTitle>
+      <Lead tone="bone">{faq.intro}</Lead>
 
       <div className="mt-12 border-t border-fog-200">
         {faq.items.map((item) => (

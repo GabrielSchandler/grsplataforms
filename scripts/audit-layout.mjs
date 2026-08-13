@@ -28,22 +28,20 @@ const viewports = [
   { name: "390x844", width: 390, height: 844 },
 ];
 
+/** Seções da home. A profundidade mora nas páginas de área. */
 const expectedSections = [
   "topo",
-  "jornada",
   "demonstrativo",
-  "modulos",
-  "simulacoes",
-  "juridico",
-  "integracoes",
-  "portal",
-  "paineis",
-  "academy",
+  "jornada",
+  "areas",
   "seguranca",
   "implantacao",
   "perguntas",
   "demonstracao",
 ];
+
+/** Páginas de área — cada uma precisa se sustentar sozinha. */
+const areaSlugs = ["comercial", "juridico", "financeiro", "academy", "gestao"];
 
 const mimes = {
   ".html": "text/html; charset=utf-8",
@@ -80,9 +78,19 @@ function serveExport() {
 
 const failures = [];
 
+/** Altura de cada página na resolução mais larga, para acompanhar o inchaço. */
+const alturas = [];
+
 function check(condition, message) {
   if (!condition) failures.push(message);
   return condition;
+}
+
+async function registrarAltura(page, rotulo, viewport) {
+  if (viewport.width !== 1440) return;
+
+  const altura = await page.evaluate(() => document.documentElement.scrollHeight);
+  alturas.push([rotulo, altura]);
 }
 
 /**
@@ -238,6 +246,7 @@ async function main() {
       await checarOverflow(page, viewport.name);
       await checarImagens(page, viewport.name);
       await checarContraste(page, viewport.name);
+      await registrarAltura(page, "/", viewport);
 
       const missing = await page.evaluate(
         (ids) => ids.filter((id) => !document.getElementById(id)),
@@ -285,6 +294,35 @@ async function main() {
         }
       }
 
+      /* ---------- páginas de área ---------- */
+
+      for (const slug of areaSlugs) {
+        await page.goto(`${BASE}/${slug}/`, { waitUntil: "load", timeout: 30000 });
+        await prepararPagina(page);
+
+        const rotulo = `${viewport.name} /${slug}`;
+        await checarOverflow(page, rotulo);
+        await checarImagens(page, rotulo);
+        await checarContraste(page, rotulo);
+        await registrarAltura(page, `/${slug}`, viewport);
+
+        const cabecalho = await page.evaluate(() => ({
+          h1: document.querySelectorAll("h1").length,
+          temFaq: Boolean(document.querySelector("#perguntas details")),
+          temCta: Boolean(document.querySelector("#demonstracao")),
+        }));
+
+        check(cabecalho.h1 === 1, `${rotulo}: deveria ter exatamente 1 h1, tem ${cabecalho.h1}`);
+        check(cabecalho.temFaq, `${rotulo}: sem FAQ proprio`);
+        check(cabecalho.temCta, `${rotulo}: sem secao de chamada final`);
+
+        if (viewport.width === 1440) {
+          await page.evaluate(() => window.scrollTo(0, 0));
+          await page.waitForTimeout(250);
+          await page.screenshot({ path: path.join(SHOT_DIR, "areas", `${slug}.png`) });
+        }
+      }
+
       /* ---------- política de privacidade ---------- */
 
       await page.goto(`${BASE}/privacidade/`, { waitUntil: "load", timeout: 30000 });
@@ -306,6 +344,14 @@ async function main() {
   } finally {
     await browser.close();
     server.close();
+  }
+
+  if (alturas.length > 0) {
+    console.log("\nAltura das paginas em 1440px:");
+    for (const [rotulo, altura] of alturas) {
+      const telas = (altura / 900).toFixed(1);
+      console.log(`  ${rotulo.padEnd(14)} ${String(altura).padStart(6)} px   ~${telas} telas`);
+    }
   }
 
   if (failures.length > 0) {

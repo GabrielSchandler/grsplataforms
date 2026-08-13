@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { hero, nav } from "@/content/site";
 import { CONTACT_ANCHOR, primaryCtaHref, siteConfig } from "@/lib/site-config";
@@ -30,24 +31,24 @@ export function Header() {
       }`}
     >
       <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-6 px-5 py-4 sm:px-8">
-        <a href="#topo" className="flex items-baseline gap-2">
+        <Link href="/" className="flex items-baseline gap-2">
           <span className="font-display text-lg font-semibold tracking-tight text-white">
             GRS
           </span>
           <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-brand-300">
             Plataforma
           </span>
-        </a>
+        </Link>
 
-        <nav aria-label="Seções do site" className="hidden items-center gap-7 lg:flex">
+        <nav aria-label="Páginas do site" className="hidden items-center gap-6 lg:flex">
           {nav.links.map((link) => (
-            <a
+            <Link
               key={link.href}
               href={link.href}
               className="text-sm font-medium text-fog-300 transition hover:text-white"
             >
               {link.label}
-            </a>
+            </Link>
           ))}
         </nav>
 
@@ -86,13 +87,13 @@ export function Header() {
           <ul className="space-y-1">
             {nav.links.map((link) => (
               <li key={link.href}>
-                <a
+                <Link
                   href={link.href}
                   onClick={() => setOpen(false)}
                   className="block rounded-lg px-3 py-2.5 text-sm font-medium text-fog-300 hover:bg-ink-900 hover:text-white"
                 >
                   {link.label}
-                </a>
+                </Link>
               </li>
             ))}
             <li className="pt-2">

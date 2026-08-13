@@ -45,13 +45,39 @@ comercial reconhecer a origem já na lista de conversas.
 Para sobrescrever qualquer um desses valores, copie `.env.example` para
 `.env.local`. Como o build é estático, mudar variável exige refazer o build.
 
+## Arquitetura das páginas
+
+A home resume e encaminha; a profundidade mora em cinco páginas de área, que
+espelham as cinco áreas de trabalho do próprio sistema. **Nada é repetido nos
+dois lugares** — conteúdo duplicado divide a força de busca e obriga a manter
+a mesma frase em dois arquivos.
+
+| Página | Altura em 1440px | Assunto |
+| --- | --- | --- |
+| `/` | ~9.200px | Promessa, demo, problema, jornada, índice das áreas, implantação, FAQ |
+| `/comercial` | ~8.400px | Leads, pipeline, cliente, simulação, documentos, painel |
+| `/juridico` | ~5.400px | Esteira configurável, e-mail, cobranças, portal do cliente |
+| `/gestao` | ~5.500px | Multiempresa, permissões, segurança, backup, implantação |
+| `/financeiro` | ~3.800px | Lançamentos, chargebacks, metas e comissões |
+| `/academy` | ~3.800px | Trilhas de treinamento e acompanhamento |
+
+A primeira versão era **uma página de 21.900px**, cerca de 24 telas de
+rolagem. Ela tentava atender três leitores ao mesmo tempo — o visitante frio
+de anúncio, o avaliador e o decisor técnico — e não servia bem nenhum.
+
+`npm run audit:layout` imprime a altura de cada página a cada execução, para
+que o inchaço volte a ser visível antes de virar problema.
+
 ## Como o conteúdo é organizado
 
-- `src/content/site.ts` — **todo o texto da página**. Editar este arquivo muda
-  o site inteiro, sem tocar em componente.
-- `src/lib/site-config.ts` — o que vem de variável de ambiente.
-- `src/components/sections/` — as seções, em ordem de leitura.
-- `src/components/site/` — cabeçalho, rodapé, formulário e primitivas visuais.
+- `src/content/site.ts` — texto da **home**.
+- `src/content/areas.ts` — texto das **cinco páginas de área**. Adicionar uma
+  área aqui já a inclui no menu, no rodapé, no índice da home e no sitemap;
+  falta só criar a pasta da rota em `src/app/<slug>/`.
+- `src/lib/site-config.ts` — dados da empresa e o que vem de ambiente.
+- `src/components/sections/` — as seções da home, em ordem de leitura.
+- `src/components/site/` — cabeçalho, rodapé, formulário, barra fixa do
+  celular, página de área e primitivas visuais.
 
 ## As telas do produto
 

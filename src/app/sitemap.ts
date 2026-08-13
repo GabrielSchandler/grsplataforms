@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { areas } from "@/content/areas";
 import { siteConfig } from "@/lib/site-config";
 
 export const dynamic = "force-static";
@@ -11,6 +12,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 1,
     },
+    ...areas.map((area) => ({
+      url: `${siteConfig.siteUrl}/${area.slug}/`,
+      lastModified: new Date(),
+      changeFrequency: "monthly" as const,
+      priority: 0.8,
+    })),
     {
       url: `${siteConfig.siteUrl}/privacidade/`,
       lastModified: new Date(),

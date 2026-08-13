@@ -44,12 +44,12 @@ export function Footer() {
               <ul className="mt-5 space-y-3">
                 {column.links.map((link) => (
                   <li key={link.href}>
-                    <a
+                    <Link
                       href={link.href}
                       className="text-[14px] text-fog-300 transition hover:text-white"
                     >
                       {link.label}
-                    </a>
+                    </Link>
                   </li>
                 ))}
               </ul>
@@ -59,7 +59,8 @@ export function Footer() {
 
         <div className="mt-14 border-t border-ink-800 pt-8">
           <p className="measure text-[13px] leading-relaxed text-fog-500">{footer.disclaimer}</p>
-          <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
+          <p className="mt-4 text-[13px] text-fog-500">{addressLine}</p>
+          <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2">
             <p className="text-[13px] text-fog-500">
               © {year} {siteConfig.legalName || siteConfig.vendorName}
               {siteConfig.taxId ? ` · CNPJ ${siteConfig.taxId}` : ""}
