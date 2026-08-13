@@ -108,17 +108,176 @@
   scrollbar-width: thin;
 }
 
-@keyframes rise {
-  from {
+/* ==========================================================================
+   Sistema de movimento
+   --------------------------------------------------------------------------
+   Uma curva, uma duração-base e um atraso escalonado, usados em tudo. O que
+   dá sensação de produto caro não é a quantidade de efeitos, é todos se
+   moverem com a mesma assinatura.
+
+   O estado inicial escondido vive dentro de `prefers-reduced-motion:
+   no-preference`. Assim, quem pede menos movimento vê a página inteira
+   pronta, mesmo que o JavaScript não rode.
+   ========================================================================== */
+
+@theme {
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-base: 720ms;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-reveal] {
     opacity: 0;
-    transform: translateY(14px);
+    transition:
+      opacity var(--dur-base) var(--ease-out-quint),
+      transform var(--dur-base) var(--ease-out-quint),
+      clip-path var(--dur-base) var(--ease-out-quint),
+      filter var(--dur-base) var(--ease-out-quint);
+    transition-delay: var(--reveal-delay, 0ms);
+    will-change: opacity, transform;
   }
-  to {
+
+  [data-reveal="up"] {
+    transform: translate3d(0, 22px, 0);
+  }
+
+  [data-reveal="rise"] {
+    transform: translate3d(0, 42px, 0);
+    filter: blur(6px);
+  }
+
+  /* Cortina: o conteúdo é descoberto de cima para baixo, como um documento
+     saindo da impressora. Serve para as capturas de tela. */
+  [data-reveal="wipe"] {
+    clip-path: inset(0 0 100% 0);
+    transform: scale(1.015);
+  }
+
+  [data-reveal="line"] {
+    transform: scaleX(0);
+    transform-origin: left center;
+  }
+
+  [data-reveal].is-visible {
     opacity: 1;
     transform: none;
+    clip-path: inset(0 0 0 0);
+    filter: none;
+    will-change: auto;
   }
 }
 
-@utility rise {
-  animation: rise 0.5s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+/* Varredura única sobre a cena do hero: a luz passa uma vez e some. */
+@keyframes scan {
+  0% {
+    transform: translateX(-120%) skewX(-12deg);
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateX(320%) skewX(-12deg);
+    opacity: 0;
+  }
+}
+
+@keyframes cue {
+  0%,
+  100% {
+    transform: scaleY(0.2);
+    opacity: 0.35;
+  }
+  50% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+@utility scan-line {
+  animation: scan 2.6s var(--ease-out-quint) 0.6s both;
+}
+
+/* A cena do hero entra em foco: sai do desfoque e assenta na opacidade final.
+   Sem movimento reduzido, ela já nasce assentada. */
+@keyframes stage-in {
+  from {
+    opacity: 0;
+    transform: scale(1.05);
+    filter: blur(10px);
+  }
+  to {
+    opacity: 0.28;
+    transform: scale(1);
+    filter: blur(0.4px);
+  }
+}
+
+@utility hero-stage {
+  opacity: 0.28;
+  filter: blur(0.4px);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .hero-stage {
+    animation: stage-in 1.6s var(--ease-out-quint) 0.15s both;
+  }
+}
+
+/* Botão que se preenche a partir da esquerda, sem trocar de cor de texto. */
+@utility sweep {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  transition: transform 0.3s var(--ease-out-quint);
+}
+
+.sweep::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: var(--color-brand-600);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.42s var(--ease-out-quint);
+}
+
+.sweep:hover::before,
+.sweep:focus-visible::before {
+  transform: scaleX(1);
+}
+
+@utility scroll-cue {
+  animation: cue 2.2s ease-in-out infinite;
+  transform-origin: top center;
+}
+
+/* Realce que segue o ponteiro nas seções escuras. As coordenadas chegam por
+   variável CSS, então o movimento não dispara recálculo de layout. */
+@utility spotlight {
+  background-image: radial-gradient(
+    460px circle at var(--mx, 50%) var(--my, 0%),
+    rgba(195, 18, 48, 0.14),
+    transparent 68%
+  );
+}
+
+/* Costura entre seções: fio fino com um traço vermelho no início. */
+@utility seam {
+  position: relative;
+}
+
+@utility seam-line {
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    var(--color-brand-500) 0,
+    var(--color-brand-500) 64px,
+    color-mix(in srgb, currentColor 12%, transparent) 64px,
+    transparent 100%
+  );
 }

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, ArrowUpRight, Plus } from "lucide-react";
 import { areas, type Area } from "@/content/areas";
+import { Reveal, ScrollProgress } from "@/components/motion/motion";
 import { Footer } from "@/components/site/footer";
 import { Header } from "@/components/site/header";
 import { MobileCta } from "@/components/site/mobile-cta";
@@ -79,6 +80,7 @@ export function AreaPage({ area }: { area: Area }) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData(area)) }}
       />
+      <ScrollProgress />
       <Header />
       <main id="conteudo">
         {/* Cabeçalho da área */}
@@ -95,20 +97,29 @@ export function AreaPage({ area }: { area: Area }) {
             </nav>
 
             <div className="mt-8 max-w-3xl">
-              <Eyebrow>{area.eyebrow}</Eyebrow>
-              <h1 className="font-display mt-5 text-3xl leading-[1.08] font-semibold text-white sm:text-4xl lg:text-5xl">
-                {area.headline}
-              </h1>
-              <p className="measure mt-6 text-lg leading-relaxed text-fog-300">{area.lead}</p>
-
-              <a
-                href={ctaHref}
-                {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-                className="mt-8 inline-flex items-center gap-2 rounded-lg bg-brand-500 px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-brand-600"
-              >
-                Agendar demonstração
-                <ArrowRight aria-hidden="true" className="h-4 w-4" />
-              </a>
+              <Reveal>
+                <Eyebrow>{area.eyebrow}</Eyebrow>
+              </Reveal>
+              <Reveal variant="rise" delay={90}>
+                <h1 className="font-display mt-5 text-3xl leading-[1.08] font-semibold text-white sm:text-4xl lg:text-5xl">
+                  {area.headline}
+                </h1>
+              </Reveal>
+              <Reveal delay={190}>
+                <p className="measure mt-6 text-lg leading-relaxed text-fog-300">{area.lead}</p>
+              </Reveal>
+              <Reveal delay={280}>
+                <a
+                  href={ctaHref}
+                  {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                  className="sweep mt-8 inline-flex items-center gap-2 rounded-lg bg-brand-500 px-6 py-3.5 text-sm font-semibold text-white"
+                >
+                  <span className="relative z-10 inline-flex items-center gap-2">
+                    Agendar demonstração
+                    <ArrowRight aria-hidden="true" className="h-4 w-4" />
+                  </span>
+                </a>
+              </Reveal>
             </div>
           </div>
         </section>
@@ -116,18 +127,22 @@ export function AreaPage({ area }: { area: Area }) {
         {/* Blocos de conteúdo, alternando fundo para quebrar a monotonia */}
         {area.blocks.map((block, index) => (
           <Section key={block.title} tone={index % 2 === 0 ? "light" : "bone"}>
-            <h2 className="font-display max-w-3xl text-2xl leading-snug font-semibold text-ink-950 sm:text-3xl">
-              {block.title}
-            </h2>
+            <Reveal>
+              <h2 className="font-display max-w-3xl text-2xl leading-snug font-semibold text-ink-950 sm:text-3xl">
+                {block.title}
+              </h2>
 
-            {block.paragraph ? (
-              <p className="measure mt-5 text-base leading-relaxed text-fog-600 sm:text-[17px]">
-                {block.paragraph}
-              </p>
-            ) : null}
+              {block.paragraph ? (
+                <p className="measure mt-5 text-base leading-relaxed text-fog-600 sm:text-[17px]">
+                  {block.paragraph}
+                </p>
+              ) : null}
+            </Reveal>
 
             {block.items ? (
-              <CheckList items={block.items} tone="light" columns={2} />
+              <Reveal delay={100}>
+                <CheckList items={block.items} tone="light" columns={2} />
+              </Reveal>
             ) : null}
 
             {block.screenshot ? (

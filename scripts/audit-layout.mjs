@@ -114,6 +114,16 @@ async function prepararPagina(page) {
       timeout: 20000,
     })
     .catch(() => {});
+
+  // Força o fim das animações de entrada. Sem isso, elementos ainda em
+  // transição ficam com opacidade baixa e escapam da checagem de contraste —
+  // o teste passaria por não ter olhado, e não por estar tudo certo.
+  await page.evaluate(() => {
+    for (const node of document.querySelectorAll("[data-reveal]")) {
+      node.classList.add("is-visible");
+    }
+  });
+  await page.waitForTimeout(850);
 }
 
 async function checarOverflow(page, rotulo) {
@@ -141,6 +151,10 @@ async function checarOverflow(page, rotulo) {
 async function checarImagens(page, rotulo) {
   const quebradas = await page.evaluate(() =>
     Array.from(document.images)
+      // Imagem escondida por breakpoint (display:none) não é baixada pelo
+      // navegador, e isso é o comportamento certo — só interessa o que o
+      // visitante daquela largura realmente enxerga.
+      .filter((image) => image.getClientRects().length > 0)
       .filter((image) => !image.complete || image.naturalWidth === 0)
       .map((image) => image.getAttribute("src")),
   );
@@ -241,6 +255,13 @@ async function main() {
       /* ---------- página principal ---------- */
 
       await page.goto(`${BASE}/`, { waitUntil: "load", timeout: 30000 });
+
+      // Primeira impressão: fotografa o topo antes de qualquer rolagem, com
+      // tempo para a animação de entrada terminar.
+      await page.evaluate(() => document.fonts.ready);
+      await page.waitForTimeout(2200);
+      await page.screenshot({ path: path.join(SHOT_DIR, `${viewport.name}.png`) });
+
       await prepararPagina(page);
 
       await checarOverflow(page, viewport.name);
@@ -273,10 +294,12 @@ async function main() {
 
       await page.evaluate(() => {
         if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+        // Instantâneo: `scroll-behavior: smooth` deixaria a rolagem em curso
+        // quando a próxima captura acontecesse.
+        document.documentElement.style.scrollBehavior = "auto";
         window.scrollTo(0, 0);
       });
-      await page.waitForTimeout(300);
-      await page.screenshot({ path: path.join(SHOT_DIR, `${viewport.name}.png`) });
+      await page.waitForTimeout(400);
 
       // Uma imagem por seção, só na resolução mais larga. Captura de página
       // inteira não serve aqui: a página passa de 20.000px e o Chrome costura

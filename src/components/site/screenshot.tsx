@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { Reveal } from "@/components/motion/motion";
 import sizes from "@/content/screenshot-sizes.json";
 
 /**
@@ -24,7 +25,10 @@ export function Screenshot({
 
   return (
     <figure className="mt-10">
-      <div
+      {/* A captura é descoberta de cima para baixo, como um documento saindo
+          da impressora — combina com o que a imagem mostra. */}
+      <Reveal
+        variant="wipe"
         className={`overflow-hidden rounded-lg border ${
           tone === "dark" ? "border-ink-700 bg-ink-900" : "border-fog-200 bg-white"
         } p-1.5`}
@@ -37,7 +41,7 @@ export function Screenshot({
           sizes="(max-width: 1024px) 100vw, 1024px"
           className="w-full rounded border border-fog-200"
         />
-      </div>
+      </Reveal>
       <figcaption
         className={`mt-3 flex gap-2.5 border-l-2 border-brand-500 pl-3 text-[13px] leading-relaxed ${
           tone === "dark" ? "text-fog-500" : "text-fog-600"

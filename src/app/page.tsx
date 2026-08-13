@@ -1,6 +1,8 @@
+import { ScrollProgress } from "@/components/motion/motion";
 import { Faq, FinalCta } from "@/components/sections/fim";
+import { JourneyScroll } from "@/components/sections/journey-scroll";
 import { Implementation, SecurityTeaser } from "@/components/sections/operacao";
-import { AreasIndex, DemoSection, Journey } from "@/components/sections/produto";
+import { AreasIndex, DemoSection } from "@/components/sections/produto";
 import { BenefitStrip, Hero, Problems } from "@/components/sections/topo";
 import { Footer } from "@/components/site/footer";
 import { Header } from "@/components/site/header";
@@ -97,6 +99,7 @@ export default function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
+      <ScrollProgress />
       <Header />
       <main id="conteudo">
         <Hero />
@@ -104,7 +107,7 @@ export default function Home() {
         {/* O demo é o ativo mais forte da página: vem antes do argumento. */}
         <DemoSection />
         <Problems />
-        <Journey />
+        <JourneyScroll />
         <AreasIndex />
         <SecurityTeaser />
         <Implementation />

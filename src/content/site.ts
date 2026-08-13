@@ -121,26 +121,34 @@ export const journey = {
     {
       name: "Entrada do lead",
       description:
-        "As planilhas do Google Sheets ficam conectadas por empresa, e a importação traz somente as linhas novas. O supervisor distribui manual ou igualmente, e o lead vira cadastro de cliente já no nome do consultor responsável.",
+        "As planilhas do Google Sheets ficam conectadas, e a importação traz somente as linhas novas. O supervisor distribui manual ou igualmente, e o lead vira cadastro de cliente já no nome do consultor responsável.",
       href: "/comercial",
+      screenshot: "distribuicao-leads",
+      alt: "Tela de distribuição de leads com linhas novas importadas e carga por consultor",
     },
     {
       name: "Pré-venda e negociação",
       description:
-        "A pré-venda anda pelo pipeline com o motivo de cada mudança registrado. Quando o caso pede, uma simulação de veículo, imóvel ou empréstimo gera o relatório em PDF e a imagem-resumo na hora, e os documentos saem de template com numeração própria.",
+        "A pré-venda anda pelo pipeline com o motivo de cada mudança registrado. Quando o caso pede, a simulação gera o relatório em PDF e a imagem-resumo na hora, e os documentos saem de template com numeração própria.",
       href: "/comercial",
+      screenshot: "pipeline",
+      alt: "Pipeline comercial em Kanban com valor somado por etapa",
     },
     {
       name: "Jurídico",
       description:
-        "Aprovado, o cliente entra na esteira sem recadastro, com o histórico junto. O jurídico controla etapa, documento esperado, responsável, e-mail e cobrança — e o que for liberado aparece no portal de acompanhamento do cliente.",
+        "Aprovado, o cliente entra na esteira sem recadastro, com o histórico junto. O jurídico controla etapa, documento esperado, responsável, e-mail e cobrança — e o que for liberado aparece no portal do cliente.",
       href: "/juridico",
+      screenshot: "esteira-juridica",
+      alt: "Esteira jurídica com etapas configuráveis e documentos esperados",
     },
     {
       name: "Gestão",
       description:
         "Metas, comissões, caixa, produtividade e histórico se consolidam a partir do que a equipe já registrou, sem ninguém parar para alimentar relatório.",
       href: "/financeiro",
+      screenshot: "painel-comercial",
+      alt: "Painel comercial com meta, vendas, comissão e ranking de consultores",
     },
   ],
 };
