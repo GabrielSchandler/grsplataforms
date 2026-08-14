@@ -19,6 +19,13 @@ export type AreaBlock = {
 export type Area = {
   slug: string;
   navLabel: string;
+  /**
+   * Réplica navegável embutida na página: o visitante entra na área e clica
+   * pelas telas dela. Quando existe, as capturas estáticas daquelas mesmas
+   * telas saem dos blocos — seria mostrar duas vezes a mesma coisa, e a
+   * segunda vez pesando no carregamento.
+   */
+  demo?: { workspace: "Comercial" | "Jurídico" | "Financeiro" | "Academy" | "Gestão"; inicial: string; legenda: string };
   /** Rótulo curto para o índice na home. */
   cardTitle: string;
   cardDescription: string;
@@ -36,6 +43,12 @@ export const areas: readonly Area[] = [
   {
     slug: "comercial",
     navLabel: "Comercial",
+    demo: {
+      workspace: "Comercial",
+      inicial: "Painel comercial",
+      legenda:
+        "Navegue pela área comercial: painel, distribuição de leads, cliente, pipeline, simulação e documentos.",
+    },
     cardTitle: "Comercial",
     cardDescription:
       "Do lead da planilha ao contrato assinado: distribuição, pipeline, simulação e documento.",
@@ -51,12 +64,6 @@ export const areas: readonly Area[] = [
         title: "Distribuição de leads sem duplicar ninguém",
         paragraph:
           "Cada empresa liga as próprias planilhas do Google Sheets como fonte. O sistema confere o que já entrou e importa somente as linhas novas, então rodar a importação duas vezes não cria cliente repetido. O supervisor distribui manualmente ou divide em partes iguais entre os consultores disponíveis, e o lead distribuído vira cadastro já no nome do responsável.",
-        screenshot: {
-          id: "distribuicao-leads",
-          alt: "Tela de distribuição de leads, mostrando linhas novas importadas e carga por consultor",
-          caption:
-            "A contagem de linhas ignoradas é o que prova a importação incremental: rodar de novo não recria ninguém.",
-        },
       },
       {
         title: "Pipeline com o motivo de cada movimento",
@@ -69,12 +76,6 @@ export const areas: readonly Area[] = [
           "Pagamentos previstos e pagos vinculados à pré-venda",
           "Alerta de cobrança pelo que está previsto e não entrou",
         ],
-        screenshot: {
-          id: "pipeline",
-          alt: "Pipeline comercial em Kanban, com colunas de etapa e cards de pré-venda",
-          caption:
-            "O valor somado aparece na própria coluna, então o supervisor lê o funil sem abrir relatório.",
-        },
       },
       {
         title: "Um cadastro por cliente, com tudo dentro",
@@ -85,12 +86,6 @@ export const areas: readonly Area[] = [
           "Upload múltiplo de documento, imagem, áudio WAV, DOCX, PDF e e-mail MSG",
           "Linha do tempo alimentada por cada ação registrada, com autor e data",
         ],
-        screenshot: {
-          id: "cliente",
-          alt: "Cadastro de cliente dividido em abas, exibindo a linha do tempo",
-          caption:
-            "A linha do tempo se alimenta sozinha: mudança de etapa, documento anexado e simulação entram com autor e data.",
-        },
       },
       {
         title: "Simulação feita na tela, em três tipos de contrato",
@@ -102,12 +97,6 @@ export const areas: readonly Area[] = [
           "Importação dos dados da anotação interna da Totalk pelo telefone",
           "Numeração de protocolo própria por simulação",
         ],
-        screenshot: {
-          id: "simulacao",
-          alt: "Tela de simulação revisional com redução ajustável e arquivos gerados",
-          caption:
-            "O protocolo da simulação é aplicado aos dois arquivos, o que permite achar o cálculo meses depois.",
-        },
       },
       {
         title: "O sistema produz a análise. Ninguém monta arquivo à mão.",
@@ -155,12 +144,6 @@ export const areas: readonly Area[] = [
           "Origem do lead e produto vendido",
           "Produtividade das simulações",
         ],
-        screenshot: {
-          id: "painel-comercial",
-          alt: "Painel comercial com meta, vendas, comissão, ranking de consultores e origem do lead",
-          caption:
-            "Meta, comissão e ranking saem do que já foi registrado na operação, sem digitação paralela.",
-        },
       },
     ],
     faq: [
@@ -186,6 +169,12 @@ export const areas: readonly Area[] = [
   {
     slug: "juridico",
     navLabel: "Jurídico",
+    demo: {
+      workspace: "Jurídico",
+      inicial: "Esteira",
+      legenda:
+        "Navegue pela área jurídica: esteira, cliente, pré-vendas e documentos.",
+    },
     cardTitle: "Jurídico",
     cardDescription:
       "Esteira que você desenha, com documentos esperados por etapa e portal para o cliente.",
@@ -208,12 +197,6 @@ export const areas: readonly Area[] = [
           "Filtros por responsável, consultor e situação",
           "Inativação e distrato tratados sem apagar histórico",
         ],
-        screenshot: {
-          id: "esteira-juridica",
-          alt: "Esteira jurídica em colunas configuráveis, com documentos esperados por etapa",
-          caption:
-            "Exemplo de configuração. Cada coluna declara o que espera receber, e o card mostra responsável e tempo parado.",
-        },
       },
       {
         title: "E-mail sem sair do processo",
@@ -265,6 +248,11 @@ export const areas: readonly Area[] = [
   {
     slug: "financeiro",
     navLabel: "Financeiro",
+    demo: {
+      workspace: "Financeiro",
+      inicial: "Lançamentos",
+      legenda: "Navegue pela área financeira: lançamentos e consultas por período.",
+    },
     cardTitle: "Financeiro",
     cardDescription:
       "Entradas, saídas, chargebacks e comissões no mesmo lugar em que a venda foi registrada.",
@@ -287,12 +275,6 @@ export const areas: readonly Area[] = [
           "Consultas por intervalo de datas",
           "Histórico de alterações de cada lançamento",
         ],
-        screenshot: {
-          id: "financeiro",
-          alt: "Tela de lançamentos financeiros com entradas, saídas e chargebacks no período",
-          caption:
-            "Cada lançamento guarda o próprio histórico de alterações, então correção não apaga o que havia antes.",
-        },
       },
       {
         title: "Meta e comissão calculadas do que entrou",
@@ -370,6 +352,12 @@ export const areas: readonly Area[] = [
   {
     slug: "gestao",
     navLabel: "Gestão e segurança",
+    demo: {
+      workspace: "Gestão",
+      inicial: "Empresa",
+      legenda:
+        "Navegue pela gestão: configuração da empresa, usuários, painel, backups e logs de auditoria.",
+    },
     cardTitle: "Gestão e segurança",
     cardDescription:
       "Controle do seu ambiente: marca, usuários, módulos, permissões, backup e implantação.",
@@ -391,12 +379,6 @@ export const areas: readonly Area[] = [
           "E-mail Outlook e Backups",
           "Usuários contratados e armazenamento acompanhados pela sua equipe",
         ],
-        screenshot: {
-          id: "empresa",
-          alt: "Tela de configuração da empresa, com marca, usuários, armazenamento e módulos ativos",
-          caption:
-            "Módulo desligado desaparece da interface da equipe, em vez de virar convite para upgrade.",
-        },
       },
       {
         title: "O sistema leva a marca da sua empresa",

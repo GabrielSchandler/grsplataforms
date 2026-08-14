@@ -383,6 +383,118 @@ export const academy = {
 };
 
 /**
+ * Telas de apoio, com as mesmas colunas que existem no sistema.
+ *
+ * As colunas não foram inventadas: saíram das tabelas do próprio CRM
+ * (documentos, usuários, backups e logs). O que muda é só o conteúdo, que é
+ * fictício.
+ */
+export const documentos = {
+  filters: ["Todos os tipos", "Contrato", "Recibo", "Procuração", "Notificação"],
+  rows: [
+    {
+      title: "Contrato de prestação de serviços",
+      type: "Contrato",
+      client: "Tereza Aquino",
+      template: "Contrato padrão v4",
+      source: "Template",
+      status: "Gerado",
+      date: "12/08/2026",
+      author: "Marina Vasques",
+    },
+    {
+      title: "Recibo de honorários",
+      type: "Recibo",
+      client: "Jorge Menegatti",
+      template: "Recibo simples",
+      source: "Template",
+      status: "Gerado",
+      date: "11/08/2026",
+      author: "Rafael Otoni",
+    },
+    {
+      title: "Procuração ad judicia",
+      type: "Procuração",
+      client: "Ademir Fontoura",
+      template: "Procuração v2",
+      source: "Template",
+      status: "Assinado",
+      date: "09/08/2026",
+      author: "Dra. Helena Prates",
+    },
+    {
+      title: "contrato-financiamento.pdf",
+      type: "Documento do cliente",
+      client: "Cleusa Andrade",
+      template: "—",
+      source: "Upload",
+      status: "Recebido",
+      date: "09/08/2026",
+      author: "Diego Antunes",
+    },
+    {
+      title: "Notificação extrajudicial",
+      type: "Notificação",
+      client: "Wilson Prata",
+      template: "Notificação banco",
+      source: "Template",
+      status: "Enviado",
+      date: "05/08/2026",
+      author: "Dr. Caio Sobral",
+    },
+  ],
+};
+
+export const usuarios = {
+  rows: [
+    { name: "Marina Vasques", nick: "Marina", login: "marina.v", phone: "(11) 90000-0011", area: "Comercial", goal: "R$ 45.000", role: "Consultora", active: true },
+    { name: "Rafael Otoni", nick: "Rafa", login: "rafael.o", phone: "(11) 90000-0012", area: "Comercial", goal: "R$ 40.000", role: "Consultor", active: true },
+    { name: "Camila Prado", nick: "Cah", login: "camila.p", phone: "(11) 90000-0013", area: "Comercial", goal: "R$ 35.000", role: "Consultora", active: true },
+    { name: "Helena Prates", nick: "Dra. Helena", login: "helena.p", phone: "(11) 90000-0021", area: "Jurídico", goal: "—", role: "Advogada", active: true },
+    { name: "Caio Sobral", nick: "Dr. Caio", login: "caio.s", phone: "(11) 90000-0022", area: "Jurídico", goal: "—", role: "Advogado", active: true },
+    { name: "Sônia Rebelo", nick: "Sônia", login: "sonia.r", phone: "(11) 90000-0031", area: "Financeiro", goal: "—", role: "Analista", active: false },
+  ],
+};
+
+export const backups = {
+  rows: [
+    { name: "backup-2026-08-12", origin: "Automático", status: "Concluído", size: "412 MB", created: "12/08 · 00:10", expires: "19/08" },
+    { name: "backup-2026-08-11", origin: "Automático", status: "Concluído", size: "409 MB", created: "11/08 · 00:10", expires: "18/08" },
+    { name: "backup-2026-08-10", origin: "Manual", status: "Concluído", size: "408 MB", created: "10/08 · 15:42", expires: "17/08" },
+    { name: "backup-2026-08-09", origin: "Automático", status: "Concluído", size: "405 MB", created: "09/08 · 00:10", expires: "16/08" },
+    { name: "backup-2026-08-08", origin: "Automático", status: "Concluído", size: "401 MB", created: "08/08 · 00:10", expires: "15/08" },
+  ],
+  note: "Cópia completa gerada todo dia às 00:10 e guardada fora do banco de dados.",
+};
+
+export const logs = {
+  rows: [
+    { date: "12/08 · 14:32", user: "Diego Antunes", action: "simulation.created", entity: "Simulação", record: "SIM-2026-00318", detail: "Imóvel · redução 18%" },
+    { date: "12/08 · 11:07", user: "Diego Antunes", action: "document.uploaded", entity: "Documento", record: "DOC-4471", detail: "contrato-financiamento.pdf" },
+    { date: "12/08 · 09:12", user: "Sistema", action: "leads.imported", entity: "Lead", record: "lote 2026-08-12", detail: "24 novos · 61 ignorados" },
+    { date: "11/08 · 16:48", user: "Marina Vasques", action: "presale.stage_changed", entity: "Pré-venda", record: "PV-2211", detail: "Novo contato → Em negociação" },
+    { date: "11/08 · 10:20", user: "Ana Prado", action: "company.logo_uploaded", entity: "Empresa", record: "Ativa Assessoria", detail: "Logo substituída" },
+    { date: "11/08 · 00:10", user: "Sistema", action: "backup.completed", entity: "Backup", record: "backup-2026-08-11", detail: "409 MB · expira em 18/08" },
+  ],
+};
+
+export const consultas = {
+  period: "01/07/2026 a 12/08/2026",
+  totals: [
+    { label: "Entradas no período", value: "R$ 318.240", tone: "positive" as const },
+    { label: "Saídas no período", value: "R$ 106.870", tone: "negative" as const },
+    { label: "Resultado", value: "R$ 211.370" },
+    { label: "Lançamentos", value: "212" },
+  ],
+  byCategory: [
+    { label: "Venda", value: "R$ 296.400", share: 100 },
+    { label: "Comissão", value: "R$ 74.100", share: 25 },
+    { label: "Custo fixo", value: "R$ 24.360", share: 8 },
+    { label: "Chargeback", value: "R$ 8.410", share: 3 },
+  ],
+};
+
+/**
  * Configuração da empresa que usa o sistema — o ambiente é dela, e quem
  * administra é ela. A tela mostra o que o administrador do cliente controla
  * sozinho: marca, usuários, armazenamento e quais módulos ficam ligados.

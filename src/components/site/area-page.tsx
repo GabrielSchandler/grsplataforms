@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, ArrowUpRight, Plus } from "lucide-react";
+import { AppDemo } from "@/components/demo/app-demo";
 import { areas, type Area } from "@/content/areas";
 import { Reveal, ScrollProgress } from "@/components/motion/motion";
 import { Footer } from "@/components/site/footer";
@@ -123,6 +124,26 @@ export function AreaPage({ area }: { area: Area }) {
             </div>
           </div>
         </section>
+
+        {/* Réplica navegável da área: o visitante clica pelas telas antes de
+            ler qualquer argumento. */}
+        {area.demo ? (
+          <Section id="demonstrativo" tone="panel">
+            <Reveal>
+              <Eyebrow>Ambiente demonstrativo</Eyebrow>
+              <SectionTitle className="max-w-3xl">
+                Use a área {area.navLabel.toLowerCase()} aqui mesmo.
+              </SectionTitle>
+            </Reveal>
+            <Reveal delay={120} className="mt-10">
+              <AppDemo
+                workspace={area.demo.workspace}
+                inicial={area.demo.inicial}
+                legenda={area.demo.legenda}
+              />
+            </Reveal>
+          </Section>
+        ) : null}
 
         {/* Blocos de conteúdo, alternando fundo para quebrar a monotonia */}
         {area.blocks.map((block, index) => (

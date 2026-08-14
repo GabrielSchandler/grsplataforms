@@ -1,3 +1,6 @@
+"use client";
+
+import { createContext, useContext } from "react";
 import {
   BarChart3,
   Building2,
@@ -46,7 +49,13 @@ export type NavItem = { label: string; icon: keyof typeof icons };
 
 export type Workspace = "Comercial" | "Jurídico" | "Financeiro" | "Academy" | "Gestão";
 
-/** Navegação por área, espelhando o filtro por workspace do sistema. */
+/**
+ * Navegação por área, espelhando o filtro por workspace do sistema.
+ *
+ * A lista traz apenas itens que têm tela construída: dentro do demo todos são
+ * clicáveis, e item de menu que não leva a lugar nenhum frustra mais do que
+ * a lista curta incomoda.
+ */
 export const workspaceNav: Record<Workspace, NavItem[]> = {
   Comercial: [
     { label: "Painel comercial", icon: "dashboard" },
@@ -55,15 +64,12 @@ export const workspaceNav: Record<Workspace, NavItem[]> = {
     { label: "Pré-vendas", icon: "preSales" },
     { label: "Simulações", icon: "calculations" },
     { label: "Documentos", icon: "documents" },
-    { label: "Academy", icon: "academy" },
   ],
   "Jurídico": [
     { label: "Esteira", icon: "legal" },
     { label: "Clientes", icon: "clients" },
     { label: "Pré-vendas", icon: "preSales" },
     { label: "Documentos", icon: "documents" },
-    { label: "Integrações", icon: "integrations" },
-    { label: "Academy", icon: "academy" },
   ],
   Financeiro: [
     { label: "Lançamentos", icon: "finance" },
@@ -72,15 +78,25 @@ export const workspaceNav: Record<Workspace, NavItem[]> = {
   Academy: [{ label: "Academy", icon: "academy" }],
   "Gestão": [
     { label: "Painel comercial", icon: "dashboard" },
-    { label: "Contratos", icon: "contracts" },
     { label: "Usuários", icon: "users" },
     { label: "Empresa", icon: "company" },
-    { label: "Templates", icon: "documents" },
-    { label: "Integrações", icon: "integrations" },
     { label: "Backups", icon: "backups" },
     { label: "Logs", icon: "logs" },
   ],
 };
+
+/**
+ * Quando a réplica está dentro de um demo navegável, o contexto assume a área
+ * e o item ativo, e entrega o clique. Sem contexto — nas capturas de imagem —
+ * a barra lateral continua estática, como uma fotografia.
+ */
+type DemoNav = {
+  workspace?: Workspace;
+  active?: string;
+  onSelect?: (label: string) => void;
+};
+
+export const DemoNavContext = createContext<DemoNav>({});
 
 export function DemoBadge() {
   return (
@@ -102,7 +118,10 @@ type ScreenProps = {
 
 /** Casca completa: barra lateral + cabeçalho + área de conteúdo. */
 export function Screen({ workspace, active, title, subtitle, actions, children }: ScreenProps) {
-  const items = workspaceNav[workspace];
+  const nav = useContext(DemoNavContext);
+  const areaAtual = nav.workspace ?? workspace;
+  const itemAtivo = nav.active ?? active;
+  const items = workspaceNav[areaAtual];
 
   return (
     // data-demo marca a réplica do produto: ela reproduz o estilo do sistema
@@ -115,7 +134,7 @@ export function Screen({ workspace, active, title, subtitle, actions, children }
           </div>
           <div className="min-w-0">
             <p className="text-[11px] font-semibold uppercase tracking-wide text-teal-700">
-              {workspace}
+              {areaAtual}
             </p>
             <p className="mt-0.5 truncate text-base font-semibold text-slate-950">
               {demoCompany.tradeName}
@@ -133,21 +152,37 @@ export function Screen({ workspace, active, title, subtitle, actions, children }
         <nav className="mt-4 flex flex-1 flex-col gap-1">
           {items.map((item) => {
             const Icon = icons[item.icon];
-            const isActive = item.label === active;
+            const isActive = item.label === itemAtivo;
+            const classe = `inline-flex items-center gap-2.5 rounded-lg px-3 py-2 text-left text-[13px] font-medium transition-colors ${
+              isActive ? "bg-teal-50 text-teal-900" : "text-slate-700"
+            }`;
+            const icone = (
+              <Icon
+                aria-hidden="true"
+                className={`h-4 w-4 shrink-0 ${isActive ? "text-teal-800" : "text-teal-700"}`}
+              />
+            );
+
+            if (!nav.onSelect) {
+              return (
+                <span key={item.label} className={classe}>
+                  {icone}
+                  {item.label}
+                </span>
+              );
+            }
 
             return (
-              <span
+              <button
                 key={item.label}
-                className={`inline-flex items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] font-medium ${
-                  isActive ? "bg-teal-50 text-teal-900" : "text-slate-700"
-                }`}
+                type="button"
+                onClick={() => nav.onSelect?.(item.label)}
+                aria-current={isActive ? "page" : undefined}
+                className={`${classe} cursor-pointer hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-600`}
               >
-                <Icon
-                  aria-hidden="true"
-                  className={`h-4 w-4 ${isActive ? "text-teal-800" : "text-teal-700"}`}
-                />
+                {icone}
                 {item.label}
-              </span>
+              </button>
             );
           })}
         </nav>

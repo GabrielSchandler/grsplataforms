@@ -11,7 +11,14 @@ const eslintConfig = [
   ...compat.extends("next/core-web-vitals", "next/typescript"),
   {
     // next-env.d.ts é gerado pelo Next e não deve ser lintado.
-    ignores: [".next/**", "out/**", "node_modules/**", "scripts/**", "next-env.d.ts"],
+    ignores: [
+      ".next/**",
+      ".next-tooling/**",
+      "out/**",
+      "node_modules/**",
+      "scripts/**",
+      "next-env.d.ts",
+    ],
   },
 ];
 

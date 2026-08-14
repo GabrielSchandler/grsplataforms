@@ -8,7 +8,7 @@ import sizes from "@/content/screenshot-sizes.json";
  * defasada quando as telas são geradas de novo. Sem isso a página salta
  * enquanto as imagens carregam.
  */
-const dimensions: Record<string, { width: number; height: number }> = sizes;
+const dimensions: Record<string, { width: number; height: number; blur?: string }> = sizes;
 
 export function Screenshot({
   id,
@@ -39,6 +39,7 @@ export function Screenshot({
           width={dimension.width}
           height={dimension.height}
           sizes="(max-width: 1024px) 100vw, 1024px"
+          {...(dimension.blur ? { placeholder: "blur" as const, blurDataURL: dimension.blur } : {})}
           className="w-full rounded border border-fog-200"
         />
       </Reveal>

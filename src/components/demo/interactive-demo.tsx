@@ -1,7 +1,24 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { DemoNavContext } from "./chrome";
 import { demoScreens } from "./registry";
+
+/**
+ * A barra lateral da réplica também navega aqui, e não só nas páginas de
+ * área: sidebar clicável em um lugar e morta em outro confunde.
+ */
+const navParaTela: Record<string, string> = {
+  "Painel comercial": "painel-comercial",
+  "Distribuição de leads": "distribuicao-leads",
+  Clientes: "cliente",
+  "Pré-vendas": "pipeline",
+  "Simulações": "simulacao",
+  Esteira: "esteira-juridica",
+  "Lançamentos": "financeiro",
+  Academy: "academy",
+  Empresa: "empresa",
+};
 
 /**
  * Demo navegável embutido na página. Roda 100% no cliente, sem backend e
@@ -77,7 +94,16 @@ export function InteractiveDemo() {
         className="scroll-x mt-4 rounded-lg border border-ink-700 bg-ink-900 p-2"
       >
         <div className="min-w-[1040px] overflow-hidden rounded border border-slate-200">
-          <ActiveScreen />
+          <DemoNavContext.Provider
+            value={{
+              onSelect: (label) => {
+                const destino = navParaTela[label];
+                if (destino) setActiveId(destino);
+              },
+            }}
+          >
+            <ActiveScreen />
+          </DemoNavContext.Provider>
         </div>
       </div>
 

@@ -1,50 +1,42 @@
 {
-  "painel-comercial": {
-    "width": 2048,
-    "height": 1147
-  },
   "distribuicao-leads": {
     "width": 2048,
-    "height": 1002
+    "height": 1002,
+    "blur": "data:image/webp;base64,UklGRjQAAABXRUJQVlA4ICgAAAAwAQCdASoQAAgAA8BmJaQAA3AA/vITi93fl+WeGVMWmqqOda/BwAAA"
   },
   "pipeline": {
     "width": 2048,
-    "height": 995
-  },
-  "cliente": {
-    "width": 2048,
-    "height": 995
-  },
-  "simulacao": {
-    "width": 2048,
-    "height": 995
-  },
-  "relatorio-pdf": {
-    "width": 2048,
-    "height": 1837
-  },
-  "imagem-resumo": {
-    "width": 2048,
-    "height": 1534
+    "height": 995,
+    "blur": "data:image/webp;base64,UklGRjAAAABXRUJQVlA4ICQAAAAwAQCdASoQAAgAA8BmJaQAA3AA/vG/68BcDE/5Z4ZV7a0AAAA="
   },
   "esteira-juridica": {
     "width": 2048,
-    "height": 995
+    "height": 995,
+    "blur": "data:image/webp;base64,UklGRi4AAABXRUJQVlA4ICIAAAAwAQCdASoQAAgAA8BmJaQAA3AA/vG/6nW6Vy/hjKi8xgAA"
+  },
+  "painel-comercial": {
+    "width": 2048,
+    "height": 1147,
+    "blur": "data:image/webp;base64,UklGRjAAAABXRUJQVlA4ICQAAAAwAQCdASoQAAkAA8BmJZwAA3AA/vIKPZo3y/5Z4ZUxS3QQAAA="
+  },
+  "relatorio-pdf": {
+    "width": 2048,
+    "height": 1837,
+    "blur": "data:image/webp;base64,UklGRi4AAABXRUJQVlA4ICIAAAAwAQCdASoQAA4AA8BmJZwAA3AA/vEG9XQEhtcJfofZgQAA"
+  },
+  "imagem-resumo": {
+    "width": 2048,
+    "height": 1534,
+    "blur": "data:image/webp;base64,UklGRjQAAABXRUJQVlA4ICgAAACQAQCdASoQAAwAA8BmJZwAAud7W3AA/fB/PPfc3c2mwuhF6g9yW4AA"
   },
   "portal-cliente": {
     "width": 2048,
-    "height": 995
-  },
-  "financeiro": {
-    "width": 2048,
-    "height": 995
+    "height": 995,
+    "blur": "data:image/webp;base64,UklGRiYAAABXRUJQVlA4IBoAAAAwAQCdASoQAAgAA8BmJaQAA3AA/vHA4EoAAA=="
   },
   "academy": {
     "width": 2048,
-    "height": 995
-  },
-  "empresa": {
-    "width": 2048,
-    "height": 1125
+    "height": 995,
+    "blur": "data:image/webp;base64,UklGRjIAAABXRUJQVlA4ICYAAADQAQCdASoQAAgAA8BmJZwAAxfy7VZAAAD+8+3zODjv5/qgAAAAAA=="
   }
 }

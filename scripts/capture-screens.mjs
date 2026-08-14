@@ -26,19 +26,22 @@ const OUT_DIR = path.join(ROOT, "public", "img", "telas");
 const PUBLIC_DIR = path.join(ROOT, "public");
 const EXPORT_DIR = path.join(ROOT, "out");
 
+/**
+ * Só entram aqui as telas que aparecem como imagem em alguma página. As
+ * demais existem apenas dentro do demo navegável, onde são renderizadas ao
+ * vivo — gerar imagem delas seria peso no repositório sem nenhum uso.
+ */
 const screens = [
-  "painel-comercial",
+  // Jornada da home
   "distribuicao-leads",
   "pipeline",
-  "cliente",
-  "simulacao",
+  "esteira-juridica",
+  "painel-comercial",
+  // Páginas de área
   "relatorio-pdf",
   "imagem-resumo",
-  "esteira-juridica",
   "portal-cliente",
-  "financeiro",
   "academy",
-  "empresa",
 ];
 
 /** Chama o Next diretamente pelo Node — sem npx e sem shell intermediário. */
@@ -115,6 +118,16 @@ async function main() {
   console.log("Gerando build de captura (CAPTURE=1)...");
   nextBuild({ CAPTURE: "1" });
 
+  // Confere que o build de captura realmente exportou as rotas. Sem isso, a
+  // falha aparece lá na frente como "timeout esperando #alvo", que não diz
+  // nada sobre a causa.
+  const sonda = path.join(EXPORT_DIR, "capturas", screens[0], "index.html");
+  if (!(await stat(sonda).catch(() => null))) {
+    throw new Error(
+      `O build com CAPTURE=1 nao exportou ${sonda}. Verifique pageExtensions em next.config.ts.`,
+    );
+  }
+
   const server = await serveExport();
   console.log("Build servido em " + BASE + ". Abrindo o Chrome.\n");
 
@@ -137,7 +150,17 @@ async function main() {
       // A imagem aparece em no máximo ~1090px de largura; 2048 cobre telas
       // 2x sem carregar o dobro de bytes à toa.
       const info = await sharp(raw).resize({ width: 2048 }).webp({ quality: 80 }).toFile(file);
-      manifest[id] = { width: info.width, height: info.height };
+
+      // Miniatura de 16px embutida como base64: o navegador mostra o borrão
+      // no primeiro quadro e troca pela imagem quando ela chega, em vez de
+      // deixar um retângulo vazio e depois estourar o conteúdo na tela.
+      const borrao = await sharp(raw).resize({ width: 16 }).webp({ quality: 32 }).toBuffer();
+
+      manifest[id] = {
+        width: info.width,
+        height: info.height,
+        blur: `data:image/webp;base64,${borrao.toString("base64")}`,
+      };
 
       const { size } = await stat(file);
       console.log(`  ${id.padEnd(20)} ${(size / 1024).toFixed(0)} KB  ${info.width}x${info.height}`);

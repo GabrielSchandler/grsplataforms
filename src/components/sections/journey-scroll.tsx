@@ -9,7 +9,17 @@ import { Eyebrow, Lead, SectionTitle } from "@/components/site/primitives";
 import { journey } from "@/content/site";
 import tamanhos from "@/content/screenshot-sizes.json";
 
-const dimensoes: Record<string, { width: number; height: number }> = tamanhos;
+const dimensoes: Record<string, { width: number; height: number; blur?: string }> = tamanhos;
+
+/** Reserva de espaço e borrão de carregamento de cada tela. */
+function imagem(id: string) {
+  const dado = dimensoes[id] ?? { width: 2048, height: 995 };
+  return {
+    width: dado.width,
+    height: dado.height,
+    ...(dado.blur ? { placeholder: "blur" as const, blurDataURL: dado.blur } : {}),
+  };
+}
 
 /**
  * A jornada em rolagem guiada: o texto de cada fase passa pela coluna da
@@ -105,8 +115,7 @@ export function JourneyScroll() {
                     <Image
                       src={`/img/telas/${phase.screenshot}.webp`}
                       alt={phase.alt}
-                      width={dimensoes[phase.screenshot]?.width ?? 2048}
-                      height={dimensoes[phase.screenshot]?.height ?? 995}
+                      {...imagem(phase.screenshot)}
                       sizes="100vw"
                       className="w-full rounded"
                     />
@@ -125,8 +134,7 @@ export function JourneyScroll() {
                     key={phase.screenshot}
                     src={`/img/telas/${phase.screenshot}.webp`}
                     alt={phase.alt}
-                    width={dimensoes[phase.screenshot]?.width ?? 2048}
-                    height={dimensoes[phase.screenshot]?.height ?? 995}
+                    {...imagem(phase.screenshot)}
                     sizes="640px"
                     priority={index === 0}
                     className={`rounded transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${

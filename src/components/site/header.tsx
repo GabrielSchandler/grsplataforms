@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { hero, nav } from "@/content/site";
 import { CONTACT_ANCHOR, primaryCtaHref, siteConfig } from "@/lib/site-config";
@@ -9,6 +10,11 @@ import { CONTACT_ANCHOR, primaryCtaHref, siteConfig } from "@/lib/site-config";
 export function Header() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const pathname = usePathname();
+
+  // `trailingSlash` deixa o caminho como "/comercial/"; a comparação ignora
+  // a barra final para o item certo ficar marcado.
+  const atual = pathname?.replace(/\/$/, "") || "/";
 
   useEffect(() => {
     function onScroll() {
@@ -41,15 +47,28 @@ export function Header() {
         </Link>
 
         <nav aria-label="Páginas do site" className="hidden items-center gap-6 lg:flex">
-          {nav.links.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="text-sm font-medium text-fog-300 transition hover:text-white"
-            >
-              {link.label}
-            </Link>
-          ))}
+          {nav.links.map((link) => {
+            const ativo = link.href === atual;
+
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                aria-current={ativo ? "page" : undefined}
+                className={`relative text-sm font-medium transition-colors ${
+                  ativo ? "text-white" : "text-fog-300 hover:text-white"
+                }`}
+              >
+                {link.label}
+                <span
+                  aria-hidden="true"
+                  className={`absolute -bottom-1.5 left-0 h-px w-full origin-left bg-brand-500 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                    ativo ? "scale-x-100" : "scale-x-0"
+                  }`}
+                />
+              </Link>
+            );
+          })}
         </nav>
 
         <div className="flex items-center gap-3">
