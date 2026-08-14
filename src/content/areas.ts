@@ -25,7 +25,14 @@ export type Area = {
    * telas saem dos blocos — seria mostrar duas vezes a mesma coisa, e a
    * segunda vez pesando no carregamento.
    */
-  demo?: { workspace: "Comercial" | "Jurídico" | "Financeiro" | "Academy" | "Gestão"; inicial: string; legenda: string };
+  demo?: {
+    workspace: "Comercial" | "Jurídico" | "Financeiro" | "Academy" | "Gestão";
+    inicial: string;
+    /** Título da seção. Escrito à mão porque montar a frase a partir do
+     *  nome da área erra a concordância ("a área jurídico"). */
+    titulo: string;
+    legenda: string;
+  };
   /** Rótulo curto para o índice na home. */
   cardTitle: string;
   cardDescription: string;
@@ -46,8 +53,9 @@ export const areas: readonly Area[] = [
     demo: {
       workspace: "Comercial",
       inicial: "Painel comercial",
+      titulo: "Use a área comercial aqui mesmo.",
       legenda:
-        "Navegue pela área comercial: painel, distribuição de leads, cliente, pipeline, simulação e documentos.",
+        "Navegue pelo comercial: painel, distribuição de leads, clientes, pré-vendas, simulações e documentos.",
     },
     cardTitle: "Comercial",
     cardDescription:
@@ -172,6 +180,7 @@ export const areas: readonly Area[] = [
     demo: {
       workspace: "Jurídico",
       inicial: "Esteira",
+      titulo: "Use a área jurídica aqui mesmo.",
       legenda:
         "Navegue pela área jurídica: esteira, cliente, pré-vendas e documentos.",
     },
@@ -251,7 +260,8 @@ export const areas: readonly Area[] = [
     demo: {
       workspace: "Financeiro",
       inicial: "Lançamentos",
-      legenda: "Navegue pela área financeira: lançamentos e consultas por período.",
+      titulo: "Use o financeiro aqui mesmo.",
+      legenda: "Navegue pelo financeiro: lançamentos do período e consultas por intervalo.",
     },
     cardTitle: "Financeiro",
     cardDescription:
@@ -355,6 +365,7 @@ export const areas: readonly Area[] = [
     demo: {
       workspace: "Gestão",
       inicial: "Empresa",
+      titulo: "Use a gestão do seu ambiente aqui mesmo.",
       legenda:
         "Navegue pela gestão: configuração da empresa, usuários, painel, backups e logs de auditoria.",
     },

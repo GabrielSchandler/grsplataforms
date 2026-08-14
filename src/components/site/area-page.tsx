@@ -131,9 +131,7 @@ export function AreaPage({ area }: { area: Area }) {
           <Section id="demonstrativo" tone="panel">
             <Reveal>
               <Eyebrow>Ambiente demonstrativo</Eyebrow>
-              <SectionTitle className="max-w-3xl">
-                Use a área {area.navLabel.toLowerCase()} aqui mesmo.
-              </SectionTitle>
+              <SectionTitle className="max-w-3xl">{area.demo.titulo}</SectionTitle>
             </Reveal>
             <Reveal delay={120} className="mt-10">
               <AppDemo
