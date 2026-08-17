@@ -234,6 +234,23 @@
     animation: hero-rise 340ms var(--ease-out-quint) both;
   }
 
+  /* Entrada da legenda do tour: só deslocamento, sem mexer na opacidade.
+     Ela fica sobre a interface do sistema, e qualquer transparência —
+     mesmo por uma fração de segundo — deixa o texto disputando com o que
+     está atrás. */
+  .swap-slide {
+    animation: swap-slide 380ms var(--ease-out-quint) both;
+  }
+}
+
+@keyframes swap-slide {
+  from {
+    transform: translate3d(0, 10px, 0);
+  }
+  to {
+    transform: none;
+  }
+
   /* A tela entra pelo lado de onde veio: avançar vem da direita, voltar da
      esquerda. Sem direção, a troca parece um piscar sem sentido. */
   .slide-from-right {

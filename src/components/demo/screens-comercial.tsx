@@ -183,9 +183,15 @@ export function Pipeline() {
         </Button>
       }
     >
-      <div className="flex gap-3" data-tour="kanban">
-        {pipeline.columns.map((column) => (
-          <div key={column.title} className="flex w-56 shrink-0 flex-col">
+      <div className="flex gap-3">
+        {pipeline.columns.map((column, indice) => (
+          <div
+            key={column.title}
+            // O realce do tour pega uma coluna, não o quadro inteiro: é mais
+            // preciso e deixa área escura para a legenda.
+            data-tour={indice === 1 ? "kanban" : undefined}
+            className="flex w-56 shrink-0 flex-col"
+          >
             <div className="flex items-baseline justify-between gap-2 rounded-t-lg border border-b-0 border-slate-200 bg-white px-3 py-3">
               <h4 className="truncate text-[12px] font-semibold text-slate-950">{column.title}</h4>
               <span className="shrink-0 text-[11px] text-slate-500">{column.cards.length}</span>

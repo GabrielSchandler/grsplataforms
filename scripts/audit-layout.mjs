@@ -393,21 +393,28 @@ async function main() {
         if (await tour.count()) {
           // Pausa antes de medir: o tour anda sozinho, e um avanço automático
           // no meio do teste faria a contagem falhar sem haver defeito.
-          await page.locator("button:has(> span:text('Pausar o tour'))").first().click();
-          await page.waitForTimeout(200);
+          const pausar = page.getByRole("button", { name: "Pausar" }).first();
+          if (await pausar.count()) await pausar.click();
+          await page.waitForTimeout(250);
 
-          const passoAntes = Number(new URL(page.url()).searchParams.get("passo") ?? "1");
+          const contador = page.locator("#demonstrativo span").filter({ hasText: /^\d+\/14$/ });
+          const antes = Number((await contador.first().textContent())?.split("/")[0]);
           const tituloInicial = await page.locator("#demonstrativo h3").first().textContent();
 
           await tour.click();
-          await page.waitForTimeout(650);
+          await page.waitForTimeout(700);
 
-          const passoDepois = Number(new URL(page.url()).searchParams.get("passo"));
+          const depois = Number((await contador.first().textContent())?.split("/")[0]);
+          const passoNaUrl = Number(new URL(page.url()).searchParams.get("passo"));
           const tituloDepois = await page.locator("#demonstrativo h3").first().textContent();
 
           check(
-            passoDepois === passoAntes + 1,
-            `${viewport.name}: tour nao avancou na URL (${passoAntes} -> ${passoDepois})`,
+            depois === antes + 1,
+            `${viewport.name}: tour nao avancou a etapa (${antes} -> ${depois})`,
+          );
+          check(
+            passoNaUrl === depois,
+            `${viewport.name}: URL fora de sincronia com a etapa (url=${passoNaUrl}, etapa=${depois})`,
           );
           check(
             tituloInicial !== tituloDepois,

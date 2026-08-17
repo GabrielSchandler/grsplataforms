@@ -26,9 +26,13 @@ export function EsteiraJuridica() {
         </Button>
       }
     >
-      <div className="flex gap-3" data-tour="esteira-colunas">
-        {legalPipeline.columns.map((column) => (
-          <div key={column.title} className="flex w-56 shrink-0 flex-col">
+      <div className="flex gap-3">
+        {legalPipeline.columns.map((column, indice) => (
+          <div
+            key={column.title}
+            data-tour={indice === 1 ? "esteira-colunas" : undefined}
+            className="flex w-56 shrink-0 flex-col"
+          >
             <div className="rounded-t-lg border border-b-0 border-slate-200 bg-white px-3 py-2.5">
               <div className="flex items-center gap-2">
                 <span
