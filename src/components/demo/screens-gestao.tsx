@@ -150,7 +150,7 @@ export function Backups() {
     >
       <div className="grid grid-cols-3 gap-3">
         <Stat label="Último backup" value="Hoje · 00:10" tone="positive" />
-        <Stat label="Janela de restauração" value="7 dias" hint="Cada cópia expira sozinha" />
+        <Stat label="Janela de restauração" value="7 dias" hint="Neste ambiente demonstrativo" />
         <Stat label="Guardado em" value="Fora do banco" hint="Repositório privado separado" />
       </div>
 

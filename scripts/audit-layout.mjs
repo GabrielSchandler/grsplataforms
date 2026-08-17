@@ -18,7 +18,12 @@ import { chromium } from "playwright";
 const PORT = 4322;
 const BASE = `http://127.0.0.1:${PORT}`;
 const ROOT = process.cwd();
-const EXPORT_DIR = path.join(ROOT, "out");
+/**
+ * Com `distDir` customizado, o Next exporta o site para dentro da própria
+ * pasta de build — e não para `out/`. Auditar `out/` significaria validar um
+ * build antigo e passar por engano.
+ */
+const EXPORT_DIR = path.join(ROOT, ".next-tooling");
 const SHOT_DIR = path.join(ROOT, "reports", "layout");
 
 const viewports = [
@@ -234,15 +239,16 @@ async function checarContraste(page, rotulo) {
 async function main() {
   await mkdir(SHOT_DIR, { recursive: true });
 
-  if (!(await stat(EXPORT_DIR).catch(() => null))) {
-    console.log("Sem diretorio out/. Gerando build...");
-    execFileSync(
-      process.execPath,
-      [path.join(ROOT, "node_modules", "next", "dist", "bin", "next"), "build"],
-      // Constrói em .next-tooling para não atropelar um `npm run dev` aberto.
-      { stdio: "inherit", cwd: ROOT, env: { ...process.env, BUILD_TARGET: "tooling" } },
-    );
-  }
+  // Sempre reconstrói. Auditar um build que já estava no disco é o jeito mais
+  // fácil de passar por engano: o teste diz "tudo certo" sobre uma versão que
+  // não é a que está no código.
+  console.log("Gerando build para auditar...");
+  execFileSync(
+    process.execPath,
+    [path.join(ROOT, "node_modules", "next", "dist", "bin", "next"), "build"],
+    // Pasta própria: não atropela um `npm run dev` aberto.
+    { stdio: "ignore", cwd: ROOT, env: { ...process.env, CAPTURE: "", BUILD_TARGET: "tooling" } },
+  );
 
   const server = await serveExport();
   const browser = await chromium.launch({ channel: "chrome" });

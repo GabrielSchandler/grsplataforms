@@ -184,14 +184,11 @@ export function Pipeline() {
       <div className="flex gap-3">
         {pipeline.columns.map((column) => (
           <div key={column.title} className="flex w-56 shrink-0 flex-col">
-            <div className="flex items-baseline justify-between gap-2 rounded-t-lg border border-b-0 border-slate-200 bg-white px-3 py-2.5">
+            <div className="flex items-baseline justify-between gap-2 rounded-t-lg border border-b-0 border-slate-200 bg-white px-3 py-3">
               <h4 className="truncate text-[12px] font-semibold text-slate-950">{column.title}</h4>
               <span className="shrink-0 text-[11px] text-slate-500">{column.cards.length}</span>
             </div>
-            <div className="border-x border-slate-200 bg-white px-3 pb-2">
-              <p className="text-[11px] font-medium text-teal-700">{column.total}</p>
-            </div>
-            <div className="flex-1 space-y-2 rounded-b-lg border border-t-0 border-slate-200 bg-slate-50/60 p-2">
+            <div className="flex-1 space-y-2 rounded-b-lg border-x border-b border-slate-200 bg-slate-50/60 p-2">
               {column.cards.map((card) => (
                 <article
                   key={card.client}

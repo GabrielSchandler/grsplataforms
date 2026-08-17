@@ -79,11 +79,15 @@ export const leadDistribution = {
   ],
 };
 
+/**
+ * Pipeline. O sistema mostra o valor do contrato em cada card, mas **não**
+ * soma por coluna — conferido em `pre-sales-kanban.tsx`, que só formata o
+ * valor do card. A réplica não pode mostrar o que o produto não faz.
+ */
 export const pipeline = {
   columns: [
     {
       title: "Novo contato",
-      total: "R$ 18.400",
       cards: [
         { client: "Helena Marcondes", product: "Veículo", value: "R$ 4.800", owner: "MV", age: "1 dia" },
         { client: "Otávio Bittencourt", product: "Imóvel", value: "R$ 7.200", owner: "RO", age: "1 dia" },
@@ -92,7 +96,6 @@ export const pipeline = {
     },
     {
       title: "Em negociação",
-      total: "R$ 26.100",
       cards: [
         { client: "Fábio Tanaka", product: "Veículo", value: "R$ 5.900", owner: "MV", age: "4 dias" },
         { client: "Cleusa Andrade", product: "Imóvel", value: "R$ 12.400", owner: "DA", age: "6 dias" },
@@ -101,7 +104,6 @@ export const pipeline = {
     },
     {
       title: "Proposta enviada",
-      total: "R$ 21.700",
       cards: [
         { client: "Neusa Villar", product: "Empréstimo", value: "R$ 9.300", owner: "CP", age: "8 dias" },
         { client: "Ademir Fontoura", product: "Veículo", value: "R$ 12.400", owner: "MV", age: "5 dias" },
@@ -109,14 +111,12 @@ export const pipeline = {
     },
     {
       title: "Aguardando documentos",
-      total: "R$ 15.200",
       cards: [
         { client: "Sueli Barcelos", product: "Imóvel", value: "R$ 15.200", owner: "LN", age: "11 dias" },
       ],
     },
     {
       title: "Aprovado",
-      total: "R$ 33.900",
       cards: [
         { client: "Jorge Menegatti", product: "Veículo", value: "R$ 8.700", owner: "RO", age: "2 dias" },
         { client: "Tereza Aquino", product: "Imóvel", value: "R$ 25.200", owner: "MV", age: "1 dia" },
@@ -347,38 +347,41 @@ export const finance = {
   ],
 };
 
+/**
+ * Os dois cursos que existem de fato, conforme `src/lib/academy/course.ts`
+ * do CRM. A nota de corte 85 também vem de lá.
+ *
+ * Não inventar trilha de jurídico, financeiro ou supervisão: anunciar curso
+ * que não existe é promessa que o cliente cobra na primeira semana de uso.
+ */
 export const academy = {
+  passingScore: 85,
   tracks: [
     {
-      name: "Trilha do supervisor",
-      description: "Todas as funções do sistema, ponta a ponta.",
-      chapters: 14,
+      name: "Formação Comercial GRS",
+      description:
+        "Venda consultiva revisional: qualificação, simulação, objeções e fechamento.",
+      audience: "Consultores, supervisores e gestores que acompanham vendas.",
       progress: 86,
     },
     {
-      name: "Comercial — uso diário",
-      description: "Pipeline, pré-venda, simulação e documentos.",
-      chapters: 9,
+      name: "Operação do CRM GRS",
+      description:
+        "Uso profissional da plataforma: clientes, pré-vendas, simulações, documentos e jurídico.",
+      audience: "Usuários comerciais, jurídicos, financeiros e administradores em onboarding.",
       progress: 62,
-    },
-    {
-      name: "Jurídico — esteira e documentos",
-      description: "Etapas, anexos, e-mail e cobranças.",
-      chapters: 7,
-      progress: 41,
-    },
-    {
-      name: "Financeiro — lançamentos",
-      description: "Entradas, saídas, chargebacks e consultas.",
-      chapters: 5,
-      progress: 20,
     },
   ],
   team: [
-    { name: "Marina Vasques", track: "Comercial — uso diário", progress: 100, status: "Concluído" },
-    { name: "Rafael Otoni", track: "Comercial — uso diário", progress: 78, status: "Em andamento" },
-    { name: "Camila Prado", track: "Comercial — uso diário", progress: 55, status: "Em andamento" },
-    { name: "Diego Antunes", track: "Jurídico — esteira", progress: 33, status: "Em andamento" },
+    {
+      name: "Marina Vasques",
+      track: "Formação Comercial GRS",
+      progress: 100,
+      status: "Aprovada · 92",
+    },
+    { name: "Rafael Otoni", track: "Formação Comercial GRS", progress: 78, status: "Em andamento" },
+    { name: "Camila Prado", track: "Operação do CRM GRS", progress: 55, status: "Em andamento" },
+    { name: "Diego Antunes", track: "Operação do CRM GRS", progress: 33, status: "Em andamento" },
   ],
 };
 
@@ -464,7 +467,7 @@ export const backups = {
     { name: "backup-2026-08-09", origin: "Automático", status: "Concluído", size: "405 MB", created: "09/08 · 00:10", expires: "16/08" },
     { name: "backup-2026-08-08", origin: "Automático", status: "Concluído", size: "401 MB", created: "08/08 · 00:10", expires: "15/08" },
   ],
-  note: "Cópia completa gerada todo dia às 00:10 e guardada fora do banco de dados.",
+  note: "Rotina deste ambiente demonstrativo: cópia guardada fora do banco de dados.",
 };
 
 export const logs = {

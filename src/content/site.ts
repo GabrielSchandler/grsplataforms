@@ -132,7 +132,7 @@ export const journey = {
         "A pré-venda anda pelo pipeline com o motivo de cada mudança registrado. Quando o caso pede, a simulação gera o relatório em PDF e a imagem-resumo na hora, e os documentos saem de template com numeração própria.",
       href: "/comercial",
       screenshot: "pipeline",
-      alt: "Pipeline comercial em Kanban com valor somado por etapa",
+      alt: "Pipeline comercial em Kanban, com o valor do contrato em cada card",
     },
     {
       name: "Jurídico",
@@ -157,7 +157,7 @@ export const areasIndex = {
   eyebrow: "As cinco áreas",
   title: "O site tem a mesma divisão que o sistema.",
   intro:
-    "Cada área é um conjunto de módulos, e você escolhe quais entram no seu ambiente. Entre na que interessa para a sua operação — o que não é contratado nem aparece na barra lateral da equipe.",
+    "Cada área é um conjunto de módulos, configurados conforme o pacote contratado. Entre na que interessa para a sua operação — o que não faz parte do pacote nem aparece na barra lateral da equipe.",
 };
 
 export const securityTeaser = {
@@ -171,8 +171,9 @@ export const securityTeaser = {
       description: "Isolamento aplicado no banco de dados, não somente na tela.",
     },
     {
-      title: "Backup diário automático",
-      description: "Cópia completa guardada fora do banco, com sete dias de restauração.",
+      title: "Backup e restauração",
+      description:
+        "Rotinas de cópia e restauração conforme a configuração do ambiente e do pacote contratado.",
     },
     {
       title: "Rastro de quem fez o quê",
@@ -207,7 +208,7 @@ export const implementation = {
     {
       title: "Treinamento e operação assistida",
       description:
-        "As videoaulas ficam na Academy dentro do sistema, com trilha do supervisor e trilha por setor.",
+        "As videoaulas ficam na Academy dentro do sistema: Formação Comercial GRS e Operação do CRM GRS.",
     },
   ],
   support: {

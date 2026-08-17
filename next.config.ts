@@ -9,8 +9,17 @@ const pageExtensions =
 
 // Os scripts de captura e auditoria rodam `next build` por conta própria. Se
 // escrevessem na mesma pasta que o `next dev`, derrubariam o servidor de
-// desenvolvimento no meio do trabalho — então eles constroem em outro lugar.
-const distDir = process.env.BUILD_TARGET === "tooling" ? ".next-tooling" : ".next";
+// desenvolvimento no meio do trabalho — então cada um constrói em outro lugar.
+//
+// Captura e auditoria também não podem dividir a mesma pasta: elas usam
+// `pageExtensions` diferentes, e o cache de uma faz a outra sair sem as rotas
+// de captura. Uma pasta por finalidade.
+const distDirPorAlvo: Record<string, string> = {
+  capture: ".next-capture",
+  tooling: ".next-tooling",
+};
+
+const distDir = distDirPorAlvo[process.env.BUILD_TARGET ?? ""] ?? ".next";
 
 const nextConfig: NextConfig = {
   output: "export",

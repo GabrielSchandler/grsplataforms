@@ -229,10 +229,13 @@ export function AcademyScreen() {
                     <div className="flex items-baseline justify-between gap-2">
                       <p className="truncate text-[13px] font-semibold text-slate-900">{track.name}</p>
                       <span className="shrink-0 text-[11px] text-slate-500">
-                        {track.chapters} capítulos
+                        nota mínima {academy.passingScore}
                       </span>
                     </div>
-                    <p className="mt-0.5 truncate text-[12px] text-slate-600">{track.description}</p>
+                    <p className="mt-0.5 text-[12px] leading-snug text-slate-600">
+                      {track.description}
+                    </p>
+                    <p className="mt-1 text-[11px] text-slate-400">{track.audience}</p>
                     <div className="mt-2 flex items-center gap-2">
                       <Bar value={track.progress} />
                       <span className="shrink-0 text-[11px] font-medium text-slate-700">
@@ -291,7 +294,7 @@ export function ConfiguracaoEmpresa() {
       workspace="Gestão"
       active="Empresa"
       title={companySettings.name}
-      subtitle="Configuração da empresa · administrada pela própria equipe"
+      subtitle="Configuração da empresa · módulos conforme o pacote contratado"
       actions={<Pill tone="teal">Ambiente ativo</Pill>}
     >
       <div className="grid grid-cols-3 gap-4">
@@ -385,7 +388,7 @@ export function ConfiguracaoEmpresa() {
           ))}
         </div>
         <p className="mt-4 border-t border-slate-100 pt-3 text-[12px] text-slate-600">
-          Módulo desligado não aparece na barra lateral da equipe.
+          Módulo fora do pacote não aparece na barra lateral da equipe.
         </p>
       </Panel>
     </Screen>

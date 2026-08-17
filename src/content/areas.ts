@@ -76,10 +76,10 @@ export const areas: readonly Area[] = [
       {
         title: "Pipeline com o motivo de cada movimento",
         paragraph:
-          "As pré-vendas ficam em Kanban, com o valor somado por etapa e o responsável em cada card. Toda mudança de etapa pede o motivo, o que transforma o funil em histórico consultável em vez de fotografia do momento.",
+          "As pré-vendas ficam em Kanban, com o valor do contrato e o responsável em cada card. Toda mudança de etapa pede o motivo, o que transforma o funil em histórico consultável em vez de fotografia do momento.",
         items: [
           "Filtro por consultor, origem e produto",
-          "Valor total visível por coluna",
+          "Valor do contrato visível em cada card",
           "Registro obrigatório do motivo em cada mudança",
           "Pagamentos previstos e pagos vinculados à pré-venda",
           "Alerta de cobrança pelo que está previsto e não entrou",
@@ -322,13 +322,13 @@ export const areas: readonly Area[] = [
       "O treinamento mora dentro do sistema, no mesmo lugar onde o trabalho acontece. Não é PDF que ninguém abre nem vídeo perdido em pasta compartilhada.",
     blocks: [
       {
-        title: "Duas trilhas, propósitos diferentes",
+        title: "Dois cursos, propósitos diferentes",
         paragraph:
-          "A trilha do supervisor cobre todas as funções do sistema, porque é ele quem cria os usuários e configura a operação. As trilhas por setor mostram o uso específico de cada equipe — o consultor não assiste aula de conciliação financeira.",
+          "A Formação Comercial GRS trata da venda consultiva revisional — qualificação, simulação, objeções e fechamento. A Operação do CRM GRS ensina a usar a plataforma: clientes, pré-vendas, simulações, documentos e jurídico. Os dois exigem nota mínima 85 para aprovação.",
         items: [
-          "Trilha do supervisor com todas as funções",
-          "Trilha por setor, com o uso específico de cada equipe",
-          "Capítulos, avaliações e conclusão registrada",
+          "Formação Comercial GRS, para quem vende e para quem acompanha vendas",
+          "Operação do CRM GRS, para o onboarding de qualquer área",
+          "Capítulos, avaliações com nota mínima 85 e conclusão registrada",
           "Painel de acompanhamento do progresso para a gestão",
         ],
         screenshot: {
@@ -348,7 +348,7 @@ export const areas: readonly Area[] = [
       {
         question: "O treinamento está incluído ou é contratado à parte?",
         answer:
-          "As videoaulas ficam dentro da própria plataforma, na Academy, com trilha do supervisor e trilha por setor. O formato e o que entra no pacote são definidos na proposta, depois do diagnóstico.",
+          "As videoaulas ficam dentro da própria plataforma, na Academy, nos cursos Formação Comercial GRS e Operação do CRM GRS. O que entra no pacote é definido na proposta, depois do diagnóstico.",
       },
       {
         question: "Consigo acompanhar quem já fez o treinamento?",
@@ -381,9 +381,9 @@ export const areas: readonly Area[] = [
       "Marca, usuários, permissões e quais módulos ficam ligados são decisões da sua equipe, tomadas dentro do sistema — sem abrir chamado e sem esperar ninguém.",
     blocks: [
       {
-        title: "Você decide o que fica ligado",
+        title: "O ambiente é montado conforme o seu pacote",
         paragraph:
-          "São onze módulos, e a sua empresa escolhe quais entram. O que não é contratado não fica cinza esperando upgrade: some da barra lateral, e a equipe não perde tempo com tela que não vai usar. Usuários contratados e limite de armazenamento também ficam visíveis para o administrador da sua equipe.",
+          "São onze módulos, configurados conforme o pacote contratado e definidos com o comercial. O que não faz parte do pacote não fica cinza esperando upgrade: some da barra lateral, e a equipe não perde tempo com tela que não vai usar. Usuários contratados e limite de armazenamento ficam visíveis para o administrador da sua equipe acompanhar.",
         items: [
           "Comercial, Jurídico, Financeiro, Simulações, Documentos e Templates",
           "Distribuição de leads, Portal do cliente e Academy",
@@ -411,8 +411,9 @@ export const areas: readonly Area[] = [
           "Permissão por função e departamento",
           "Log de auditoria com autor e data, mantido sem expiração automática",
           "Linha do tempo com o histórico de alterações de cada cliente",
-          "Backup completo gerado todo dia e guardado fora do banco de dados",
-          "Sete dias de janela de restauração, completa ou de um cliente específico",
+          "Rotinas de backup e restauração conforme a configuração do ambiente e do pacote contratado",
+          "Cópia guardada fora do banco de dados, em repositório privado separado",
+          "Restauração completa ou limitada a um cliente específico",
           "Tokens de e-mail e integrações guardados cifrados",
         ],
       },
@@ -431,7 +432,7 @@ export const areas: readonly Area[] = [
       {
         question: "E se alguém apagar algo por engano?",
         answer:
-          "Há backup completo gerado automaticamente todo dia e guardado fora do banco, com sete dias de janela de restauração. A restauração pode ser completa ou limitada a um cliente específico.",
+          "Há rotinas de backup e restauração, definidas conforme a configuração do ambiente e do pacote contratado. A cópia é guardada fora do banco de dados, e a restauração pode ser completa ou limitada a um cliente específico.",
       },
       {
         question: "O sistema fica com a marca da minha empresa?",
@@ -441,7 +442,7 @@ export const areas: readonly Area[] = [
       {
         question: "Consigo contratar só uma parte do sistema?",
         answer:
-          "Sim. São onze módulos, e você escolhe quais entram no seu ambiente. O que não foi contratado nem aparece na barra lateral da equipe.",
+          "Sim. Os módulos são configurados conforme o pacote contratado, definido com o comercial. O que não faz parte do pacote nem aparece na barra lateral da equipe.",
       },
     ],
     whatsappMessage:

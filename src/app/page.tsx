@@ -55,7 +55,7 @@ const structuredData = {
         "Portal de acompanhamento do cliente por CPF e protocolo",
         "Painel comercial e módulo financeiro",
         "Academy com trilhas de treinamento",
-        "Backup diário automático com restauração",
+        "Rotinas de backup e restauração conforme o ambiente contratado",
       ],
       offers: {
         "@type": "Offer",

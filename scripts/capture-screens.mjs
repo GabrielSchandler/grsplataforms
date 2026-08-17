@@ -24,7 +24,13 @@ const BASE = `http://127.0.0.1:${PORT}`;
 const ROOT = process.cwd();
 const OUT_DIR = path.join(ROOT, "public", "img", "telas");
 const PUBLIC_DIR = path.join(ROOT, "public");
-const EXPORT_DIR = path.join(ROOT, "out");
+/**
+ * Com `distDir` customizado, o Next exporta o site para dentro da própria
+ * pasta de build — e não para `out/`. Servir `out/` aqui significaria
+ * fotografar um build antigo, então o servidor aponta para onde a exportação
+ * realmente caiu.
+ */
+const EXPORT_DIR = path.join(ROOT, ".next-capture");
 
 /**
  * Só entram aqui as telas que aparecem como imagem em alguma página. As
@@ -45,15 +51,21 @@ const screens = [
 ];
 
 /** Chama o Next diretamente pelo Node — sem npx e sem shell intermediário. */
-function nextBuild(env = {}) {
+function nextBuild({ capture = false } = {}) {
   execFileSync(
     process.execPath,
     [path.join(ROOT, "node_modules", "next", "dist", "bin", "next"), "build"],
     {
-      // BUILD_TARGET manda o Next construir em .next-tooling. Sem isso, este
-      // script derruba um `npm run dev` que esteja rodando, porque os dois
-      // escreveriam na mesma pasta .next.
-      env: { ...process.env, BUILD_TARGET: "tooling", ...env },
+      env: {
+        ...process.env,
+        // CAPTURE liga as rotas /capturas. Sempre explícito, para uma variável
+        // deixada no ambiente não vazar de um build para o outro.
+        CAPTURE: capture ? "1" : "",
+        // Cada finalidade tem a própria pasta de build: não derruba um
+        // `npm run dev` aberto, e o cache de um build não contamina o outro,
+        // que usa `pageExtensions` diferente.
+        BUILD_TARGET: capture ? "capture" : "tooling",
+      },
       stdio: "inherit",
       cwd: ROOT,
     },
@@ -116,7 +128,7 @@ async function main() {
   }
 
   console.log("Gerando build de captura (CAPTURE=1)...");
-  nextBuild({ CAPTURE: "1" });
+  nextBuild({ capture: true });
 
   // Confere que o build de captura realmente exportou as rotas. Sem isso, a
   // falha aparece lá na frente como "timeout esperando #alvo", que não diz
