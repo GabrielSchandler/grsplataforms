@@ -62,7 +62,7 @@ export const demoLabels = {
   eyebrow: "Ambiente demonstrativo",
   title: "Navegue pelo sistema aqui mesmo.",
   intro:
-    "As telas abaixo reproduzem a interface do sistema com dados fictícios. Troque de módulo para ver como cada área trabalha.",
+    "As telas abaixo reproduzem a interface do sistema, com dados fictícios. O tour guiado percorre o caminho completo de um cliente, do lead que cai na planilha ao número que a gestão lê no fim do mês. A exploração livre deixa você clicar por onde quiser.",
   badge: "Ambiente demonstrativo",
   note: "Nomes, CPFs e telefones são fictícios.",
   testAccess: {

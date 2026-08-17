@@ -340,6 +340,42 @@ async function main() {
         `${viewport.name}: primeiro Tab foi para "${firstFocus}" em vez do atalho de conteudo`,
       );
 
+      // Tour guiado: avançar muda a etapa e grava na URL; o voltar do
+      // navegador tem de desfazer. É a parte do demo que mais depende de
+      // estado, e a que quebra sem ninguém perceber.
+      if (viewport.width === 1440) {
+        const tour = page.locator("button", { hasText: "Próxima" }).first();
+
+        if (await tour.count()) {
+          const tituloInicial = await page.locator("#demonstrativo h3").first().textContent();
+
+          await tour.click();
+          await page.waitForTimeout(450);
+
+          const urlDepois = new URL(page.url());
+          const tituloDepois = await page.locator("#demonstrativo h3").first().textContent();
+
+          check(
+            urlDepois.searchParams.get("passo") === "2",
+            `${viewport.name}: tour nao gravou a etapa na URL (passo=${urlDepois.searchParams.get("passo")})`,
+          );
+          check(
+            tituloInicial !== tituloDepois,
+            `${viewport.name}: tour avancou mas o titulo da etapa nao mudou`,
+          );
+
+          await page.goBack();
+          await page.waitForTimeout(450);
+          const tituloVoltando = await page.locator("#demonstrativo h3").first().textContent();
+          check(
+            tituloVoltando === tituloInicial,
+            `${viewport.name}: voltar no navegador nao restaurou a etapa do tour`,
+          );
+        } else {
+          check(false, `${viewport.name}: botao do tour guiado nao encontrado`);
+        }
+      }
+
       // FAQ abre e fecha sem JavaScript.
       const faqWorks = await page.evaluate(() => {
         const item = document.querySelector("#perguntas details");

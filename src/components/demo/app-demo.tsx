@@ -1,11 +1,9 @@
 "use client";
 
-import { useState, type ComponentType } from "react";
+import { useState } from "react";
 import { MousePointerClick } from "lucide-react";
 import { DemoNavContext, type Workspace } from "./chrome";
-import { Documentos, Backups, Consultas, Logs, Usuarios } from "./screens-gestao";
-import { DistribuicaoLeads, PainelComercial, Pipeline, Simulacao, TelaCliente } from "./screens-comercial";
-import { AcademyScreen, ConfiguracaoEmpresa, EsteiraJuridica, Financeiro } from "./screens-operacao";
+import { navToScreen, screenMap } from "./screen-map";
 
 /**
  * Réplica navegável de uma área do sistema.
@@ -15,23 +13,6 @@ import { AcademyScreen, ConfiguracaoEmpresa, EsteiraJuridica, Financeiro } from 
  * Não há backend nem dado real por trás: são os mesmos componentes que geram
  * as imagens estáticas, alimentados por dados fictícios.
  */
-
-const telas: Record<string, ComponentType> = {
-  "Painel comercial": PainelComercial,
-  "Distribuição de leads": DistribuicaoLeads,
-  Clientes: TelaCliente,
-  "Pré-vendas": Pipeline,
-  "Simulações": Simulacao,
-  Documentos: Documentos,
-  Esteira: EsteiraJuridica,
-  "Lançamentos": Financeiro,
-  Consultas: Consultas,
-  Academy: AcademyScreen,
-  "Usuários": Usuarios,
-  Empresa: ConfiguracaoEmpresa,
-  Backups: Backups,
-  Logs: Logs,
-};
 
 export function AppDemo({
   workspace,
@@ -44,7 +25,8 @@ export function AppDemo({
   legenda?: string;
 }) {
   const [ativo, setAtivo] = useState(inicial);
-  const Tela = telas[ativo] ?? telas[inicial];
+  const idTela = navToScreen[ativo] ?? navToScreen[inicial];
+  const Tela = screenMap[idTela].component;
 
   return (
     <div>

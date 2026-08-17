@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
-import { InteractiveDemo } from "@/components/demo/interactive-demo";
+import { SystemDemo } from "@/components/demo/system-demo";
 import { Reveal } from "@/components/motion/motion";
 import { Eyebrow, Lead, Section, SectionTitle } from "@/components/site/primitives";
 import { areas } from "@/content/areas";
@@ -21,7 +21,7 @@ export function DemoSection() {
       </Reveal>
 
       <Reveal delay={120} className="mt-10">
-        <InteractiveDemo />
+        <SystemDemo />
       </Reveal>
 
       <Reveal delay={80}>

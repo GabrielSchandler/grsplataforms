@@ -3,22 +3,7 @@
 import { useRef, useState } from "react";
 import { DemoNavContext } from "./chrome";
 import { demoScreens } from "./registry";
-
-/**
- * A barra lateral da réplica também navega aqui, e não só nas páginas de
- * área: sidebar clicável em um lugar e morta em outro confunde.
- */
-const navParaTela: Record<string, string> = {
-  "Painel comercial": "painel-comercial",
-  "Distribuição de leads": "distribuicao-leads",
-  Clientes: "cliente",
-  "Pré-vendas": "pipeline",
-  "Simulações": "simulacao",
-  Esteira: "esteira-juridica",
-  "Lançamentos": "financeiro",
-  Academy: "academy",
-  Empresa: "empresa",
-};
+import { navToScreen } from "./screen-map";
 
 /**
  * Demo navegável embutido na página. Roda 100% no cliente, sem backend e
@@ -96,9 +81,13 @@ export function InteractiveDemo() {
         <div className="min-w-[1040px] overflow-hidden rounded border border-slate-200">
           <DemoNavContext.Provider
             value={{
+              // A barra lateral também navega aqui, e não só nas páginas de
+              // área: sidebar clicável em um lugar e morta em outro confunde.
               onSelect: (label) => {
-                const destino = navParaTela[label];
-                if (destino) setActiveId(destino);
+                const destino = navToScreen[label];
+                if (destino && demoScreens.some((tela) => tela.id === destino)) {
+                  setActiveId(destino);
+                }
               },
             }}
           >

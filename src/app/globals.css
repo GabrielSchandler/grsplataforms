@@ -228,6 +228,11 @@
     animation: hero-rise 460ms var(--ease-out-quint) both;
     animation-delay: var(--delay, 0ms);
   }
+
+  /* Troca de tela no tour: curta, só para o olho perceber que algo mudou. */
+  .swap-in {
+    animation: hero-rise 340ms var(--ease-out-quint) both;
+  }
 }
 @keyframes scene-in {
   from {
