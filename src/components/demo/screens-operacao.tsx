@@ -26,7 +26,7 @@ export function EsteiraJuridica() {
         </Button>
       }
     >
-      <div className="flex gap-3">
+      <div className="flex gap-3" data-tour="esteira-colunas">
         {legalPipeline.columns.map((column) => (
           <div key={column.title} className="flex w-56 shrink-0 flex-col">
             <div className="rounded-t-lg border border-b-0 border-slate-200 bg-white px-3 py-2.5">
@@ -120,7 +120,7 @@ export function PortalCliente() {
             <Pill tone="teal">{clientPortal.status}</Pill>
           </div>
 
-          <ol className="mt-5 space-y-4 border-l border-slate-200 pl-5">
+          <ol className="mt-5 space-y-4 border-l border-slate-200 pl-5" data-tour="portal-atualizacoes">
             {clientPortal.updates.map((update) => (
               <li key={update.when} className="relative">
                 <span
@@ -159,7 +159,7 @@ export function Financeiro() {
         </Button>
       }
     >
-      <div className="grid grid-cols-4 gap-3">
+      <div className="grid grid-cols-4 gap-3" data-tour="financeiro-stats">
         {finance.stats.map((stat) => (
           <Stat key={stat.label} {...stat} />
         ))}

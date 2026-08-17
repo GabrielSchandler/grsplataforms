@@ -233,6 +233,48 @@
   .swap-in {
     animation: hero-rise 340ms var(--ease-out-quint) both;
   }
+
+  /* A tela entra pelo lado de onde veio: avançar vem da direita, voltar da
+     esquerda. Sem direção, a troca parece um piscar sem sentido. */
+  .slide-from-right {
+    animation: slide-right 480ms var(--ease-out-quint) both;
+  }
+
+  .slide-from-left {
+    animation: slide-left 480ms var(--ease-out-quint) both;
+  }
+}
+
+@keyframes slide-right {
+  from {
+    opacity: 0;
+    transform: translate3d(3%, 0, 0) scale(0.995);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes slide-left {
+  from {
+    opacity: 0;
+    transform: translate3d(-3%, 0, 0) scale(0.995);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Barra de tempo do avanço automático do tour. */
+@keyframes tour-timer {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
 }
 @keyframes scene-in {
   from {

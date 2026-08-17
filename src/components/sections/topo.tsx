@@ -63,7 +63,9 @@ export function Hero() {
           </div>
         </div>
 
-        <div className="absolute inset-y-0 left-0 w-[40%] overflow-hidden">
+        {/* Varredura de luz: só no desktop. Em tela estreita ela não é
+            percebida e ainda empurrava a largura da página. */}
+        <div className="absolute inset-y-0 left-0 hidden w-[40%] overflow-hidden sm:block">
           <div className="scan-line h-full w-24 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
         </div>
       </div>

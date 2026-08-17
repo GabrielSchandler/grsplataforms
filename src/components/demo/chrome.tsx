@@ -219,14 +219,15 @@ export function Panel({
   hint,
   children,
   className = "",
+  ...rest
 }: {
   title?: string;
   hint?: string;
   children: React.ReactNode;
   className?: string;
-}) {
+} & React.HTMLAttributes<HTMLElement>) {
   return (
-    <section className={`rounded-lg border border-slate-200 bg-white ${className}`}>
+    <section {...rest} className={`rounded-lg border border-slate-200 bg-white ${className}`}>
       {title ? (
         <div className="flex items-baseline justify-between gap-3 border-b border-slate-100 px-4 py-3">
           <h4 className="text-[13px] font-semibold text-slate-950">{title}</h4>

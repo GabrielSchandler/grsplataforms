@@ -132,24 +132,63 @@ async function prepararPagina(page) {
 }
 
 async function checarOverflow(page, rotulo) {
-  const overflow = await page.evaluate(() => ({
-    scrollWidth: document.documentElement.scrollWidth,
-    innerWidth: window.innerWidth,
-    culprits: Array.from(document.querySelectorAll("body *"))
+  const overflow = await page.evaluate(() => {
+    // Duas medidas ruins foram descartadas aqui, e vale registrar por quê:
+    //
+    // - "a página rola para o lado" nunca dispara, porque o `body` tem
+    //   `overflow-x: hidden`. Seria um teste que passa sempre.
+    // - `documentElement.scrollWidth` acusa falso positivo, porque conta o
+    //   conteúdo largo por projeto dentro dos contêineres roláveis (a
+    //   réplica do sistema tem 1.040px de propósito).
+    //
+    // O que sobra e vale: existe algum elemento passando da janela sem ter
+    // um ancestral que role ou recorte? Se existe, é vazamento de verdade —
+    // e o `overflow-x: hidden` do body só estaria escondendo o defeito.
+    return {
+      scrollWidth: document.documentElement.scrollWidth,
+      innerWidth: window.innerWidth,
+    // Contêiner que deveria conter e não contém: conteúdo maior que a caixa,
+    // com overflow visível. É ele que empurra a página.
+    vazando: Array.from(document.querySelectorAll("body *"))
       .filter((element) => {
-        const rect = element.getBoundingClientRect();
-        if (rect.width === 0) return false;
-        // Conteúdo largo pode rolar dentro do próprio contêiner.
-        if (element.closest(".scroll-x")) return false;
-        return rect.right > window.innerWidth + 1 || rect.left < -1;
+        if (element.scrollWidth <= element.clientWidth + 1) return false;
+        return getComputedStyle(element).overflowX === "visible";
       })
-      .slice(0, 5)
-      .map((element) => `${element.tagName.toLowerCase()}.${element.className}`.slice(0, 90)),
-  }));
+      .slice(0, 4)
+      .map(
+        (element) =>
+          `${element.tagName.toLowerCase()}.${String(element.className).slice(0, 55)} (${element.clientWidth}->${element.scrollWidth})`,
+      ),
+    // Reporta também o que está dentro de contêiner rolável, marcando com
+    // [rolavel]. Um `.scroll-x` que não consegue encolher continua
+    // empurrando a página, e esconder isso da lista mascara a causa.
+    culprits: Array.from(document.querySelectorAll("body *"))
+      .map((element) => ({ element, rect: element.getBoundingClientRect() }))
+      .filter(({ rect }) => rect.width > 0 && rect.right > window.innerWidth + 1)
+      .sort((a, b) => b.rect.right - a.rect.right)
+      .slice(0, 6)
+      // Só interessa o que não tem ancestral capaz de rolar ou recortar: é
+      // esse que realmente empurra a largura da página.
+      .filter(({ element }) => {
+        let atual = element.parentElement;
+        while (atual && atual !== document.body) {
+          const overflow = getComputedStyle(atual).overflowX;
+          if (overflow === "auto" || overflow === "scroll" || overflow === "hidden") return false;
+          atual = atual.parentElement;
+        }
+        return true;
+      })
+      .slice(0, 6)
+      .map(({ element, rect }) => {
+        const classe = `${element.tagName.toLowerCase()}.${element.className}`.slice(0, 70);
+        return `${classe} (ate ${Math.round(rect.right)}px)`;
+      }),
+    };
+  });
 
   check(
-    overflow.scrollWidth <= overflow.innerWidth + 1,
-    `${rotulo}: overflow horizontal (${overflow.scrollWidth}px > ${overflow.innerWidth}px) — ${overflow.culprits.join(" | ")}`,
+    overflow.culprits.length === 0,
+    `${rotulo}: elemento passando da janela sem ancestral rolavel — ${overflow.culprits.join(" | ")}`,
   );
 }
 
@@ -212,6 +251,11 @@ async function checarContraste(page, rotulo) {
       const estilo = getComputedStyle(elemento);
       if (estilo.visibility === "hidden" || estilo.display === "none") continue;
       if (Number(estilo.opacity) < 0.95) continue;
+
+      // Texto só para leitor de tela (sr-only) fica recortado a 1px. Contraste
+      // ali não significa nada — ninguém enxerga aquilo.
+      const caixa = elemento.getBoundingClientRect();
+      if (caixa.width <= 1 || caixa.height <= 1) continue;
 
       const frente = paraRgb(estilo.color);
       if (!frente || frente.alpha < 0.95) continue;
@@ -347,17 +391,23 @@ async function main() {
         const tour = page.locator("button", { hasText: "Próxima" }).first();
 
         if (await tour.count()) {
+          // Pausa antes de medir: o tour anda sozinho, e um avanço automático
+          // no meio do teste faria a contagem falhar sem haver defeito.
+          await page.locator("button:has(> span:text('Pausar o tour'))").first().click();
+          await page.waitForTimeout(200);
+
+          const passoAntes = Number(new URL(page.url()).searchParams.get("passo") ?? "1");
           const tituloInicial = await page.locator("#demonstrativo h3").first().textContent();
 
           await tour.click();
-          await page.waitForTimeout(450);
+          await page.waitForTimeout(650);
 
-          const urlDepois = new URL(page.url());
+          const passoDepois = Number(new URL(page.url()).searchParams.get("passo"));
           const tituloDepois = await page.locator("#demonstrativo h3").first().textContent();
 
           check(
-            urlDepois.searchParams.get("passo") === "2",
-            `${viewport.name}: tour nao gravou a etapa na URL (passo=${urlDepois.searchParams.get("passo")})`,
+            passoDepois === passoAntes + 1,
+            `${viewport.name}: tour nao avancou na URL (${passoAntes} -> ${passoDepois})`,
           );
           check(
             tituloInicial !== tituloDepois,

@@ -46,7 +46,7 @@ export function Documentos() {
         ))}
       </div>
 
-      <Panel title="Documentos do período" hint="5 de 148">
+      <Panel title="Documentos do período" hint="5 de 148" data-tour="tabela-documentos">
         <table className="w-full border-collapse text-left">
           <thead>
             <tr className="border-b border-slate-100 text-[11px] uppercase tracking-wide text-slate-500">

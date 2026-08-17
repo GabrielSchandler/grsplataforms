@@ -16,7 +16,7 @@ export function PainelComercial() {
       title="Painel comercial"
       subtitle={commercialPanel.period}
     >
-      <div className="grid grid-cols-4 gap-3">
+      <div className="grid grid-cols-4 gap-3" data-tour="painel-stats">
         {commercialPanel.stats.map((stat) => (
           <Stat key={stat.label} {...stat} />
         ))}
@@ -98,11 +98,13 @@ export function DistribuicaoLeads() {
     >
       <div className="grid grid-cols-3 gap-3">
         <Stat label="Linhas novas importadas" value={String(leadDistribution.imported)} tone="positive" />
-        <Stat
-          label="Já existentes, ignoradas"
-          value={String(leadDistribution.ignored)}
-          hint="Importação incremental não duplica"
-        />
+        <div data-tour="importacao-incremental">
+          <Stat
+            label="Já existentes, ignoradas"
+            value={String(leadDistribution.ignored)}
+            hint="Importação incremental não duplica"
+          />
+        </div>
         <Stat label="Aguardando distribuição" value={String(leadDistribution.pending)} />
       </div>
 
@@ -144,7 +146,7 @@ export function DistribuicaoLeads() {
           </table>
         </Panel>
 
-        <Panel title="Carga por consultor" hint="Após distribuir">
+        <Panel title="Carga por consultor" hint="Após distribuir" data-tour="carga-consultor">
           <div className="space-y-3">
             {leadDistribution.workload.map((person) => (
               <div key={person.name} className="flex items-center justify-between gap-3">
@@ -181,7 +183,7 @@ export function Pipeline() {
         </Button>
       }
     >
-      <div className="flex gap-3">
+      <div className="flex gap-3" data-tour="kanban">
         {pipeline.columns.map((column) => (
           <div key={column.title} className="flex w-56 shrink-0 flex-col">
             <div className="flex items-baseline justify-between gap-2 rounded-t-lg border border-b-0 border-slate-200 bg-white px-3 py-3">
@@ -239,7 +241,7 @@ export function TelaCliente() {
         </div>
 
         <div className="grid grid-cols-3 gap-4 p-4">
-          <div className="col-span-2">
+          <div className="col-span-2" data-tour="linha-do-tempo">
             <ol className="relative space-y-4 border-l border-slate-200 pl-5">
               {clientRecord.timeline.map((event) => (
                 <li key={event.when} className="relative">
@@ -324,7 +326,7 @@ export function Simulacao() {
               </div>
             ))}
 
-            <div className="border-t border-slate-100 pt-3">
+            <div className="border-t border-slate-100 pt-3" data-tour="reducao">
               <div className="flex items-baseline justify-between gap-2">
                 <span className="text-[12px] font-medium text-slate-700">Redução aplicada</span>
                 <span className="text-[13px] font-semibold text-teal-700">{simulation.reduction}%</span>

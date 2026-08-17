@@ -77,7 +77,7 @@ export function ImagemResumo() {
           </span>
         </section>
 
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-3 gap-4" data-tour="cards-parcela">
           {[
             {
               label: "Parcela atual",
@@ -220,7 +220,10 @@ export function RelatorioPdf() {
           existir oportunidade de revisão e negociação do contrato.
         </p>
 
-        <div className="mt-7 rounded-lg border border-emerald-200 bg-emerald-50 px-6 py-5">
+        <div
+          data-tour="economia-total"
+          className="mt-7 rounded-lg border border-emerald-200 bg-emerald-50 px-6 py-5"
+        >
           <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-emerald-800">
             Economia total
           </p>
