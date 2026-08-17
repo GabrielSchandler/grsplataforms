@@ -69,22 +69,23 @@ export function Hero() {
       </div>
 
       <div className="relative mx-auto flex min-h-[94vh] w-full max-w-6xl flex-col justify-center px-5 pb-28 pt-32 sm:px-8 sm:pt-36">
+        {/* Cascata em CSS puro: nada aqui espera pelo JavaScript. */}
         <div className="max-w-xl lg:max-w-[34rem] xl:max-w-2xl">
-          <Reveal variant="up">
+          <div className="hero-in">
             <Eyebrow>{hero.eyebrow}</Eyebrow>
-          </Reveal>
+          </div>
 
-          <Reveal variant="rise" delay={90}>
+          <div className="hero-in" style={{ "--delay": "70ms" } as React.CSSProperties}>
             <h1 className="font-display mt-6 text-4xl leading-[1.05] font-semibold text-white sm:text-5xl lg:text-6xl">
               {hero.title}
             </h1>
-          </Reveal>
+          </div>
 
-          <Reveal variant="up" delay={200}>
+          <div className="hero-in" style={{ "--delay": "150ms" } as React.CSSProperties}>
             <p className="measure mt-6 text-lg leading-relaxed text-fog-300">{hero.subtitle}</p>
-          </Reveal>
+          </div>
 
-          <Reveal variant="up" delay={300}>
+          <div className="hero-in" style={{ "--delay": "220ms" } as React.CSSProperties}>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
               <a
                 href={ctaHref}
@@ -105,14 +106,14 @@ export function Hero() {
                 {hero.secondaryCta}
               </a>
             </div>
-          </Reveal>
+          </div>
 
-          <Reveal variant="up" delay={400}>
+          <div className="hero-in" style={{ "--delay": "290ms" } as React.CSSProperties}>
             <p className="mt-8 flex max-w-md items-start gap-2.5 text-[13px] leading-relaxed text-fog-500">
               <span aria-hidden="true" className="mt-[0.62em] h-px w-5 shrink-0 bg-brand-500" />
               {hero.trustLine}
             </p>
-          </Reveal>
+          </div>
         </div>
       </div>
 

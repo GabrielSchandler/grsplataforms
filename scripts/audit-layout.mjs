@@ -254,6 +254,56 @@ async function main() {
   const browser = await chromium.launch({ channel: "chrome" });
 
   try {
+    /* ---------- acima da dobra sem JavaScript ---------- */
+
+    // O conteúdo que o visitante vê primeiro não pode depender de hidratação.
+    // Quando dependia, o título ficava invisível até o bundle carregar — numa
+    // conexão ruim, segundos de tela preta.
+    const semJs = await browser.newContext({
+      javaScriptEnabled: false,
+      viewport: { width: 1440, height: 900 },
+    });
+    const paginaSemJs = await semJs.newPage();
+    await paginaSemJs.goto(`${BASE}/`, { waitUntil: "load", timeout: 30000 });
+    await paginaSemJs.waitForTimeout(1200);
+
+    const dobra = await paginaSemJs.evaluate(() => {
+      const titulo = document.querySelector("h1");
+      if (!titulo) return { existe: false };
+      const estilo = getComputedStyle(titulo);
+      const rect = titulo.getBoundingClientRect();
+      return {
+        existe: true,
+        opacidade: Number(estilo.opacity),
+        visivel: rect.width > 0 && rect.height > 0 && rect.top < window.innerHeight,
+        botao: Boolean(
+          [...document.querySelectorAll("a")].find((a) =>
+            a.textContent?.includes("Agendar"),
+          ),
+        ),
+        // Um elemento abaixo da dobra, que legitimamente espera o
+        // IntersectionObserver: sem JavaScript ele tem de continuar
+        // escondido. Se estivesse visível, o teste acima passaria por
+        // vacuidade — o CSS de revelação simplesmente não estaria ativo.
+        revealEscondido: (() => {
+          const alvo = document.querySelector("[data-reveal]");
+          return alvo ? Number(getComputedStyle(alvo).opacity) < 0.05 : null;
+        })(),
+      };
+    });
+
+    check(dobra.existe && dobra.visivel, "sem JavaScript: h1 do hero nao esta visivel");
+    check(
+      (dobra.opacidade ?? 0) > 0.95,
+      `sem JavaScript: h1 do hero com opacidade ${dobra.opacidade}`,
+    );
+    check(dobra.botao, "sem JavaScript: CTA do hero ausente");
+    check(
+      dobra.revealEscondido === true,
+      "sem JavaScript: elemento [data-reveal] deveria estar escondido — se nao esta, a checagem acima nao prova nada",
+    );
+    await semJs.close();
+
     for (const viewport of viewports) {
       const page = await browser.newPage({
         viewport: { width: viewport.width, height: viewport.height },
