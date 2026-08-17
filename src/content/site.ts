@@ -23,11 +23,14 @@ export const nav = {
 
 export const hero = {
   eyebrow: "Sistema de operação para empresas de serviços com comercial e jurídico",
-  title: "Do primeiro lead ao acompanhamento final, toda a operação em um só lugar.",
+  // Testei contra a versão anterior ("Do primeiro lead ao acompanhamento
+  // final..."): esta diz a mesma coisa em metade das palavras e sobrevive
+  // melhor sobre a fotografia, onde linha longa disputa com a cena.
+  title: "O CRM que conecta sua operação inteira.",
   subtitle:
-    "Comercial, jurídico, financeiro, documentos e treinamento no mesmo sistema, com o nome e a logo da sua empresa. Cada setor enxerga apenas o que é dele, e nada se perde no caminho entre um departamento e outro.",
-  primaryCta: "Agendar demonstração",
-  secondaryCta: "Conhecer o sistema",
+    "Comercial, jurídico, financeiro, gestão e relacionamento com o cliente em um único fluxo, com documentos, automações e acompanhamento em tempo real — no seu domínio e com a sua marca.",
+  primaryCta: "Agendar uma demonstração",
+  secondaryCta: "Explorar o sistema",
   trustLine:
     "Nasceu e roda dentro de uma operação real de revisão de juros, com equipe comercial e jurídico próprios.",
   // As mensagens começam identificando a origem: na lista do WhatsApp o
@@ -167,8 +170,9 @@ export const securityTeaser = {
     "Desenvolvido com controles alinhados à proteção e à governança de dados. Sem promessa de conformidade absoluta e sem selo que não temos.",
   highlights: [
     {
-      title: "Ambiente exclusivo da sua empresa",
-      description: "Isolamento aplicado no banco de dados, não somente na tela.",
+      title: "Arquitetura multiempresa",
+      description:
+        "Políticas de acesso e isolamento lógico por empresa, aplicados no banco e não somente na tela.",
     },
     {
       title: "Backup e restauração",
@@ -177,7 +181,8 @@ export const securityTeaser = {
     },
     {
       title: "Rastro de quem fez o quê",
-      description: "Log de auditoria com autor e data, sem expiração automática.",
+      description:
+        "Alterações e operações relevantes ficam registradas no histórico de auditoria.",
     },
   ],
   cta: "Ver os controles em detalhe",

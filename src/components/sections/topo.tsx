@@ -10,19 +10,58 @@ export function Hero() {
 
   return (
     <section id="topo" className="relative isolate min-h-[94vh] overflow-hidden bg-ink-950">
-      {/* Cena de fundo: a tela real do sistema entrando em foco. A varredura
-          passa uma vez e some — sinaliza "sistema ligado", não decoração. */}
+      {/* Camada 1 — a cena. Fotografia de ambiente, não de interface: a
+          interface real entra depois, por cima, como réplica em HTML. */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
-        <ParallaxLayer speed={0.14} className="absolute inset-0">
-          <div className="hero-stage absolute -right-[10%] top-[14%] w-[1500px]">
-            <div className="overflow-hidden rounded-lg border border-ink-700">
-              <PainelComercial />
-            </div>
-          </div>
+        <ParallaxLayer speed={0.1} className="absolute inset-0">
+          <picture>
+            <source
+              media="(max-width: 640px)"
+              type="image/avif"
+              srcSet="/img/hero/cena-mobile.avif"
+            />
+            <source
+              media="(max-width: 640px)"
+              type="image/webp"
+              srcSet="/img/hero/cena-mobile.webp"
+            />
+            <source type="image/avif" srcSet="/img/hero/cena-2560.avif" />
+            <source
+              type="image/webp"
+              srcSet="/img/hero/cena-1280.webp 1280w, /img/hero/cena-2560.webp 2560w"
+              sizes="100vw"
+            />
+            <img
+              src="/img/hero/cena-2560.webp"
+              alt=""
+              width={2560}
+              height={1097}
+              fetchPriority="high"
+              decoding="async"
+              className="hero-scene h-[112vh] w-full object-cover"
+            />
+          </picture>
         </ParallaxLayer>
 
-        <div className="absolute inset-0 bg-gradient-to-r from-ink-950 via-ink-950/92 to-ink-950/45" />
-        <div className="absolute inset-0 bg-gradient-to-t from-ink-950 via-transparent to-ink-950/80" />
+        {/* Camada 2 — escurecimento. O texto fica sobre o terço escuro da
+            esquerda, que a própria fotografia já reserva. */}
+        <div className="absolute inset-0 bg-gradient-to-r from-ink-950 via-ink-950/85 to-ink-950/35" />
+        <div className="absolute inset-0 bg-gradient-to-t from-ink-950 via-ink-950/20 to-ink-950/70" />
+
+        {/* Camada 3 — a interface surgindo por baixo, em perspectiva. A
+            máscara dissolve a borda esquerda: sem ela o painel invade a
+            coluna do texto e engole o subtítulo. */}
+        <div
+          className="hero-panel absolute -bottom-[8%] right-[-8%] hidden w-[54%] lg:block xl:w-[52%]"
+          style={{
+            maskImage: "linear-gradient(to right, transparent, black 22%)",
+            WebkitMaskImage: "linear-gradient(to right, transparent, black 22%)",
+          }}
+        >
+          <div className="overflow-hidden rounded-lg border border-ink-700 shadow-[0_40px_120px_rgba(0,0,0,0.65)]">
+            <PainelComercial />
+          </div>
+        </div>
 
         <div className="absolute inset-y-0 left-0 w-[40%] overflow-hidden">
           <div className="scan-line h-full w-24 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
@@ -30,7 +69,7 @@ export function Hero() {
       </div>
 
       <div className="relative mx-auto flex min-h-[94vh] w-full max-w-6xl flex-col justify-center px-5 pb-28 pt-32 sm:px-8 sm:pt-36">
-        <div className="max-w-3xl">
+        <div className="max-w-xl lg:max-w-[34rem] xl:max-w-2xl">
           <Reveal variant="up">
             <Eyebrow>{hero.eyebrow}</Eyebrow>
           </Reveal>

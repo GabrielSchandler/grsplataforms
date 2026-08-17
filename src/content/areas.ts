@@ -392,9 +392,9 @@ export const areas: readonly Area[] = [
         ],
       },
       {
-        title: "O sistema leva a marca da sua empresa",
+        title: "No seu domínio, com a sua marca",
         paragraph:
-          "A logo e o nome da sua empresa aparecem na plataforma para toda a equipe, e também nos documentos que o sistema gera — relatório de simulação, imagem-resumo, contrato e recibo saem com a sua identidade, não com a de quem desenvolveu o sistema. O arquivo da logo fica em armazenamento privado, servido por link temporário, e a troca fica registrada no log de auditoria. A paleta de cores da interface é a do sistema; a personalização hoje é da identidade da empresa, não do tema visual.",
+          "O CRM pode ser configurado no domínio da sua empresa, com a sua logo e o seu nome. Para a equipe e para o cliente final, o sistema é seu — a marca aparece na plataforma e também nos documentos gerados: relatório de simulação, imagem-resumo, contrato e recibo saem com a sua identidade, não com a de quem desenvolveu o sistema. O arquivo da logo fica em armazenamento privado, servido por link temporário, e a troca fica registrada no histórico de auditoria. A paleta de cores da interface é a do sistema; a personalização hoje é de domínio e identidade, não do tema visual.",
       },
       {
         title: "Perfis e permissões definidos por você",
@@ -406,10 +406,10 @@ export const areas: readonly Area[] = [
         paragraph:
           "O sistema foi desenvolvido com controles alinhados à proteção e à governança de dados. Abaixo está o que existe implementado — sem afirmação de conformidade absoluta e sem selo que não temos.",
         items: [
-          "Dados da sua empresa isolados no próprio banco, não somente na tela",
+          "Arquitetura multiempresa com políticas de acesso e isolamento lógico por empresa",
           "Documentos e logos em armazenamento privado, com link temporário que expira",
           "Permissão por função e departamento",
-          "Log de auditoria com autor e data, mantido sem expiração automática",
+          "Histórico de auditoria com o usuário responsável, a data, o horário e o contexto da ação",
           "Linha do tempo com o histórico de alterações de cada cliente",
           "Rotinas de backup e restauração conforme a configuração do ambiente e do pacote contratado",
           "Cópia guardada fora do banco de dados, em repositório privado separado",
@@ -427,7 +427,7 @@ export const areas: readonly Area[] = [
       {
         question: "Quem tem acesso aos dados da minha operação?",
         answer:
-          "A sua equipe, conforme as permissões que o seu supervisor definir. O ambiente é exclusivo da sua empresa, com isolamento aplicado no próprio banco de dados e não apenas na interface, e todo acesso relevante fica registrado no log de auditoria.",
+          "A sua equipe, conforme as permissões que o seu supervisor definir. A arquitetura é multiempresa, com políticas de acesso e isolamento lógico por empresa aplicados no próprio banco de dados, e não apenas na interface. Alterações e operações relevantes ficam registradas no histórico de auditoria.",
       },
       {
         question: "E se alguém apagar algo por engano?",

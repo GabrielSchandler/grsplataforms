@@ -75,6 +75,26 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="pt-BR" className={`${inter.variable} ${fraunces.variable}`}>
+      <head>
+        {/* Só a cena do hero é pré-carregada: é o único recurso acima da
+            dobra que decide a primeira impressão. O resto entra preguiçoso. */}
+        <link
+          rel="preload"
+          as="image"
+          href="/img/hero/cena-2560.avif"
+          type="image/avif"
+          media="(min-width: 641px)"
+          fetchPriority="high"
+        />
+        <link
+          rel="preload"
+          as="image"
+          href="/img/hero/cena-mobile.avif"
+          type="image/avif"
+          media="(max-width: 640px)"
+          fetchPriority="high"
+        />
+      </head>
       <body className="bg-ink-950 text-white antialiased">
         <a
           href="#conteudo"

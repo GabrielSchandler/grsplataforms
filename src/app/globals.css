@@ -198,29 +198,48 @@
   animation: scan 2.6s var(--ease-out-quint) 0.6s both;
 }
 
-/* A cena do hero entra em foco: sai do desfoque e assenta na opacidade final.
-   Sem movimento reduzido, ela já nasce assentada. */
-@keyframes stage-in {
+/* Abertura do hero, em três tempos: a cena assenta, a interface sobe por
+   baixo e o texto entra em cascata (esse último via Reveal).
+   Sem movimento reduzido, tudo já nasce no lugar. */
+@keyframes scene-in {
   from {
     opacity: 0;
-    transform: scale(1.05);
-    filter: blur(10px);
+    transform: scale(1.06);
   }
   to {
-    opacity: 0.28;
+    opacity: 0.62;
     transform: scale(1);
-    filter: blur(0.4px);
   }
 }
 
-@utility hero-stage {
-  opacity: 0.28;
-  filter: blur(0.4px);
+@keyframes panel-in {
+  from {
+    opacity: 0;
+    transform: perspective(1800px) rotateX(14deg) rotateY(-10deg) translate3d(60px, 90px, 0);
+  }
+  to {
+    opacity: 0.85;
+    transform: perspective(1800px) rotateX(7deg) rotateY(-7deg) translate3d(0, 0, 0);
+  }
+}
+
+@utility hero-scene {
+  opacity: 0.62;
+}
+
+@utility hero-panel {
+  opacity: 0.85;
+  transform: perspective(1800px) rotateX(7deg) rotateY(-7deg);
+  transform-origin: bottom right;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .hero-stage {
-    animation: stage-in 1.6s var(--ease-out-quint) 0.15s both;
+  .hero-scene {
+    animation: scene-in 1.5s var(--ease-out-quint) both;
+  }
+
+  .hero-panel {
+    animation: panel-in 1.5s var(--ease-out-quint) 0.55s both;
   }
 }
 
