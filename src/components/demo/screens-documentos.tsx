@@ -177,7 +177,7 @@ export function ImagemResumo() {
   );
 }
 
-/** Relatório em PDF: a primeira das três páginas geradas. */
+/** Relatório detalhado em PDF: primeira página do documento gerado. */
 export function RelatorioPdf() {
   return (
     <div data-demo="true" className="w-full bg-slate-200 px-10 py-8">
@@ -289,8 +289,8 @@ export function RelatorioPdf() {
         </div>
 
         <p className="mt-8 border-t border-slate-200 pt-4 text-center text-[11px] text-slate-400">
-          Página 1 de 3 · as páginas seguintes trazem o resumo da operação, o panorama da
-          oportunidade e as condições contratuais.
+          Primeira página do relatório. As seguintes trazem o resumo da operação, o
+          panorama da oportunidade e as condições contratuais.
         </p>
       </article>
     </div>

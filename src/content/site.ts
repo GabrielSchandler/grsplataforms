@@ -28,11 +28,11 @@ export const hero = {
   // melhor sobre a fotografia, onde linha longa disputa com a cena.
   title: "O CRM que conecta sua operação inteira.",
   subtitle:
-    "Comercial, jurídico, financeiro, gestão e relacionamento com o cliente em um único fluxo, com documentos, automações e acompanhamento em tempo real — no seu domínio e com a sua marca.",
+    "Comercial, jurídico, financeiro, gestão e relacionamento com o cliente em um fluxo conectado, com documentos, automações e acompanhamento centralizado, em um ambiente configurado com a identidade da sua empresa.",
   primaryCta: "Agendar uma demonstração",
   secondaryCta: "Explorar o sistema",
   trustLine:
-    "Nasceu e roda dentro de uma operação real de revisão de juros, com equipe comercial e jurídico próprios.",
+    "Nasceu e roda dentro de uma operação real de revisão de juros, com equipes comercial e jurídica próprias.",
   // As mensagens começam identificando a origem: na lista do WhatsApp o
   // comercial já vê que o contato veio do site do CRM, não do institucional.
   whatsappMessage:
@@ -49,12 +49,13 @@ export const benefitStrip = [
     description: "Áreas de trabalho separadas, com permissão por função e departamento.",
   },
   {
-    title: "Rastro de tudo",
-    description: "Linha do tempo por cliente, com autor, data e documento de cada passo.",
+    title: "Histórico das operações relevantes",
+    description:
+      "Alterações e operações relevantes ficam registradas com data, responsável e contexto, facilitando auditorias e continuidade do atendimento.",
   },
   {
     title: "Com a sua marca",
-    description: "O sistema exibe a logo e o nome da sua empresa, não os nossos.",
+    description: "O ambiente é configurado com o nome e o logotipo da sua empresa.",
   },
 ];
 
@@ -132,7 +133,7 @@ export const journey = {
     {
       name: "Pré-venda e negociação",
       description:
-        "A pré-venda anda pelo pipeline com o motivo de cada mudança registrado. Quando o caso pede, a simulação gera o relatório em PDF e a imagem-resumo na hora, e os documentos saem de template com numeração própria.",
+        "A pré-venda anda pelo pipeline com o motivo de cada mudança registrado. Quando o caso pede, a simulação gera o relatório detalhado em PDF e a imagem-resumo, e os documentos seguem os templates cadastrados, com numeração própria.",
       href: "/comercial",
       screenshot: "pipeline",
       alt: "Pipeline comercial em Kanban, com o valor do contrato em cada card",
@@ -148,7 +149,7 @@ export const journey = {
     {
       name: "Gestão",
       description:
-        "Metas, comissões, caixa, produtividade e histórico se consolidam a partir do que a equipe já registrou, sem ninguém parar para alimentar relatório.",
+        "Os indicadores comerciais de meta e comissão se consolidam a partir dos pagamentos registrados nas pré-vendas, e o módulo financeiro organiza vendas, entradas, saídas e chargebacks em uma visão própria.",
       href: "/financeiro",
       screenshot: "painel-comercial",
       alt: "Painel comercial com meta, vendas, comissão e ranking de consultores",
@@ -165,9 +166,9 @@ export const areasIndex = {
 
 export const securityTeaser = {
   eyebrow: "Segurança e governança",
-  title: "Separação de dados, rastro e cópia fora do banco.",
+  title: "Isolamento entre empresas, histórico e rotinas de backup.",
   intro:
-    "Desenvolvido com controles alinhados à proteção e à governança de dados. Sem promessa de conformidade absoluta e sem selo que não temos.",
+    "Controles técnicos para apoiar governança, proteção de dados e isolamento entre empresas. Abaixo está o que existe implementado no sistema.",
   highlights: [
     {
       title: "Arquitetura multiempresa",
@@ -191,9 +192,9 @@ export const securityTeaser = {
 
 export const implementation = {
   eyebrow: "Implantação",
-  title: "Sua equipe começa a usar em menos de 24 horas.",
+  title: "A equipe entra em operação assim que o ambiente é liberado.",
   intro:
-    "O acesso do supervisor é liberado em menos de um dia útil, e é ele mesmo quem cria os usuários da equipe. A migração de base anterior corre em paralelo, sem impedir ninguém de trabalhar.",
+    "O ambiente da empresa é liberado para o administrador da empresa, que cadastra os usuários e define os perfis. A migração de base anterior corre em paralelo, sem impedir ninguém de trabalhar.",
   steps: [
     {
       title: "Diagnóstico",
@@ -201,9 +202,9 @@ export const implementation = {
         "Entendemos como sua operação funciona hoje, quais módulos fazem sentido e o que existe de base para trazer.",
     },
     {
-      title: "Ambiente liberado em menos de 24h",
+      title: "Liberação do ambiente",
       description:
-        "O supervisor recebe o acesso, cadastra a equipe, sobe a logo da empresa e já começa a operar.",
+        "O administrador da empresa recebe o acesso, cadastra os usuários, define perfis e configura a identidade visual do ambiente.",
     },
     {
       title: "Migração analisada caso a caso",
@@ -213,12 +214,13 @@ export const implementation = {
     {
       title: "Treinamento e operação assistida",
       description:
-        "As videoaulas ficam na Academy dentro do sistema: Formação Comercial GRS e Operação do CRM GRS.",
+        "As trilhas de treinamento ficam na Academy, dentro do sistema: Formação Comercial GRS e Operação do CRM GRS.",
     },
   ],
   support: {
     title: "Suporte",
-    description: "Atendimento pelo WhatsApp em horário comercial, todos os dias.",
+    description:
+      "Atendimento pelo WhatsApp em horário comercial, nas condições definidas em contrato.",
   },
   commercialModel: {
     title: "Modelo de contratação",
@@ -235,12 +237,12 @@ export const faq = {
     {
       question: "Preciso trocar tudo que já uso de uma vez?",
       answer:
-        "Não. Você escolhe quais módulos entram, então dá para começar pelo comercial e ligar jurídico, financeiro ou Academy depois. O que não foi contratado nem aparece na barra lateral da equipe.",
+        "Não. Os módulos são disponibilizados conforme o pacote contratado, então dá para começar pelo comercial e incluir jurídico, financeiro ou Academy depois. O que não faz parte dos módulos contratados nem aparece na barra lateral da equipe.",
     },
     {
       question: "Em quanto tempo minha equipe começa a usar?",
       answer:
-        "O acesso do supervisor sai em menos de 24 horas, e é ele quem cria os usuários dele. A partir daí a equipe já opera, mesmo que a migração de base anterior ainda esteja em andamento.",
+        "Assim que o ambiente da empresa é liberado, o administrador da empresa cadastra os usuários e a equipe já opera — mesmo que a migração de base anterior ainda esteja em andamento. O prazo de liberação é definido no diagnóstico, porque depende do escopo contratado.",
     },
     {
       question: "Vocês migram os dados do meu sistema atual?",
@@ -260,7 +262,7 @@ export const faq = {
     {
       question: "Como funciona o suporte depois que entra no ar?",
       answer:
-        "Atendimento pelo WhatsApp em horário comercial, todos os dias.",
+        "Atendimento pelo WhatsApp em horário comercial, nas condições e nos prazos definidos em contrato.",
     },
   ],
 };

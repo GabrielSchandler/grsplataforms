@@ -43,14 +43,14 @@ const structuredData = {
       url: siteConfig.siteUrl,
       inLanguage: "pt-BR",
       description:
-        "Sistema que reúne comercial, jurídico, financeiro, documentos, portal do cliente e treinamento em um ambiente exclusivo da empresa, com módulos escolhidos por ela e esteira jurídica configurável.",
+        "Sistema que reúne comercial, jurídico, financeiro, documentos, portal do cliente e trilhas de treinamento em um ambiente configurado com a identidade da empresa, com módulos conforme o pacote contratado e esteira jurídica configurável.",
       publisher: { "@id": `${siteConfig.siteUrl}/#organizacao` },
       featureList: [
-        "Ambiente exclusivo por empresa com isolamento de dados no banco",
+        "Isolamento lógico por empresa, aplicado no banco de dados",
         "Distribuição de leads com importação incremental de planilhas",
         "Pipeline comercial em Kanban",
         "Simulações de veículo, imóvel e empréstimo com relatório em PDF e imagem-resumo gerados automaticamente",
-        "Geração de documentos por template com variáveis",
+        "Contratos e recibos a partir dos templates cadastrados, com variáveis",
         "Esteira jurídica configurável por empresa",
         "Portal de acompanhamento do cliente por CPF e protocolo",
         "Painel comercial e módulo financeiro",

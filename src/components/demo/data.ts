@@ -467,7 +467,7 @@ export const backups = {
     { name: "backup-2026-08-09", origin: "Automático", status: "Concluído", size: "405 MB", created: "09/08 · 00:10", expires: "16/08" },
     { name: "backup-2026-08-08", origin: "Automático", status: "Concluído", size: "401 MB", created: "08/08 · 00:10", expires: "15/08" },
   ],
-  note: "Rotina deste ambiente demonstrativo: cópia guardada fora do banco de dados.",
+  note: "Rotina deste ambiente demonstrativo. Backups podem ser mantidos fora do banco de produção, conforme a configuração do ambiente.",
 };
 
 export const logs = {

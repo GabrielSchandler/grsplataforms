@@ -187,7 +187,7 @@ export function Screen({ workspace, active, title, subtitle, actions, children }
           })}
         </nav>
 
-        <p className="px-3 pb-2 text-[11px] text-slate-400">Versao 1.0.0</p>
+        <p className="px-3 pb-2 text-[11px] text-slate-400">Versão 1.0.0</p>
         <span className="inline-flex items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] font-medium text-slate-600">
           <LogOut aria-hidden="true" className="h-4 w-4" />
           Sair

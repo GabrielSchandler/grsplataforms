@@ -109,9 +109,9 @@ export const areas: readonly Area[] = [
       {
         title: "O sistema produz a análise. Ninguém monta arquivo à mão.",
         paragraph:
-          "Ao salvar a simulação, o próprio sistema gera o relatório completo em PDF e a imagem-resumo na mesma ação — com os dados do cliente, os números do contrato, o protocolo e a marca da sua empresa já aplicados. O consultor não abre editor, não formata nada e não tem como enviar uma versão desatualizada: o arquivo nasce do cálculo que acabou de ser feito.",
+          "Ao salvar a simulação, o sistema gera automaticamente o relatório detalhado em PDF e a imagem-resumo, vinculados ao cliente e ao protocolo, com a identidade configurada para a empresa. O consultor não abre editor nem formata nada, e não há como enviar uma versão desatualizada: o arquivo nasce do cálculo que acabou de ser feito.",
         items: [
-          "Relatório em PDF de três páginas, gerado automaticamente",
+          "Relatório detalhado em PDF, gerado automaticamente",
           "Imagem-resumo para enviar direto ao cliente",
           "Marca da sua empresa aplicada nos dois arquivos",
           "Protocolo único ligando os arquivos à simulação que os originou",
@@ -121,13 +121,13 @@ export const areas: readonly Area[] = [
           id: "relatorio-pdf",
           alt: "Primeira página do relatório em PDF gerado automaticamente pela simulação",
           caption:
-            "Primeira das três páginas. O documento sai com a marca da empresa que usa o sistema, não com a de quem o desenvolveu.",
+            "O documento sai com a identidade configurada para a empresa que usa o sistema, e não com a de quem o desenvolveu.",
         },
       },
       {
-        title: "A peça que o cliente recebe no WhatsApp",
+        title: "A imagem-resumo, pronta para compartilhar",
         paragraph:
-          "A imagem-resumo sai na mesma ação do relatório e é feita para ser lida no celular: economia total, comparação entre a parcela atual e a corrigida, e os dois cenários lado a lado. É o material que faz o cliente entender o caso em dez segundos.",
+          "A imagem-resumo sai na mesma ação do relatório, em formato pensado para leitura no celular: economia total, comparação entre a parcela atual e a corrigida, e os dois cenários lado a lado.",
         screenshot: {
           id: "imagem-resumo",
           alt: "Imagem-resumo da simulação, com economia total, parcelas e os dois cenários comparados",
@@ -138,7 +138,7 @@ export const areas: readonly Area[] = [
       {
         title: "Contrato e recibo por template, não por cópia do anterior",
         paragraph:
-          "Os documentos também saem do próprio sistema: modelos DOCX ou PDF com as variáveis do cliente preenchidas automaticamente. Cada contrato recebe numeração única, então localizar depois não depende de lembrar o nome do arquivo nem de procurar em pasta compartilhada.",
+          "Contratos e recibos seguem os templates cadastrados, em DOCX ou PDF, com as variáveis do cliente preenchidas automaticamente. Cada contrato recebe numeração única, então localizar depois não depende de lembrar o nome do arquivo nem de procurar em pasta compartilhada.",
       },
       {
         title: "Painel que se monta do trabalho do dia",
@@ -265,14 +265,14 @@ export const areas: readonly Area[] = [
     },
     cardTitle: "Financeiro",
     cardDescription:
-      "Entradas, saídas, chargebacks e comissões no mesmo lugar em que a venda foi registrada.",
+      "Vendas, entradas, saídas e chargebacks em visão própria, ligada ao que o comercial registrou.",
     metaTitle: "Controle financeiro integrado ao comercial",
     metaDescription:
-      "Entradas, saídas, chargebacks, importação de planilha Excel, consultas por período e histórico de alterações — ligados à venda que os originou, sem exportação.",
+      "Vendas, entradas, saídas e chargebacks em visão própria, com importação de planilha Excel, consultas por período e histórico de alterações. Pagamentos jurídicos podem ser sincronizados com o financeiro.",
     eyebrow: "Área financeira",
-    headline: "O número da reunião, sem exportar nada.",
+    headline: "Indicadores comerciais e financeiro, cada um na sua visão.",
     lead:
-      "O financeiro deixa de viver de exportação porque o lançamento nasce ligado à venda que o originou.",
+      "Pagamentos registrados nas pré-vendas alimentam os indicadores comerciais de meta e comissão. O módulo financeiro organiza vendas, entradas, saídas e chargebacks em uma visão própria. Pagamentos jurídicos podem ser sincronizados com o financeiro.",
     blocks: [
       {
         title: "Lançamentos do período",
@@ -287,9 +287,9 @@ export const areas: readonly Area[] = [
         ],
       },
       {
-        title: "Meta e comissão calculadas do que entrou",
+        title: "Indicador comercial e lançamento financeiro não são a mesma coisa",
         paragraph:
-          "Os pagamentos registrados na pré-venda alimentam meta e comissão automaticamente. Ninguém precisa refazer a conta no fim do mês, e a divergência entre o que o consultor acha que vendeu e o que a empresa recebeu aparece antes da reunião, não durante.",
+          "Os pagamentos registrados na pré-venda alimentam os indicadores comerciais de meta e comissão. Eles não se confundem com o lançamento financeiro: o módulo financeiro tem visão própria, com vendas, entradas, saídas e chargebacks, e os pagamentos jurídicos podem ser sincronizados com ele.",
       },
     ],
     faq: [
@@ -312,14 +312,14 @@ export const areas: readonly Area[] = [
     navLabel: "Academy",
     cardTitle: "Academy",
     cardDescription:
-      "Treinamento em vídeo dentro do próprio sistema, com progresso acompanhado pela gestão.",
+      "Trilhas de treinamento dentro do próprio sistema, com progresso acompanhado pela gestão.",
     metaTitle: "Treinamento de equipe dentro do próprio CRM",
     metaDescription:
-      "Trilhas de treinamento em vídeo dentro da plataforma, com capítulos, avaliações, conclusão registrada e painel de progresso por usuário para a gestão.",
+      "Trilhas de treinamento com módulos, avaliações, progresso e acompanhamento pela gestão, dentro da própria plataforma.",
     eyebrow: "Academy",
     headline: "Quem entra na empresa aprende o método, não o jeito do colega.",
     lead:
-      "O treinamento mora dentro do sistema, no mesmo lugar onde o trabalho acontece. Não é PDF que ninguém abre nem vídeo perdido em pasta compartilhada.",
+      "O treinamento mora dentro do sistema, no mesmo lugar onde o trabalho acontece — e não em PDF que ninguém abre nem em pasta compartilhada.",
     blocks: [
       {
         title: "Dois cursos, propósitos diferentes",
@@ -348,7 +348,7 @@ export const areas: readonly Area[] = [
       {
         question: "O treinamento está incluído ou é contratado à parte?",
         answer:
-          "As videoaulas ficam dentro da própria plataforma, na Academy, nos cursos Formação Comercial GRS e Operação do CRM GRS. O que entra no pacote é definido na proposta, depois do diagnóstico.",
+          "As trilhas ficam dentro da própria plataforma, na Academy, nos cursos Formação Comercial GRS e Operação do CRM GRS. O que entra no pacote é definido na proposta, depois do diagnóstico.",
       },
       {
         question: "Consigo acompanhar quem já fez o treinamento?",
@@ -378,7 +378,7 @@ export const areas: readonly Area[] = [
     eyebrow: "Gestão e segurança",
     headline: "O ambiente é da sua empresa, e quem administra é ela.",
     lead:
-      "Marca, usuários, permissões e quais módulos ficam ligados são decisões da sua equipe, tomadas dentro do sistema — sem abrir chamado e sem esperar ninguém.",
+      "A empresa administra seus usuários, perfis e identidade visual. Os módulos são configurados conforme o pacote contratado.",
     blocks: [
       {
         title: "O ambiente é montado conforme o seu pacote",
@@ -392,19 +392,19 @@ export const areas: readonly Area[] = [
         ],
       },
       {
-        title: "No seu domínio, com a sua marca",
+        title: "O ambiente com a identidade da sua empresa",
         paragraph:
-          "O CRM pode ser configurado no domínio da sua empresa, com a sua logo e o seu nome. Para a equipe e para o cliente final, o sistema é seu — a marca aparece na plataforma e também nos documentos gerados: relatório de simulação, imagem-resumo, contrato e recibo saem com a sua identidade, não com a de quem desenvolveu o sistema. O arquivo da logo fica em armazenamento privado, servido por link temporário, e a troca fica registrada no histórico de auditoria. A paleta de cores da interface é a do sistema; a personalização hoje é de domínio e identidade, não do tema visual.",
+          "O ambiente pode ser configurado com o nome e o logotipo da sua empresa. Para a equipe e para o cliente final, o sistema é seu: as simulações utilizam a identidade configurada para a empresa, e contratos, recibos e documentos jurídicos seguem os templates cadastrados. O arquivo do logotipo fica em armazenamento privado, servido por link temporário, e a troca fica registrada no histórico de auditoria. A paleta de cores da interface é a do sistema; a personalização hoje é de nome e logotipo, não do tema visual.",
       },
       {
         title: "Perfis e permissões definidos por você",
         paragraph:
-          "Administrador, gestor e consultor têm alcances distintos, cruzados com a área de negócio do usuário. O consultor não navega por tela de financeiro, o jurídico não esbarra em configuração da empresa, e a gestão enxerga o conjunto. Quem cria e ajusta os usuários é o supervisor da sua equipe.",
+          "Administrador, gestor e consultor têm alcances distintos, cruzados com a área de negócio do usuário. O consultor não navega por tela de financeiro, o jurídico não esbarra em configuração da empresa, e a gestão enxerga o conjunto. Quem cria e ajusta os usuários é o administrador da empresa.",
       },
       {
-        title: "Segurança, sem promessa que não se cumpre",
+        title: "Controles técnicos de governança e proteção de dados",
         paragraph:
-          "O sistema foi desenvolvido com controles alinhados à proteção e à governança de dados. Abaixo está o que existe implementado — sem afirmação de conformidade absoluta e sem selo que não temos.",
+          "Controles técnicos para apoiar governança, proteção de dados e isolamento entre empresas. Abaixo está o que existe implementado no sistema.",
         items: [
           "Arquitetura multiempresa com políticas de acesso e isolamento lógico por empresa",
           "Documentos e logos em armazenamento privado, com link temporário que expira",
@@ -412,7 +412,7 @@ export const areas: readonly Area[] = [
           "Histórico de auditoria com o usuário responsável, a data, o horário e o contexto da ação",
           "Linha do tempo com o histórico de alterações de cada cliente",
           "Rotinas de backup e restauração conforme a configuração do ambiente e do pacote contratado",
-          "Cópia guardada fora do banco de dados, em repositório privado separado",
+          "Backups podem ser mantidos fora do banco de produção, conforme a configuração do ambiente",
           "Restauração completa ou limitada a um cliente específico",
           "Tokens de e-mail e integrações guardados cifrados",
         ],
@@ -420,7 +420,7 @@ export const areas: readonly Area[] = [
       {
         title: "Implantação e suporte",
         paragraph:
-          "O acesso do supervisor é liberado em menos de 24 horas, e é ele mesmo quem cria os usuários da equipe. A migração de base anterior corre em paralelo, sem impedir ninguém de trabalhar: importamos de planilhas e de sistemas anteriores quando há exportação disponível, com tratamento dos dados antes da carga. O cronograma sai do diagnóstico, porque depende do que a sua base entrega. O suporte é pelo WhatsApp, em horário comercial, todos os dias.",
+          "O ambiente da empresa é liberado para o administrador da empresa, que cadastra os usuários, define os perfis e configura a identidade visual. A migração de base anterior corre em paralelo, sem impedir ninguém de trabalhar: importamos de planilhas e de sistemas anteriores quando há exportação disponível, com tratamento dos dados antes da carga. O cronograma sai do diagnóstico, porque depende do que a sua base entrega. O suporte é pelo WhatsApp, em horário comercial, nas condições definidas em contrato.",
       },
     ],
     faq: [
@@ -432,7 +432,7 @@ export const areas: readonly Area[] = [
       {
         question: "E se alguém apagar algo por engano?",
         answer:
-          "Há rotinas de backup e restauração, definidas conforme a configuração do ambiente e do pacote contratado. A cópia é guardada fora do banco de dados, e a restauração pode ser completa ou limitada a um cliente específico.",
+          "Há rotinas de backup e restauração, definidas conforme a configuração do ambiente e do pacote contratado. Os backups podem ser mantidos fora do banco de produção, e a restauração pode ser completa ou limitada a um cliente específico.",
       },
       {
         question: "O sistema fica com a marca da minha empresa?",
