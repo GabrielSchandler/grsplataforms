@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ArrowLeft, ArrowRight, Pause, Play, RotateCcw } from "lucide-react";
 import { DemoNavContext } from "./chrome";
+import { ScaledStage } from "./scaled-stage";
 import { screenMap } from "./screen-map";
 import { tourDepartments, tourSteps } from "@/content/tour";
 
@@ -26,9 +27,9 @@ const DURACAO = 7200;
 const corDoDepartamento: Record<string, string> = {
   Marketing: "#c31230",
   Comercial: "#c31230",
-  "Jurídico": "#3b6ef0",
+  Jurídico: "#3b6ef0",
   Financeiro: "#12a594",
-  "Gestão": "#d98324",
+  Gestão: "#d98324",
 };
 
 type Caixa = { top: number; left: number; width: number; height: number };
@@ -47,9 +48,16 @@ const limitar = (valor: number, minimo: number, maximo: number) =>
  * abaixo, acima, à esquerda e à direita do realce, nessa ordem, e só então
  * cai no canto superior esquerdo.
  */
-function posicionarLegenda(anel: Caixa, base: { width: number; height: number }) {
+function posicionarLegenda(
+  anel: Caixa,
+  base: { width: number; height: number },
+) {
   const alturaUtil = base.height - RESERVA_CONTROLES;
-  const esquerdaAlinhada = limitar(anel.left, MARGEM, base.width - LARGURA_LEGENDA - MARGEM);
+  const esquerdaAlinhada = limitar(
+    anel.left,
+    MARGEM,
+    base.width - LARGURA_LEGENDA - MARGEM,
+  );
   const topoAlinhado = limitar(anel.top, MARGEM, alturaUtil - ALTURA_ESTIMADA);
 
   const abaixo = base.height - (anel.top + anel.height);
@@ -78,10 +86,15 @@ export function GuidedTour() {
   const [direcao, setDirecao] = useState<1 | -1>(1);
   const [tocando, setTocando] = useState(true);
   const [realce, setRealce] = useState<Caixa | null>(null);
-  const [legenda, setLegenda] = useState<{ top: number; left: number } | null>(null);
+  const [legenda, setLegenda] = useState<{ top: number; left: number } | null>(
+    null,
+  );
 
   const palcoRef = useRef<HTMLDivElement>(null);
   const roloRef = useRef<HTMLDivElement>(null);
+  // O palco encolhe em tela estreita; as medidas do realce precisam voltar
+  // para a escala natural, senão o anel sai menor que o alvo.
+  const escalaRef = useRef(1);
 
   /* ---------- histórico ---------- */
 
@@ -94,7 +107,9 @@ export function GuidedTour() {
 
     function aoNavegar(evento: PopStateEvent) {
       const estado = evento.state as { passo?: number } | null;
-      setIndice(Math.min(Math.max(estado?.passo ?? 0, 0), tourSteps.length - 1));
+      setIndice(
+        Math.min(Math.max(estado?.passo ?? 0, 0), tourSteps.length - 1),
+      );
     }
 
     window.addEventListener("popstate", aoNavegar);
@@ -170,16 +185,22 @@ export function GuidedTour() {
       }
 
       const caixa = alvo.getBoundingClientRect();
+      const escala = escalaRef.current || 1;
       const margem = 10;
       const anel: Caixa = {
-        top: caixa.top - base.top - margem,
-        left: caixa.left - base.left - margem,
-        width: caixa.width + margem * 2,
-        height: caixa.height + margem * 2,
+        top: (caixa.top - base.top) / escala - margem,
+        left: (caixa.left - base.left) / escala - margem,
+        width: caixa.width / escala + margem * 2,
+        height: caixa.height / escala + margem * 2,
       };
       setRealce(anel);
 
-      setLegenda(posicionarLegenda(anel, { width: base.width, height: base.height }));
+      setLegenda(
+        posicionarLegenda(anel, {
+          width: base.width / escala,
+          height: base.height / escala,
+        }),
+      );
 
       const rolo = roloRef.current;
       if (rolo) {
@@ -207,14 +228,16 @@ export function GuidedTour() {
       <h3 className="font-display mt-3 text-xl leading-snug font-semibold text-white">
         {passo.title}
       </h3>
-      <p className="mt-2 text-[14px] leading-relaxed text-fog-300">{passo.text}</p>
+      <p className="mt-2 text-[14px] leading-relaxed text-fog-300">
+        {passo.text}
+      </p>
     </>
   );
 
   return (
     <div onMouseEnter={() => setTocando(false)}>
       {/* Trilha por área, acima da cena */}
-      <div className="scroll-x flex items-end gap-4 pb-1">
+      <div className="scroll-x flex items-end gap-3 pb-1 sm:gap-4">
         {tourDepartments.map((area) => {
           const etapas = tourSteps
             .map((etapa, posicao) => ({ etapa, posicao }))
@@ -226,7 +249,7 @@ export function GuidedTour() {
           return (
             <div key={area} className="shrink-0">
               <p
-                className={`mb-1.5 text-[10px] font-semibold uppercase tracking-wide transition-colors ${
+                className={`mb-1.5 text-[9px] font-semibold uppercase tracking-wide transition-colors sm:text-[10px] ${
                   ativa ? "text-white" : "text-fog-400"
                 }`}
               >
@@ -242,12 +265,14 @@ export function GuidedTour() {
                     title={etapa.title}
                     className={`h-1.5 rounded transition-all duration-500 ${
                       posicao === indice
-                        ? "w-10"
+                        ? "w-8 sm:w-10"
                         : posicao < indice
-                          ? "w-5 bg-fog-500"
-                          : "w-5 bg-ink-700 hover:bg-fog-600"
+                          ? "w-4 bg-fog-500 sm:w-5"
+                          : "w-4 bg-ink-700 hover:bg-fog-600 sm:w-5"
                     }`}
-                    style={posicao === indice ? { backgroundColor: cor } : undefined}
+                    style={
+                      posicao === indice ? { backgroundColor: cor } : undefined
+                    }
                   >
                     <span className="sr-only">
                       Etapa {posicao + 1}: {etapa.title}
@@ -263,7 +288,7 @@ export function GuidedTour() {
       {/* A cena: tela do sistema, escurecimento, realce e legenda */}
       <div
         ref={roloRef}
-        className="scroll-x mt-4 rounded-lg border border-ink-700 bg-ink-900 p-2"
+        className="mt-4 overflow-hidden rounded-lg border border-ink-700 bg-ink-900 p-2"
         onKeyDown={(evento) => {
           if (evento.key === "ArrowRight") {
             evento.preventDefault();
@@ -275,116 +300,124 @@ export function GuidedTour() {
           }
         }}
       >
-        <div ref={palcoRef} className="relative min-w-[1040px] overflow-hidden rounded">
-          <div
-            key={indice}
-            className={`overflow-hidden rounded border border-slate-200 ${
-              direcao === 1 ? "slide-from-right" : "slide-from-left"
-            }`}
-          >
-            <DemoNavContext.Provider value={{ workspace: tela.workspace, active: tela.nav }}>
-              <Tela />
-            </DemoNavContext.Provider>
-          </div>
-
-          {/* Anel de destaque. O box-shadow gigante escurece todo o resto. */}
-          {realce ? (
+        <ScaledStage onScaleChange={(valor) => (escalaRef.current = valor)}>
+          <div ref={palcoRef} className="relative overflow-hidden rounded">
             <div
-              aria-hidden="true"
-              className="pointer-events-none absolute z-10 rounded transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
-              style={{
-                top: realce.top,
-                left: realce.left,
-                width: realce.width,
-                height: realce.height,
-                border: `2px solid ${cor}`,
-                boxShadow: `0 0 0 9999px rgba(8, 8, 10, 0.74), 0 0 30px ${cor}66`,
-              }}
-            />
-          ) : null}
-
-          {/* A explicação, sobre a área escurecida */}
-          {legenda ? (
-            <div
-              key={`legenda-${indice}`}
-              // Fundo sólido, não translúcido: sobre a tela do sistema, vidro
-              // fosco deixa o texto competindo com a interface por trás.
-              className="swap-slide pointer-events-none absolute z-20 hidden rounded-lg border border-ink-700 bg-ink-950 p-5 shadow-[0_28px_80px_rgba(0,0,0,0.85)] lg:block"
-              style={{
-                top: legenda.top,
-                left: legenda.left,
-                width: LARGURA_LEGENDA,
-                borderLeft: `3px solid ${cor}`,
-              }}
+              key={indice}
+              className={`overflow-hidden rounded border border-slate-200 ${
+                direcao === 1 ? "slide-from-right" : "slide-from-left"
+              }`}
             >
-              {conteudoLegenda}
+              <DemoNavContext.Provider
+                value={{ workspace: tela.workspace, active: tela.nav }}
+              >
+                <Tela />
+              </DemoNavContext.Provider>
             </div>
-          ) : null}
 
-          {/* Controles flutuantes, também sobre o escuro */}
-          <div className="absolute inset-x-0 bottom-5 z-30 hidden justify-center lg:flex">
-            <div className="flex items-center gap-1 rounded-lg border border-ink-700 bg-ink-950 p-1.5 shadow-[0_16px_44px_rgba(0,0,0,0.75)]">
-              <button
-                type="button"
-                onClick={() => irPara(indice - 1)}
-                disabled={indice === 0}
-                className="inline-flex h-9 w-9 items-center justify-center rounded text-white transition-colors hover:bg-white/10 disabled:opacity-30"
+            {/* Anel de destaque. O box-shadow gigante escurece todo o resto. */}
+            {realce ? (
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute z-10 rounded transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                style={{
+                  top: realce.top,
+                  left: realce.left,
+                  width: realce.width,
+                  height: realce.height,
+                  border: `2px solid ${cor}`,
+                  boxShadow: `0 0 0 9999px rgba(8, 8, 10, 0.74), 0 0 30px ${cor}66`,
+                }}
+              />
+            ) : null}
+
+            {/* A explicação, sobre a área escurecida */}
+            {legenda ? (
+              <div
+                key={`legenda-${indice}`}
+                // Fundo sólido, não translúcido: sobre a tela do sistema, vidro
+                // fosco deixa o texto competindo com a interface por trás.
+                className="swap-slide pointer-events-none absolute z-20 hidden rounded-lg border border-ink-700 bg-ink-950 p-5 shadow-[0_28px_80px_rgba(0,0,0,0.85)] lg:block"
+                style={{
+                  top: legenda.top,
+                  left: legenda.left,
+                  width: LARGURA_LEGENDA,
+                  borderLeft: `3px solid ${cor}`,
+                }}
               >
-                <span className="sr-only">Etapa anterior</span>
-                <ArrowLeft aria-hidden="true" className="h-4 w-4" />
-              </button>
+                {conteudoLegenda}
+              </div>
+            ) : null}
 
-              <button
-                type="button"
-                onClick={() => setTocando((valor) => !valor)}
-                className="inline-flex h-9 w-9 items-center justify-center rounded text-white transition-colors hover:bg-white/10"
-              >
-                <span className="sr-only">{tocando ? "Pausar" : "Reproduzir"}</span>
-                {tocando ? (
-                  <Pause aria-hidden="true" className="h-4 w-4" />
-                ) : (
-                  <Play aria-hidden="true" className="h-4 w-4" />
-                )}
-              </button>
+            {/* Controles flutuantes, também sobre o escuro */}
+            <div className="absolute inset-x-0 bottom-5 z-30 hidden justify-center lg:flex">
+              <div className="flex items-center gap-1 rounded-lg border border-ink-700 bg-ink-950 p-1.5 shadow-[0_16px_44px_rgba(0,0,0,0.75)]">
+                <button
+                  type="button"
+                  onClick={() => irPara(indice - 1)}
+                  disabled={indice === 0}
+                  className="inline-flex h-9 w-9 items-center justify-center rounded text-white transition-colors hover:bg-white/10 disabled:opacity-30"
+                >
+                  <span className="sr-only">Etapa anterior</span>
+                  <ArrowLeft aria-hidden="true" className="h-4 w-4" />
+                </button>
 
-              <span className="px-2 text-[12px] tabular-nums text-fog-400">
-                {indice + 1}/{tourSteps.length}
-              </span>
+                <button
+                  type="button"
+                  onClick={() => setTocando((valor) => !valor)}
+                  className="inline-flex h-9 w-9 items-center justify-center rounded text-white transition-colors hover:bg-white/10"
+                >
+                  <span className="sr-only">
+                    {tocando ? "Pausar" : "Reproduzir"}
+                  </span>
+                  {tocando ? (
+                    <Pause aria-hidden="true" className="h-4 w-4" />
+                  ) : (
+                    <Play aria-hidden="true" className="h-4 w-4" />
+                  )}
+                </button>
 
-              <button
-                type="button"
-                onClick={() => irPara(indice + 1)}
-                disabled={indice === tourSteps.length - 1}
-                className="inline-flex h-9 items-center gap-1.5 rounded px-3 text-sm font-semibold text-white transition-colors hover:bg-white/10 disabled:opacity-30"
-              >
-                Próxima
-                <ArrowRight aria-hidden="true" className="h-4 w-4" />
-              </button>
+                <span className="px-2 text-[12px] tabular-nums text-fog-400">
+                  {indice + 1}/{tourSteps.length}
+                </span>
 
-              <button
-                type="button"
-                onClick={() => irPara(0)}
-                className="inline-flex h-9 w-9 items-center justify-center rounded text-fog-300 transition-colors hover:bg-white/10 hover:text-white"
-              >
-                <span className="sr-only">Recomeçar</span>
-                <RotateCcw aria-hidden="true" className="h-4 w-4" />
-              </button>
+                <button
+                  type="button"
+                  onClick={() => irPara(indice + 1)}
+                  disabled={indice === tourSteps.length - 1}
+                  className="inline-flex h-9 items-center gap-1.5 rounded px-3 text-sm font-semibold text-white transition-colors hover:bg-white/10 disabled:opacity-30"
+                >
+                  Próxima
+                  <ArrowRight aria-hidden="true" className="h-4 w-4" />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => irPara(0)}
+                  className="inline-flex h-9 w-9 items-center justify-center rounded text-fog-300 transition-colors hover:bg-white/10 hover:text-white"
+                >
+                  <span className="sr-only">Recomeçar</span>
+                  <RotateCcw aria-hidden="true" className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* Tempo do avanço automático, rente à base da cena */}
+            <div className="absolute inset-x-0 bottom-0 z-30 h-0.5 bg-white/10">
+              <div
+                key={`tempo-${indice}-${tocando}`}
+                className="h-full origin-left"
+                style={{
+                  backgroundColor: cor,
+                  animation: tocando
+                    ? `tour-timer ${DURACAO}ms linear both`
+                    : "none",
+                  transform: tocando ? undefined : "scaleX(0)",
+                }}
+              />
             </div>
           </div>
-
-          {/* Tempo do avanço automático, rente à base da cena */}
-          <div className="absolute inset-x-0 bottom-0 z-30 h-0.5 bg-white/10">
-            <div
-              key={`tempo-${indice}-${tocando}`}
-              className="h-full origin-left"
-              style={{
-                backgroundColor: cor,
-                animation: tocando ? `tour-timer ${DURACAO}ms linear both` : "none",
-                transform: tocando ? undefined : "scaleX(0)",
-              }}
-            />
-          </div>
-        </div>
+        </ScaledStage>
       </div>
 
       {/* No celular a legenda e os controles ficam abaixo da cena: sobrepor

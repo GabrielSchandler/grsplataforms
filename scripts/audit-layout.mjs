@@ -454,7 +454,11 @@ async function main() {
       // Uma imagem por seção, só na resolução mais larga. Captura de página
       // inteira não serve aqui: a página passa de 20.000px e o Chrome costura
       // errado acima do limite dele.
-      if (viewport.width === 1440) {
+      // Guarda também no celular: mobile revisado só no desktop é mobile
+      // que ninguém olhou.
+      if (viewport.width === 1440 || viewport.width === 390) {
+        const pasta = viewport.width === 1440 ? "secoes" : "secoes-mobile";
+
         for (const id of expectedSections) {
           await page.evaluate((sectionId) => {
             document.getElementById(sectionId)?.scrollIntoView();
@@ -462,7 +466,7 @@ async function main() {
           await page.waitForTimeout(500);
           await page
             .locator(`#${id}`)
-            .screenshot({ path: path.join(SHOT_DIR, "secoes", `${id}.png`) })
+            .screenshot({ path: path.join(SHOT_DIR, pasta, `${id}.png`) })
             .catch(() => {});
         }
       }

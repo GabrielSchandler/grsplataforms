@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { MousePointerClick } from "lucide-react";
 import { DemoNavContext, type Workspace } from "./chrome";
+import { ScaledStage } from "./scaled-stage";
 import { navToScreen, screenMap } from "./screen-map";
 
 /**
@@ -30,19 +31,27 @@ export function AppDemo({
 
   return (
     <div>
-      <div className="scroll-x rounded-lg border border-ink-700 bg-ink-900 p-2">
-        <div className="min-w-[1040px] overflow-hidden rounded border border-slate-200">
-          <DemoNavContext.Provider value={{ workspace, active: ativo, onSelect: setAtivo }}>
-            <Tela />
-          </DemoNavContext.Provider>
-        </div>
+      <div className="overflow-hidden rounded-lg border border-ink-700 bg-ink-900 p-2">
+        <ScaledStage>
+          <div className="overflow-hidden rounded border border-slate-200">
+            <DemoNavContext.Provider
+              value={{ workspace, active: ativo, onSelect: setAtivo }}
+            >
+              <Tela />
+            </DemoNavContext.Provider>
+          </div>
+        </ScaledStage>
       </div>
 
       <p className="mt-3 flex items-start gap-2 text-[12px] leading-relaxed text-fog-500">
-        <MousePointerClick aria-hidden="true" className="mt-0.5 h-3.5 w-3.5 shrink-0 text-brand-300" />
+        <MousePointerClick
+          aria-hidden="true"
+          className="mt-0.5 h-3.5 w-3.5 shrink-0 text-brand-300"
+        />
         <span>
-          {legenda ?? "Clique nos itens da barra lateral para navegar entre as telas."} Ambiente
-          demonstrativo, com nomes, CPFs e telefones fictícios.
+          {legenda ??
+            "Clique nos itens da barra lateral para navegar entre as telas."}{" "}
+          Ambiente demonstrativo, com nomes, CPFs e telefones fictícios.
         </span>
       </p>
     </div>

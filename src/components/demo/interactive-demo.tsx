@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { DemoNavContext } from "./chrome";
 import { demoScreens } from "./registry";
+import { ScaledStage } from "./scaled-stage";
 import { navToScreen } from "./screen-map";
 
 /**
@@ -14,14 +15,16 @@ export function InteractiveDemo() {
   const [activeId, setActiveId] = useState(demoScreens[0].id);
   const tabsRef = useRef<HTMLDivElement>(null);
 
-  const active = demoScreens.find((screen) => screen.id === activeId) ?? demoScreens[0];
+  const active =
+    demoScreens.find((screen) => screen.id === activeId) ?? demoScreens[0];
   const ActiveScreen = active.component;
 
   function moveFocus(direction: 1 | -1) {
     const index = demoScreens.findIndex((screen) => screen.id === activeId);
     const next = (index + direction + demoScreens.length) % demoScreens.length;
     setActiveId(demoScreens[next].id);
-    const buttons = tabsRef.current?.querySelectorAll<HTMLButtonElement>("[role='tab']");
+    const buttons =
+      tabsRef.current?.querySelectorAll<HTMLButtonElement>("[role='tab']");
     buttons?.[next]?.focus();
   }
 
@@ -76,29 +79,34 @@ export function InteractiveDemo() {
         id={`painel-${active.id}`}
         aria-labelledby={`tab-${active.id}`}
         tabIndex={0}
-        className="scroll-x mt-4 rounded-lg border border-ink-700 bg-ink-900 p-2"
+        className="mt-4 overflow-hidden rounded-lg border border-ink-700 bg-ink-900 p-2"
       >
-        <div className="min-w-[1040px] overflow-hidden rounded border border-slate-200">
-          <DemoNavContext.Provider
-            value={{
-              // A barra lateral também navega aqui, e não só nas páginas de
-              // área: sidebar clicável em um lugar e morta em outro confunde.
-              onSelect: (label) => {
-                const destino = navToScreen[label];
-                if (destino && demoScreens.some((tela) => tela.id === destino)) {
-                  setActiveId(destino);
-                }
-              },
-            }}
-          >
-            <ActiveScreen />
-          </DemoNavContext.Provider>
-        </div>
+        <ScaledStage>
+          <div className="overflow-hidden rounded border border-slate-200">
+            <DemoNavContext.Provider
+              value={{
+                // A barra lateral também navega aqui, e não só nas páginas de
+                // área: sidebar clicável em um lugar e morta em outro confunde.
+                onSelect: (label) => {
+                  const destino = navToScreen[label];
+                  if (
+                    destino &&
+                    demoScreens.some((tela) => tela.id === destino)
+                  ) {
+                    setActiveId(destino);
+                  }
+                },
+              }}
+            >
+              <ActiveScreen />
+            </DemoNavContext.Provider>
+          </div>
+        </ScaledStage>
       </div>
 
       <p className="mt-3 text-xs text-fog-500">
-        Ambiente demonstrativo. Nomes, CPFs e telefones são fictícios, e a esteira jurídica
-        exibida é um exemplo — cada empresa monta a própria.
+        Ambiente demonstrativo. Nomes, CPFs e telefones são fictícios, e a
+        esteira jurídica exibida é um exemplo — cada empresa monta a própria.
       </p>
     </div>
   );
