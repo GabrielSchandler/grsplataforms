@@ -158,7 +158,7 @@ export const areas: readonly Area[] = [
       {
         question: "Preciso parar de usar minhas planilhas de captação?",
         answer:
-          "Não. As planilhas do Google Sheets continuam sendo a fonte, conectadas por empresa. O que muda é que a cópia manual para o sistema deixa de existir, e a importação só traz o que é novo.",
+          "Não. As planilhas do Google Sheets continuam sendo a fonte, conectadas ao seu ambiente. O que muda é que a cópia manual para o sistema deixa de existir, e a importação só traz o que é novo.",
       },
       {
         question: "Consigo dividir os leads igualmente entre a equipe?",
@@ -404,9 +404,9 @@ export const areas: readonly Area[] = [
       {
         title: "Controles técnicos de governança e proteção de dados",
         paragraph:
-          "Controles técnicos para apoiar governança, proteção de dados e isolamento entre empresas. Abaixo está o que existe implementado no sistema.",
+          "Controles técnicos para apoiar governança, proteção e isolamento dos dados da sua empresa. Abaixo está o que existe implementado no sistema.",
         items: [
-          "Arquitetura multiempresa com políticas de acesso e isolamento lógico por empresa",
+          "Políticas de acesso e isolamento lógico dos dados, aplicados no banco e não somente na tela",
           "Documentos e logos em armazenamento privado, com link temporário que expira",
           "Permissão por função e departamento",
           "Histórico de auditoria com o usuário responsável, a data, o horário e o contexto da ação",
@@ -427,7 +427,7 @@ export const areas: readonly Area[] = [
       {
         question: "Quem tem acesso aos dados da minha operação?",
         answer:
-          "A sua equipe, conforme as permissões que o seu supervisor definir. A arquitetura é multiempresa, com políticas de acesso e isolamento lógico por empresa aplicados no próprio banco de dados, e não apenas na interface. Alterações e operações relevantes ficam registradas no histórico de auditoria.",
+          "A sua equipe, conforme as permissões que o administrador da empresa definir. Os dados do seu ambiente ficam isolados por políticas de acesso aplicadas no próprio banco de dados, e não apenas na interface. Alterações e operações relevantes ficam registradas no histórico de auditoria.",
       },
       {
         question: "E se alguém apagar algo por engano?",

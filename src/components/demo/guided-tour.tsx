@@ -331,6 +331,7 @@ export function GuidedTour() {
             {legenda ? (
               <div
                 key={`legenda-${indice}`}
+                data-tour-caption="desktop"
                 // Fundo sólido, não translúcido: sobre a tela do sistema, vidro
                 // fosco deixa o texto competindo com a interface por trás.
                 className="swap-slide pointer-events-none absolute z-20 hidden rounded-lg border border-ink-700 bg-ink-950 p-5 shadow-[0_28px_80px_rgba(0,0,0,0.85)] lg:block"
@@ -418,7 +419,10 @@ export function GuidedTour() {
 
       {/* No celular a legenda e os controles ficam abaixo da cena: sobrepor
           texto numa tela que já rola de lado atrapalharia a leitura. */}
-      <div className="mt-4 rounded-lg border border-ink-700 bg-ink-950 p-5 lg:hidden">
+      <div
+        data-tour-caption="mobile"
+        className="mt-4 rounded-lg border border-ink-700 bg-ink-950 p-5 lg:hidden"
+      >
         {conteudoLegenda}
 
         <div className="mt-4 flex items-center gap-2">

@@ -58,7 +58,7 @@ export const hero = {
    * no produto — nada de selo de certificação que a empresa não tem.
    */
   trustChips: [
-    "Ambiente multiempresa",
+    "Ambiente exclusivo da sua empresa",
     "Comercial, jurídico e financeiro conectados",
     "Demonstração com dados fictícios",
     "Teste grátis por 7 dias",
@@ -197,14 +197,14 @@ export const areasIndex = {
 
 export const securityTeaser = {
   eyebrow: "Segurança e governança",
-  title: "Isolamento entre empresas, histórico e rotinas de backup.",
+  title: "Dados isolados, histórico das operações e rotinas de backup.",
   intro:
-    "Controles técnicos para apoiar governança, proteção de dados e isolamento entre empresas. Abaixo está o que existe implementado no sistema.",
+    "Controles técnicos para apoiar governança, proteção e isolamento dos dados da sua empresa. Abaixo está o que existe implementado no sistema.",
   highlights: [
     {
-      title: "Arquitetura multiempresa",
+      title: "Ambiente isolado",
       description:
-        "Políticas de acesso e isolamento lógico por empresa, aplicados no banco e não somente na tela.",
+        "Políticas de acesso e isolamento lógico dos dados, aplicados no banco e não somente na tela.",
     },
     {
       title: "Backup e restauração",
@@ -256,7 +256,7 @@ export const implementation = {
   commercialModel: {
     title: "Modelo de contratação",
     description:
-      "Mensalidade por usuário contratado, mais implantação. Os módulos são escolhidos por empresa, e o valor é apresentado na proposta depois do diagnóstico.",
+      "Mensalidade por usuário contratado, mais implantação. Os módulos seguem o pacote contratado, e o valor é apresentado na proposta depois do diagnóstico.",
   },
 };
 
@@ -283,7 +283,7 @@ export const faq = {
     {
       question: "Como é a cobrança?",
       answer:
-        "Mensalidade por usuário contratado, mais implantação. Como os módulos variam por empresa, o valor é apresentado na proposta, depois do diagnóstico.",
+        "Mensalidade por usuário contratado, mais implantação. Como os módulos variam conforme o pacote contratado, o valor é apresentado na proposta, depois do diagnóstico.",
     },
     {
       question: "Consigo testar antes de contratar?",

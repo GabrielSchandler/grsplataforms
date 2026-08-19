@@ -193,6 +193,19 @@ async function checarOverflow(page, rotulo) {
 }
 
 async function checarImagens(page, rotulo) {
+  // Espera própria: numa máquina carregada o carregamento preguiçoso passa do
+  // tempo da preparação, e o teste acusaria falha que o visitante não vê.
+  await page
+    .waitForFunction(
+      () =>
+        Array.from(document.images)
+          .filter((image) => image.getClientRects().length > 0)
+          .every((image) => image.complete && image.naturalWidth > 0),
+      null,
+      { timeout: 30000 },
+    )
+    .catch(() => {});
+
   const quebradas = await page.evaluate(() =>
     Array.from(document.images)
       // Imagem escondida por breakpoint (display:none) não é baixada pelo
@@ -384,43 +397,6 @@ async function main() {
         `${viewport.name}: primeiro Tab foi para "${firstFocus}" em vez do atalho de conteudo`,
       );
 
-      // Tour guiado: avançar muda a etapa e grava na URL; o voltar do
-      // navegador tem de desfazer. É a parte do demo que mais depende de
-      // estado, e a que quebra sem ninguém perceber.
-      if (viewport.width === 1440) {
-        const tour = page.locator("button", { hasText: "Próxima" }).first();
-
-        if (await tour.count()) {
-          // Pausa antes de medir: o tour anda sozinho, e um avanço automático
-          // no meio do teste faria a contagem falhar sem haver defeito.
-          const pausar = page.getByRole("button", { name: "Pausar" }).first();
-          if (await pausar.count()) await pausar.click();
-          await page.waitForTimeout(250);
-
-          const contador = page.locator("#demonstrativo span").filter({ hasText: /^\d+\/14$/ });
-          const antes = Number((await contador.first().textContent())?.split("/")[0]);
-          const tituloInicial = await page.locator("#demonstrativo h3").first().textContent();
-
-          await tour.click();
-          await page.waitForTimeout(700);
-
-          const depois = Number((await contador.first().textContent())?.split("/")[0]);
-          const tituloDepois = await page.locator("#demonstrativo h3").first().textContent();
-
-          check(
-            depois === antes + 1,
-            `${viewport.name}: tour nao avancou a etapa (${antes} -> ${depois})`,
-          );
-          check(
-            tituloInicial !== tituloDepois,
-            `${viewport.name}: tour avancou mas o titulo da etapa nao mudou`,
-          );
-
-        } else {
-          check(false, `${viewport.name}: botao do tour guiado nao encontrado`);
-        }
-      }
-
       // FAQ abre e fecha sem JavaScript.
       const faqWorks = await page.evaluate(() => {
         const item = document.querySelector("#perguntas details");
@@ -459,7 +435,55 @@ async function main() {
         }
       }
 
-      /* ---------- links diretos para uma etapa do tour ---------- */
+      /* ---------- tour: avancar muda a etapa ---------- */
+
+    // Contexto com movimento reduzido de proposito: o avanço automático fica
+    // desligado, então a medição não disputa com o relógio. Numa máquina
+    // carregada, pausar por clique chegava tarde e a etapa pulava de duas.
+    if (viewport.width === 1440) {
+      const semMovimento = await browser.newContext({
+        reducedMotion: "reduce",
+        viewport: { width: 1440, height: 900 },
+      });
+      const paginaTour = await semMovimento.newPage();
+
+      await paginaTour.goto(`${BASE}/`, { waitUntil: "load", timeout: 30000 });
+      await paginaTour.evaluate(() => document.fonts.ready);
+      await paginaTour.waitForTimeout(400);
+
+      const contador = paginaTour
+        .locator("#demonstrativo span")
+        .filter({ hasText: /^\d+\/14$/ })
+        .first();
+      const antes = Number((await contador.textContent())?.split("/")[0]);
+      // Marcador próprio: `h3` sozinho pega também o bloco do teste grátis,
+      // cujo título não muda — o teste passaria a comparar a coisa errada.
+      const legendaTour = paginaTour.locator("[data-tour-caption] h3").first();
+      const tituloAntes = await legendaTour.textContent();
+
+      await paginaTour.getByRole("button", { name: "Próxima" }).first().click();
+      await paginaTour.waitForTimeout(600);
+
+      const depois = Number((await contador.textContent())?.split("/")[0]);
+      const tituloDepois = await legendaTour.textContent();
+
+      check(
+        antes === 1,
+        `${viewport.name}: tour deveria abrir na etapa 1, abriu na ${antes}`,
+      );
+      check(
+        depois === antes + 1,
+        `${viewport.name}: tour nao avancou a etapa (${antes} -> ${depois})`,
+      );
+      check(
+        tituloAntes !== tituloDepois,
+        `${viewport.name}: tour avancou mas o titulo da etapa nao mudou`,
+      );
+
+      await semMovimento.close();
+    }
+
+    /* ---------- links diretos para uma etapa do tour ---------- */
 
       // `?passo=N` precisa abrir na etapa pedida ja na primeira renderizacao,
       // e valor invalido precisa cair na etapa 1 em vez de quebrar.
@@ -481,7 +505,13 @@ async function main() {
             timeout: 30000,
           });
           await page.evaluate(() => document.fonts.ready);
-          await page.waitForTimeout(500);
+
+          // Pausa antes de medir: com `?passo=1` o tour começa tocando, e numa
+          // máquina lenta o avanço automático dispara antes da leitura,
+          // fazendo o teste falhar sem haver defeito.
+          const pausarAqui = page.getByRole("button", { name: "Pausar" }).first();
+          if (await pausarAqui.count()) await pausarAqui.click({ timeout: 5000 }).catch(() => {});
+          await page.waitForTimeout(300);
 
           const texto = await page
             .locator("#demonstrativo span")
