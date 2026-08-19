@@ -15,9 +15,14 @@ import { tourDepartments, tourSteps } from "@/content/tour";
  * escurecida da própria tela**, ancorada ao ponto destacado, como um tour de
  * produto de verdade. O olho não precisa sair da interface para ler.
  *
- * O passo sempre começa em 1 a cada carregamento — cair no meio do roteiro
- * sem contexto é pior que repetir o começo. Dentro da sessão, voltar e
- * avançar no navegador continuam andando pelas etapas.
+ * `?passo=N` abre direto na etapa pedida, para um link compartilhado levar a
+ * pessoa ao ponto certo. Sem o parâmetro, começa em 1.
+ *
+ * Nada aqui escreve na URL durante o uso, e essa é uma decisão: manter o
+ * histórico sincronizado com as etapas exigia disputar o controle da pilha
+ * com o roteador do Next, e o resultado era o botão voltar saltando para um
+ * ponto arbitrário. Sem escrita, o comportamento fica previsível — recarregar
+ * volta ao começo e o voltar sai da página, como em qualquer outra seção.
  */
 
 const PARAM = "passo";
@@ -81,10 +86,34 @@ function posicionarLegenda(
   return { top: MARGEM, left: MARGEM };
 }
 
+/**
+ * Le a etapa pedida na URL. Serve a link compartilhado (`?passo=14`), e nao a
+ * recarregamento comum: o avanco automatico nao escreve o parametro, entao
+ * uma pagina recarregada sem link explicito volta para a etapa 1.
+ *
+ * Valor invalido, abaixo de 1 ou acima do total cai na etapa 1.
+ */
+function etapaInicial() {
+  if (typeof window === "undefined") return 0;
+
+  const bruto = new URLSearchParams(window.location.search).get(PARAM);
+  if (bruto === null) return 0;
+
+  const numero = Number(bruto);
+  if (!Number.isInteger(numero) || numero < 1 || numero > tourSteps.length) {
+    return 0;
+  }
+
+  return numero - 1;
+}
+
 export function GuidedTour() {
-  const [indice, setIndice] = useState(0);
+  // Estado inicial de verdade, ja na primeira renderizacao do cliente: ler a
+  // URL num efeito fazia a etapa 1 piscar antes da etapa pedida.
+  const [indice, setIndice] = useState(etapaInicial);
   const [direcao, setDirecao] = useState<1 | -1>(1);
-  const [tocando, setTocando] = useState(true);
+  // Link para uma etapa especifica quer aquela etapa, nao um filme rodando.
+  const [tocando, setTocando] = useState(() => etapaInicial() === 0);
   const [realce, setRealce] = useState<Caixa | null>(null);
   const [legenda, setLegenda] = useState<{ top: number; left: number } | null>(
     null,
@@ -96,39 +125,14 @@ export function GuidedTour() {
   // para a escala natural, senão o anel sai menor que o alvo.
   const escalaRef = useRef(1);
 
-  /* ---------- histórico ---------- */
-
-  useEffect(() => {
-    // Começa sempre do início e limpa o parâmetro, para um link antigo ou um
-    // recarregamento não jogarem o visitante no meio do roteiro.
-    const url = new URL(window.location.href);
-    url.searchParams.delete(PARAM);
-    window.history.replaceState({ passo: 0 }, "", url);
-
-    function aoNavegar(evento: PopStateEvent) {
-      const estado = evento.state as { passo?: number } | null;
-      setIndice(
-        Math.min(Math.max(estado?.passo ?? 0, 0), tourSteps.length - 1),
-      );
-    }
-
-    window.addEventListener("popstate", aoNavegar);
-    return () => window.removeEventListener("popstate", aoNavegar);
-  }, []);
-
   const irPara = useCallback(
-    (proximo: number, opcoes: { empilhar?: boolean; parar?: boolean } = {}) => {
-      const { empilhar = true, parar = true } = opcoes;
+    (proximo: number, opcoes: { parar?: boolean } = {}) => {
+      const { parar = true } = opcoes;
       const alvo = Math.min(Math.max(proximo, 0), tourSteps.length - 1);
 
       setDirecao(alvo >= indice ? 1 : -1);
       setIndice(alvo);
       if (parar) setTocando(false);
-      if (!empilhar) return;
-
-      const url = new URL(window.location.href);
-      url.searchParams.set(PARAM, String(alvo + 1));
-      window.history.pushState({ passo: alvo }, "", url);
     },
     [indice],
   );
@@ -145,16 +149,8 @@ export function GuidedTour() {
         return;
       }
 
-      const proximo = indice + 1;
       setDirecao(1);
-      setIndice(proximo);
-
-      // Avanço automático substitui a entrada em vez de empilhar: encheria o
-      // botão voltar. Mas precisa substituir mesmo — se a entrada atual
-      // guardasse uma etapa antiga, o voltar saltaria para um ponto distante.
-      const url = new URL(window.location.href);
-      url.searchParams.set(PARAM, String(proximo + 1));
-      window.history.replaceState({ passo: proximo }, "", url);
+      setIndice(indice + 1);
     }, DURACAO);
 
     return () => window.clearTimeout(tempo);

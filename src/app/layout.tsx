@@ -19,7 +19,7 @@ const fraunces = Fraunces({
 
 const title = `${siteConfig.productName} — sistema de operação do lead ao pós-atendimento`;
 const description =
-  "Comercial, jurídico, financeiro, documentos e trilhas de treinamento em um só sistema, em um ambiente configurado com a identidade da sua empresa. Relatórios e documentos gerados pelo próprio sistema, esteira jurídica configurável e módulos conforme o pacote contratado. Agende uma demonstração.";
+  "Comercial, jurídico, financeiro, documentos e treinamento em um só sistema, no ambiente configurado com a identidade da sua empresa. Relatórios e contratos gerados pelo próprio sistema, esteira jurídica configurável e módulos conforme o pacote contratado. Agende uma demonstração ou teste grátis por 7 dias.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.siteUrl),

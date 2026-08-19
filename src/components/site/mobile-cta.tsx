@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { ArrowUpRight } from "lucide-react";
+import { trial } from "@/content/site";
 import { whatsappLink } from "@/lib/site-config";
 
 /**
@@ -47,17 +48,21 @@ export function MobileCta({ message }: { message: string }) {
   return (
     <div
       aria-hidden={!showing}
-      className={`fixed inset-x-0 bottom-0 z-30 border-t border-ink-800 bg-ink-950/95 p-3 backdrop-blur transition-transform duration-300 lg:hidden ${
+      // A folga inferior respeita a barra de gestos do aparelho.
+      style={{ paddingBottom: "calc(0.75rem + env(safe-area-inset-bottom))" }}
+      className={`fixed inset-x-0 bottom-0 z-30 border-t border-ink-800 bg-ink-950/95 px-3 pt-3 backdrop-blur transition-transform duration-300 lg:hidden ${
         showing ? "translate-y-0" : "translate-y-full"
       }`}
     >
       <a
         href={href}
-        {...(href.startsWith("http") ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+        {...(href.startsWith("http")
+          ? { target: "_blank", rel: "noopener noreferrer" }
+          : {})}
         tabIndex={showing ? 0 : -1}
         className="flex w-full items-center justify-center gap-2 rounded-lg bg-brand-500 px-5 py-3.5 text-sm font-semibold text-white"
       >
-        Agendar demonstração
+        {trial.cta}
         <ArrowUpRight aria-hidden="true" className="h-4 w-4" />
       </a>
     </div>

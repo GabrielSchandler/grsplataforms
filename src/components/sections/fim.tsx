@@ -1,8 +1,13 @@
 import { ArrowUpRight, Plus } from "lucide-react";
 import { Reveal } from "@/components/motion/motion";
 import { DemoForm } from "@/components/site/demo-form";
-import { Eyebrow, Lead, Section, SectionTitle } from "@/components/site/primitives";
-import { faq, finalCta } from "@/content/site";
+import {
+  Eyebrow,
+  Lead,
+  Section,
+  SectionTitle,
+} from "@/components/site/primitives";
+import { faq, finalCta, trial } from "@/content/site";
 import { whatsappLink } from "@/lib/site-config";
 
 export function Faq() {
@@ -10,7 +15,9 @@ export function Faq() {
     <Section id="perguntas" tone="bone">
       <Reveal>
         <Eyebrow tone="bone">{faq.eyebrow}</Eyebrow>
-        <SectionTitle className="max-w-3xl text-ink-950">{faq.title}</SectionTitle>
+        <SectionTitle className="max-w-3xl text-ink-950">
+          {faq.title}
+        </SectionTitle>
         <Lead tone="bone">{faq.intro}</Lead>
       </Reveal>
 
@@ -25,7 +32,9 @@ export function Faq() {
                   className="mt-1 h-4 w-4 shrink-0 text-brand-500 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-open:rotate-45"
                 />
               </summary>
-              <p className="measure pb-6 text-[15px] leading-relaxed text-fog-600">{item.answer}</p>
+              <p className="measure pb-6 text-[15px] leading-relaxed text-fog-600">
+                {item.answer}
+              </p>
             </details>
           </Reveal>
         ))}
@@ -58,10 +67,36 @@ export function FinalCta() {
               className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
             />
           </a>
+
+          {/* A oferta do teste aparece junto da conversão, e não só no meio
+              da página: é a alternativa de menor compromisso para quem ainda
+              não quer marcar reunião. */}
+          <div className="mt-10 rounded-lg border border-ink-800 bg-ink-900 p-5">
+            <h3 className="text-[15px] font-semibold text-white">
+              {trial.title}
+            </h3>
+            <p className="measure mt-2 text-[14px] leading-relaxed text-fog-400">
+              {trial.description}
+            </p>
+            <a
+              href={whatsappLink(trial.whatsappMessage)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-4 inline-flex items-center gap-2 rounded-lg border border-ink-700 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:border-fog-600"
+            >
+              {trial.cta}
+              <ArrowUpRight aria-hidden="true" className="h-4 w-4" />
+            </a>
+          </div>
         </Reveal>
 
-        <Reveal delay={140} className="rounded-lg border border-ink-800 bg-ink-900 p-6 sm:p-8">
-          <h3 className="font-display text-xl font-semibold text-white">{finalCta.formTitle}</h3>
+        <Reveal
+          delay={140}
+          className="rounded-lg border border-ink-800 bg-ink-900 p-6 sm:p-8"
+        >
+          <h3 className="font-display text-xl font-semibold text-white">
+            {finalCta.formTitle}
+          </h3>
           <p className="mt-2 text-[14px] leading-relaxed text-fog-400">
             {finalCta.formDescription}
           </p>

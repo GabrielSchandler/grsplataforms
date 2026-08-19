@@ -405,7 +405,6 @@ async function main() {
           await page.waitForTimeout(700);
 
           const depois = Number((await contador.first().textContent())?.split("/")[0]);
-          const passoNaUrl = Number(new URL(page.url()).searchParams.get("passo"));
           const tituloDepois = await page.locator("#demonstrativo h3").first().textContent();
 
           check(
@@ -413,21 +412,10 @@ async function main() {
             `${viewport.name}: tour nao avancou a etapa (${antes} -> ${depois})`,
           );
           check(
-            passoNaUrl === depois,
-            `${viewport.name}: URL fora de sincronia com a etapa (url=${passoNaUrl}, etapa=${depois})`,
-          );
-          check(
             tituloInicial !== tituloDepois,
             `${viewport.name}: tour avancou mas o titulo da etapa nao mudou`,
           );
 
-          await page.goBack();
-          await page.waitForTimeout(450);
-          const tituloVoltando = await page.locator("#demonstrativo h3").first().textContent();
-          check(
-            tituloVoltando === tituloInicial,
-            `${viewport.name}: voltar no navegador nao restaurou a etapa do tour`,
-          );
         } else {
           check(false, `${viewport.name}: botao do tour guiado nao encontrado`);
         }
@@ -468,6 +456,44 @@ async function main() {
             .locator(`#${id}`)
             .screenshot({ path: path.join(SHOT_DIR, pasta, `${id}.png`) })
             .catch(() => {});
+        }
+      }
+
+      /* ---------- links diretos para uma etapa do tour ---------- */
+
+      // `?passo=N` precisa abrir na etapa pedida ja na primeira renderizacao,
+      // e valor invalido precisa cair na etapa 1 em vez de quebrar.
+      if (viewport.width === 1440) {
+        const casos = [
+          { param: "1", esperado: 1 },
+          { param: "6", esperado: 6 },
+          { param: "10", esperado: 10 },
+          { param: "14", esperado: 14 },
+          { param: "0", esperado: 1 },
+          { param: "99", esperado: 1 },
+          { param: "abc", esperado: 1 },
+          { param: "2.5", esperado: 1 },
+        ];
+
+        for (const caso of casos) {
+          await page.goto(`${BASE}/?passo=${caso.param}`, {
+            waitUntil: "load",
+            timeout: 30000,
+          });
+          await page.evaluate(() => document.fonts.ready);
+          await page.waitForTimeout(500);
+
+          const texto = await page
+            .locator("#demonstrativo span")
+            .filter({ hasText: /^\d+\/14$/ })
+            .first()
+            .textContent();
+          const etapa = Number((texto ?? "0/14").split("/")[0]);
+
+          check(
+            etapa === caso.esperado,
+            `${viewport.name}: ?passo=${caso.param} abriu na etapa ${etapa}, esperado ${caso.esperado}`,
+          );
         }
       }
 

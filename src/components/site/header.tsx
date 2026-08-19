@@ -4,8 +4,13 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
-import { hero, nav } from "@/content/site";
-import { CONTACT_ANCHOR, primaryCtaHref, siteConfig } from "@/lib/site-config";
+import { hero, nav, trial } from "@/content/site";
+import {
+  CONTACT_ANCHOR,
+  primaryCtaHref,
+  siteConfig,
+  whatsappLink,
+} from "@/lib/site-config";
 
 export function Header() {
   const [open, setOpen] = useState(false);
@@ -46,7 +51,10 @@ export function Header() {
           </span>
         </Link>
 
-        <nav aria-label="Páginas do site" className="hidden items-center gap-6 lg:flex">
+        <nav
+          aria-label="Páginas do site"
+          className="hidden items-center gap-6 lg:flex"
+        >
           {nav.links.map((link) => {
             const ativo = link.href === atual;
 
@@ -74,7 +82,9 @@ export function Header() {
         <div className="flex items-center gap-3">
           <a
             href={ctaHref}
-            {...(ctaHref.startsWith("http") ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+            {...(ctaHref.startsWith("http")
+              ? { target: "_blank", rel: "noopener noreferrer" }
+              : {})}
             className="hidden rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-600 sm:inline-flex"
           >
             {nav.cta}
@@ -87,7 +97,9 @@ export function Header() {
             aria-controls="menu-mobile"
             className="inline-flex items-center justify-center rounded-lg border border-ink-700 p-2 text-white lg:hidden"
           >
-            <span className="sr-only">{open ? "Fechar menu" : "Abrir menu"}</span>
+            <span className="sr-only">
+              {open ? "Fechar menu" : "Abrir menu"}
+            </span>
             {open ? (
               <X aria-hidden="true" className="h-5 w-5" />
             ) : (
@@ -117,11 +129,24 @@ export function Header() {
             ))}
             <li className="pt-2">
               <a
-                href={siteConfig.hasWhatsapp || siteConfig.agendaUrl ? ctaHref : CONTACT_ANCHOR}
+                href={
+                  siteConfig.hasWhatsapp || siteConfig.agendaUrl
+                    ? ctaHref
+                    : CONTACT_ANCHOR
+                }
                 onClick={() => setOpen(false)}
                 className="block rounded-lg bg-brand-500 px-3 py-2.5 text-center text-sm font-semibold text-white"
               >
                 {nav.cta}
+              </a>
+            </li>
+            <li>
+              <a
+                href={whatsappLink(trial.whatsappMessage)}
+                onClick={() => setOpen(false)}
+                className="block rounded-lg border border-ink-700 px-3 py-2.5 text-center text-sm font-semibold text-white"
+              >
+                {trial.cta}
               </a>
             </li>
           </ul>

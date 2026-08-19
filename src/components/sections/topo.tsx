@@ -1,18 +1,34 @@
 import { ArrowRight } from "lucide-react";
 import { PainelComercial } from "@/components/demo/screens-comercial";
 import { ParallaxLayer, Reveal } from "@/components/motion/motion";
-import { Eyebrow, Lead, Section, SectionTitle } from "@/components/site/primitives";
-import { benefitStrip, hero, problems } from "@/content/site";
-import { CONTACT_ANCHOR, primaryCtaHref } from "@/lib/site-config";
+import {
+  Eyebrow,
+  Lead,
+  Section,
+  SectionTitle,
+} from "@/components/site/primitives";
+import { benefitStrip, hero, problems, trial } from "@/content/site";
+import {
+  CONTACT_ANCHOR,
+  primaryCtaHref,
+  whatsappLink,
+} from "@/lib/site-config";
 
 export function Hero() {
   const ctaHref = primaryCtaHref(hero.whatsappMessage);
+  const testeHref = whatsappLink(trial.whatsappMessage);
 
   return (
-    <section id="topo" className="relative isolate min-h-[94vh] overflow-hidden bg-ink-950">
+    <section
+      id="topo"
+      className="relative isolate min-h-[94vh] overflow-hidden bg-ink-950"
+    >
       {/* Camada 1 — a cena. Fotografia de ambiente, não de interface: a
           interface real entra depois, por cima, como réplica em HTML. */}
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 overflow-hidden"
+      >
         <ParallaxLayer speed={0.1} className="absolute inset-0">
           <picture>
             <source
@@ -55,7 +71,8 @@ export function Hero() {
           className="hero-panel absolute -bottom-[8%] right-[-8%] hidden w-[54%] lg:block xl:w-[52%]"
           style={{
             maskImage: "linear-gradient(to right, transparent, black 22%)",
-            WebkitMaskImage: "linear-gradient(to right, transparent, black 22%)",
+            WebkitMaskImage:
+              "linear-gradient(to right, transparent, black 22%)",
           }}
         >
           <div className="overflow-hidden rounded-lg border border-ink-700 shadow-[0_40px_120px_rgba(0,0,0,0.65)]">
@@ -77,17 +94,28 @@ export function Hero() {
             <Eyebrow>{hero.eyebrow}</Eyebrow>
           </div>
 
-          <div className="hero-in" style={{ "--delay": "70ms" } as React.CSSProperties}>
+          <div
+            className="hero-in"
+            style={{ "--delay": "70ms" } as React.CSSProperties}
+          >
             <h1 className="font-display mt-6 text-4xl leading-[1.05] font-semibold text-white sm:text-5xl lg:text-6xl">
               {hero.title}
             </h1>
           </div>
 
-          <div className="hero-in" style={{ "--delay": "150ms" } as React.CSSProperties}>
-            <p className="measure mt-6 text-lg leading-relaxed text-fog-300">{hero.subtitle}</p>
+          <div
+            className="hero-in"
+            style={{ "--delay": "150ms" } as React.CSSProperties}
+          >
+            <p className="measure mt-6 text-lg leading-relaxed text-fog-300">
+              {hero.subtitle}
+            </p>
           </div>
 
-          <div className="hero-in" style={{ "--delay": "220ms" } as React.CSSProperties}>
+          <div
+            className="hero-in"
+            style={{ "--delay": "220ms" } as React.CSSProperties}
+          >
             <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
               <a
                 href={ctaHref}
@@ -102,17 +130,49 @@ export function Hero() {
                 </span>
               </a>
               <a
-                href="#demonstrativo"
+                href={testeHref}
+                {...(testeHref.startsWith("http")
+                  ? { target: "_blank", rel: "noopener noreferrer" }
+                  : {})}
                 className="inline-flex items-center justify-center gap-2 rounded-lg border border-ink-700 px-6 py-3.5 text-sm font-semibold text-white transition-colors hover:border-fog-600"
               >
                 {hero.secondaryCta}
               </a>
+              <a
+                href="#demonstrativo"
+                className="inline-flex items-center justify-center gap-2 px-1 py-3.5 text-sm font-semibold text-fog-300 underline-offset-4 transition-colors hover:text-white hover:underline"
+              >
+                {hero.tertiaryCta}
+              </a>
             </div>
           </div>
 
-          <div className="hero-in" style={{ "--delay": "290ms" } as React.CSSProperties}>
-            <p className="mt-8 flex max-w-md items-start gap-2.5 text-[13px] leading-relaxed text-fog-500">
-              <span aria-hidden="true" className="mt-[0.62em] h-px w-5 shrink-0 bg-brand-500" />
+          {/* Faixa de confiança: só afirmações verificáveis no produto. */}
+          <div
+            className="hero-in"
+            style={{ "--delay": "260ms" } as React.CSSProperties}
+          >
+            <ul className="mt-7 flex flex-wrap gap-x-2 gap-y-2">
+              {hero.trustChips.map((chip) => (
+                <li
+                  key={chip}
+                  className="rounded border border-ink-700 bg-ink-900/60 px-2.5 py-1 text-[12px] text-fog-300"
+                >
+                  {chip}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div
+            className="hero-in"
+            style={{ "--delay": "330ms" } as React.CSSProperties}
+          >
+            <p className="mt-7 flex max-w-md items-start gap-2.5 text-[13px] leading-relaxed text-fog-500">
+              <span
+                aria-hidden="true"
+                className="mt-[0.62em] h-px w-5 shrink-0 bg-brand-500"
+              />
               {hero.trustLine}
             </p>
           </div>
@@ -140,8 +200,12 @@ export function BenefitStrip() {
             delay={index * 90}
             className="py-8 lg:px-6 lg:first:pl-0 lg:last:pr-0"
           >
-            <h2 className="text-sm font-semibold text-white">{benefit.title}</h2>
-            <p className="mt-2 text-[13px] leading-relaxed text-fog-400">{benefit.description}</p>
+            <h2 className="text-sm font-semibold text-white">
+              {benefit.title}
+            </h2>
+            <p className="mt-2 text-[13px] leading-relaxed text-fog-400">
+              {benefit.description}
+            </p>
           </Reveal>
         ))}
       </div>
@@ -154,7 +218,9 @@ export function Problems() {
     <Section tone="bone">
       <Reveal>
         <Eyebrow tone="bone">{problems.eyebrow}</Eyebrow>
-        <SectionTitle className="max-w-3xl text-ink-950">{problems.title}</SectionTitle>
+        <SectionTitle className="max-w-3xl text-ink-950">
+          {problems.title}
+        </SectionTitle>
         <Lead tone="bone">{problems.intro}</Lead>
       </Reveal>
 
@@ -172,7 +238,9 @@ export function Problems() {
             <h3 className="mt-3 text-[17px] font-semibold leading-snug text-ink-950">
               {item.title}
             </h3>
-            <p className="mt-2.5 text-[15px] leading-relaxed text-fog-600">{item.description}</p>
+            <p className="mt-2.5 text-[15px] leading-relaxed text-fog-600">
+              {item.description}
+            </p>
           </Reveal>
         ))}
       </div>

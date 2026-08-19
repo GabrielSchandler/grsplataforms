@@ -21,18 +21,48 @@ export const nav = {
   cta: "Agendar demonstração",
 };
 
+/**
+ * Oferta do teste gratuito, em um lugar só. Ela aparece na primeira dobra, no
+ * fim da demonstração, no FAQ, na conversão final e no menu do celular —
+ * repetir o texto em cinco arquivos seria garantia de divergirem.
+ *
+ * O que não se afirma, por não estar confirmado no processo comercial:
+ * liberação instantânea, dispensa de cartão, ou que todos os módulos estarão
+ * disponíveis no período.
+ */
+export const trial = {
+  title: "Teste grátis por 7 dias",
+  cta: "Testar grátis por 7 dias",
+  description:
+    "Conheça a plataforma com a sua equipe antes de contratar. O ambiente de avaliação é liberado após o alinhamento inicial com o nosso comercial.",
+  whatsappMessage:
+    "Olá! Conheci a GRS Plataforma pelo site e gostaria de solicitar o teste gratuito de 7 dias para a minha empresa.",
+};
+
 export const hero = {
-  eyebrow: "Sistema de operação para empresas de serviços com comercial e jurídico",
+  eyebrow:
+    "Sistema de operação para empresas de serviços com comercial e jurídico",
   // Testei contra a versão anterior ("Do primeiro lead ao acompanhamento
   // final..."): esta diz a mesma coisa em metade das palavras e sobrevive
   // melhor sobre a fotografia, onde linha longa disputa com a cena.
   title: "O CRM que conecta sua operação inteira.",
   subtitle:
     "Comercial, jurídico, financeiro, gestão e relacionamento com o cliente em um fluxo conectado, com documentos, automações e acompanhamento centralizado, em um ambiente configurado com a identidade da sua empresa.",
-  primaryCta: "Agendar uma demonstração",
-  secondaryCta: "Explorar o sistema",
+  primaryCta: "Agendar demonstração",
+  secondaryCta: "Testar grátis por 7 dias",
+  tertiaryCta: "Explorar o sistema",
   trustLine:
     "Nasceu e roda dentro de uma operação real de revisão de juros, com equipes comercial e jurídica próprias.",
+  /**
+   * Faixa de confiança da primeira dobra. Só entra aqui o que é verificável
+   * no produto — nada de selo de certificação que a empresa não tem.
+   */
+  trustChips: [
+    "Ambiente multiempresa",
+    "Comercial, jurídico e financeiro conectados",
+    "Demonstração com dados fictícios",
+    "Teste grátis por 7 dias",
+  ],
   // As mensagens começam identificando a origem: na lista do WhatsApp o
   // comercial já vê que o contato veio do site do CRM, não do institucional.
   whatsappMessage:
@@ -42,11 +72,13 @@ export const hero = {
 export const benefitStrip = [
   {
     title: "Uma base só",
-    description: "Lead, cliente, contrato, processo e pagamento no mesmo cadastro.",
+    description:
+      "Lead, cliente, contrato, processo e pagamento no mesmo cadastro.",
   },
   {
     title: "Cada setor no seu lugar",
-    description: "Áreas de trabalho separadas, com permissão por função e departamento.",
+    description:
+      "Áreas de trabalho separadas, com permissão por função e departamento.",
   },
   {
     title: "Histórico das operações relevantes",
@@ -55,7 +87,8 @@ export const benefitStrip = [
   },
   {
     title: "Com a sua marca",
-    description: "O ambiente é configurado com o nome e o logotipo da sua empresa.",
+    description:
+      "O ambiente é configurado com o nome e o logotipo da sua empresa.",
   },
 ];
 
@@ -67,13 +100,11 @@ export const demoLabels = {
   badge: "Ambiente demonstrativo",
   note: "Nomes, CPFs e telefones são fictícios.",
   testAccess: {
-    title: "Quer testar com a sua própria equipe?",
-    description:
-      "Depois da conversa com o comercial, liberamos um acesso de avaliação com a sua empresa configurada, para a equipe usar de verdade antes de decidir.",
-    cta: "Pedir acesso de avaliação",
+    title: trial.title,
+    description: trial.description,
+    cta: trial.cta,
     ctaExternal: "Abrir ambiente de demonstração",
-    whatsappMessage:
-      "GRS Plataforma (CRM) — vim pelo site e gostaria de um acesso de avaliação do sistema.",
+    whatsappMessage: trial.whatsappMessage,
   },
 };
 
@@ -257,7 +288,7 @@ export const faq = {
     {
       question: "Consigo testar antes de contratar?",
       answer:
-        "Consegue. Além do ambiente demonstrativo aberto nesta página, liberamos um acesso de avaliação com a sua empresa já configurada depois da conversa com o comercial — assim a equipe usa o sistema de verdade antes de decidir.",
+        "Sim. Após o alinhamento com o nosso comercial, podemos liberar um ambiente de avaliação gratuito por 7 dias, configurado para a empresa conhecer o sistema antes da contratação. Os módulos disponíveis no teste são definidos durante a configuração.",
     },
     {
       question: "Como funciona o suporte depois que entra no ar?",
@@ -289,7 +320,10 @@ export const footer = {
   columns: [
     {
       title: "O sistema",
-      links: areas.map((area) => ({ label: area.navLabel, href: `/${area.slug}` })),
+      links: areas.map((area) => ({
+        label: area.navLabel,
+        href: `/${area.slug}`,
+      })),
     },
     {
       title: "Site",
