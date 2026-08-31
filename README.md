@@ -34,7 +34,7 @@ funciona sem nenhum `.env`:
 
 | Item | Valor |
 | --- | --- |
-| WhatsApp comercial do CRM | (11) 98226-6789 |
+| WhatsApp comercial do CRM | (11) 96332-2546 |
 | E-mail | planejamento@grssolucao.com.br |
 | CNPJ | 63.562.890/0001-45 |
 | Sede | R. Evangelina, 321 — Vila Carrão, São Paulo/SP |
@@ -43,10 +43,10 @@ CNPJ e endereço vieram do site institucional já publicado
 (`GRS_INSTITUCIONAL2/lib/content.js`), para que a mesma empresa não apareça
 com identificação diferente em dois sites.
 
-O WhatsApp do CRM é **outro número** do usado no institucional
-((11) 94039-4084), de propósito: separa o lead de software do lead de
-revisional. Toda mensagem começa com `GRS Plataforma (CRM) —`, para o
-comercial reconhecer a origem já na lista de conversas.
+O WhatsApp do CRM é **o mesmo número do institucional** desde 31/08/2026,
+quando a linha anterior da GRS foi banida e todos os sites foram unificados
+no (11) 96332-2546. Toda mensagem começa com `GRS Plataforma (CRM) —`, para o
+comercial reconhecer que o lead veio do site de software, e não do revisional.
 
 Para sobrescrever qualquer um desses valores, copie `.env.example` para
 `.env.local`. Como o build é estático, mudar variável exige refazer o build.

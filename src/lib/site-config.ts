@@ -19,8 +19,8 @@ const raw = {
   taxId: process.env.NEXT_PUBLIC_CNPJ ?? "",
 };
 
-/** Linha comercial do CRM — separada da linha do institucional. */
-const defaultWhatsapp = "5511982266789";
+/** Linha comercial do CRM — mesma do institucional desde 31/08/2026. */
+const defaultWhatsapp = "5511963322546";
 
 /** Só dígitos: wa.me não aceita máscara. */
 const whatsappDigits = (raw.whatsapp || defaultWhatsapp).replace(/\D/g, "");
