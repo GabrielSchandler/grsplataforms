@@ -1,45 +1,40 @@
 /**
  * Marca NewSec.
  *
- * O símbolo é um "N" isométrico: duas hastes em paralelogramo e uma fita
- * vermelha na diagonal, com filete claro correndo por dentro. Ele foi
- * redesenhado em vetor a partir da identidade de referência — a marca
- * original nasceu como imagem raster, e imagem raster não escala para o
- * favicon de 32px nem mantém borda limpa em tela de alta densidade.
+ * Os contornos foram traçados do arquivo original da identidade, não
+ * desenhados no olho: o PNG entregue pelo gerador de imagem foi convertido
+ * em máscaras por cor, os contornos extraídos por vizinhança de Moore e
+ * simplificados por Ramer-Douglas-Peucker. Por isso o desenho bate com o
+ * material de marca em vez de ser uma aproximação parecida.
  *
- * As hastes usam `currentColor` de propósito: sobre fundo escuro a marca é
- * branca, sobre fundo claro é preta, e o vermelho da fita não muda nunca.
- * Assim o mesmo componente serve cabeçalho, rodapé e material impresso sem
- * um segundo arquivo de logo negativo para manter em sincronia.
+ * O filete claro que corre por dentro da fita não é um traço separado: ele
+ * se abre nas duas pontas, então faz parte do próprio contorno do vermelho.
+ *
+ * As formas escuras usam `currentColor` de propósito — sobre fundo escuro a
+ * marca é branca, sobre fundo claro é preta, e o vermelho da fita não muda
+ * nunca. Um componente só serve cabeçalho, rodapé e captura, sem um segundo
+ * arquivo negativo para manter em sincronia.
+ *
+ * ⚠️ `currentColor` só funciona com o SVG embutido, como aqui. Se algum dia
+ * este desenho for servido por <img src="...svg">, o SVG vira documento
+ * isolado, não herda a cor da página e as formas saem pretas.
  */
 
 export function LogoMark({ className = "" }: { className?: string }) {
   return (
     <svg
-      viewBox="0 0 100 120"
+      viewBox="0 0 95.24 100"
       className={className}
       role="img"
       aria-hidden="true"
       focusable="false"
     >
       <g fill="currentColor">
-        <polygon points="6,30 34,14 34,104 6,120" />
-        <polygon points="66,16 94,0 94,90 66,106" />
+        <path d="M 94.86,0 L 95.24,0 L 95.24,68.76 L 72.76,53.9 L 72.95,15.62 L 74.67,13.33 L 94.67,0.19 Z" />
+        <path d="M 0,32.57 L 22.29,47.62 L 22.1,80.19 L 19.24,83.05 L 0.19,95.81 L 0,32.76 Z" />
+        <path d="M 28.57,52 L 68.19,79.05 L 71.05,83.62 L 72.57,89.52 L 72.38,94.1 L 70.67,99.43 L 58.48,91.43 L 29.71,71.24 L 28.38,68.19 L 28.38,52.19 Z" />
       </g>
-      <path
-        d="M 20 18 L 80 98"
-        stroke="#E31B23"
-        strokeWidth="25"
-        strokeLinecap="round"
-        fill="none"
-      />
-      <path
-        d="M 31 31 L 69 85"
-        stroke="#FFFFFF"
-        strokeWidth="2.4"
-        strokeLinecap="round"
-        fill="none"
-      />
+      <path fill="#E31B23" d="M 23.81,2.67 L 25.71,2.86 L 64.95,29.33 L 66.86,33.33 L 66.86,49.14 L 65.9,49.14 L 27.24,23.24 L 25.71,23.24 L 24.76,24 L 24.38,24.95 L 24.76,26.29 L 90.48,70.48 L 93.14,72.76 L 94.48,75.24 L 94.86,79.24 L 94.29,81.33 L 92.95,83.62 L 71.43,100 L 70.67,99.62 L 72.57,94.48 L 72.76,88.76 L 71.05,83.05 L 68.57,79.43 L 69.71,80 L 71.43,79.81 L 71.62,77.52 L 71.24,76.57 L 4.19,30.48 L 2.29,27.81 L 1.9,24.76 L 2.48,22.67 L 3.62,20.95 L 20.57,7.43 L 22.86,4.95 L 23.81,2.86 Z" />
     </svg>
   );
 }

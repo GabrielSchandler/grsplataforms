@@ -78,7 +78,7 @@ export default function RootLayout({
         <link
           rel="preload"
           as="image"
-          href="/img/hero/cena-2560.avif"
+          href="/img/hero/cena-1672.avif"
           type="image/avif"
           media="(min-width: 641px)"
           fetchPriority="high"

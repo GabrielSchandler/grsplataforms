@@ -41,17 +41,21 @@ export function Hero() {
               type="image/webp"
               srcSet="/img/hero/cena-mobile.webp"
             />
-            <source type="image/avif" srcSet="/img/hero/cena-2560.avif" />
+            {/* O maior arquivo tem 1672px porque essa e a largura do
+                original da cena. Declarar 2560w serviria um arquivo
+                ampliado por interpolacao: mesmo borrao, mais bytes. Quem
+                trocar a foto por uma maior, atualize os tres numeros. */}
+            <source type="image/avif" srcSet="/img/hero/cena-1672.avif" />
             <source
               type="image/webp"
-              srcSet="/img/hero/cena-1280.webp 1280w, /img/hero/cena-2560.webp 2560w"
+              srcSet="/img/hero/cena-1280.webp 1280w, /img/hero/cena-1672.webp 1672w"
               sizes="100vw"
             />
             <img
-              src="/img/hero/cena-2560.webp"
+              src="/img/hero/cena-1672.webp"
               alt=""
-              width={2560}
-              height={1097}
+              width={1672}
+              height={716}
               fetchPriority="high"
               decoding="async"
               className="hero-scene h-[112vh] w-full object-cover"
