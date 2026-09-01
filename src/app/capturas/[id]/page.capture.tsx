@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { PainelComercial } from "@/components/demo/screens-comercial";
 import { demoScreens } from "@/components/demo/registry";
+import { LogoMark } from "@/components/site/logo";
 import { hero } from "@/content/site";
 import { siteConfig } from "@/lib/site-config";
 
@@ -37,10 +38,10 @@ function OpenGraphCard() {
         <div className="absolute inset-0 bg-gradient-to-r from-ink-950 via-ink-950/92 to-ink-950/50" />
       </div>
 
-      <div className="relative flex items-baseline gap-3">
-        <span className="font-display text-3xl font-semibold text-white">GRS</span>
-        <span className="text-sm font-semibold uppercase tracking-[0.24em] text-brand-300">
-          Plataforma
+      <div className="relative flex items-center gap-3 text-white">
+        <LogoMark className="h-12 w-auto" />
+        <span className="text-3xl font-extrabold uppercase tracking-[0.02em]">
+          NewSec
         </span>
       </div>
 

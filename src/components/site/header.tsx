@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
+import { Logo } from "@/components/site/logo";
 import { hero, nav, trial } from "@/content/site";
 import {
   CONTACT_ANCHOR,
@@ -42,13 +43,8 @@ export function Header() {
       }`}
     >
       <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-6 px-5 py-4 sm:px-8">
-        <Link href="/" className="flex items-baseline gap-2">
-          <span className="font-display text-lg font-semibold tracking-tight text-white">
-            GRS
-          </span>
-          <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-brand-300">
-            Plataforma
-          </span>
+        <Link href="/" aria-label={`${siteConfig.productName} — página inicial`}>
+          <Logo />
         </Link>
 
         <nav

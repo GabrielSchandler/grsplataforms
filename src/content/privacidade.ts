@@ -7,19 +7,28 @@
  * fórmula genérica de site com banco de dados.
  *
  * Precisa de revisão jurídica antes de publicar, e do encarregado de dados
- * quando a GRS designar um.
+ * quando a empresa designar um.
+ *
+ * ⚠️ Esta é a única página do site que identifica a desenvolvedora. O
+ * rodapé deixou de publicar CNPJ e endereço para não ligar a marca NewSec
+ * à GRS Soluções, que atua no mesmo ramo do comprador — mas a LGPD exige
+ * que o controlador dos dados seja identificável, e um site que esconde
+ * isso por completo fica irregular. Se a NewSec for constituída como
+ * empresa própria, esta seção passa a citá-la e o conflito desaparece.
  */
+
+import { addressLine, siteConfig } from "@/lib/site-config";
 
 export const privacidade = {
   title: "Política de privacidade",
   updatedAt: "12 de agosto de 2026",
   intro:
-    "Esta página explica como os dados são tratados no site da GRS Plataforma. Ela trata apenas deste site — o sistema contratado tem controles próprios, descritos em contrato.",
+    "Esta página explica como os dados são tratados no site da NewSec. Ela trata apenas deste site — o sistema contratado tem controles próprios, descritos em contrato.",
   sections: [
     {
       title: "Quem é responsável",
       paragraphs: [
-        "A GRS Soluções é a responsável pelo tratamento dos dados descritos aqui. A identificação completa está no rodapé do site.",
+        `O tratamento dos dados descritos aqui é de responsabilidade de ${siteConfig.legalName}, CNPJ ${siteConfig.taxId}, com sede em ${addressLine}. A NewSec é a marca sob a qual o sistema é comercializado.`,
       ],
     },
     {

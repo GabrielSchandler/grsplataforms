@@ -1,7 +1,29 @@
-# Site comercial — GRS Plataforma
+# Site comercial — NewSec
 
-Página de venda do sistema de operação desenvolvido pela GRS Soluções.
-Objetivo único da página: agendar demonstração. Não exibe preço.
+Página de venda do sistema de operação. Objetivo único da página: agendar
+demonstração. Não exibe preço.
+
+## Por que a marca do site não é a marca de quem desenvolve
+
+O sistema é desenvolvido pela GRS Soluções, que atua em revisão de juros. O
+público comprador deste site inclui empresas do mesmo ramo — ou seja,
+concorrente direto da desenvolvedora. Um comprador que percebe estar
+contratando software de um concorrente desiste antes da demonstração.
+
+Por isso o produto é vendido sob a marca própria **NewSec**, e o site não
+publica a identificação da desenvolvedora. Decisão do Gabriel, 01/09/2026.
+
+O que isso implica, na prática:
+
+- Rodapé e dados estruturados **não** exibem mais razão social, CNPJ e
+  endereço. Eles continuam em `src/lib/site-config.ts`, mas só a página de
+  privacidade os consome.
+- A primeira dobra não diz mais em que ramo o sistema nasceu. O argumento
+  de "software testado em operação real" ficou; o segmento saiu.
+- Os cursos da Academy aparecem como **Formação Comercial** e **Operação do
+  CRM**, sem o sufixo GRS.
+
+⚠️ **Três brechas seguem abertas** — ver "Pendências antes de publicar".
 
 ## Rodar
 
@@ -27,29 +49,39 @@ teclado e o FAQ funcionando sem JavaScript. Também imprime a altura de cada
 página, para o inchaço voltar a ser visível antes de virar problema. Rode
 depois de qualquer mudança visual.
 
-## Dados da empresa e contato
+## Pendências antes de publicar
 
-Já estão configurados como padrão em `src/lib/site-config.ts`, então o site
-funciona sem nenhum `.env`:
+Três coisas ainda ligam esta página à GRS. Nenhuma é resolvida no código —
+todas dependem de decisão ou de cadastro externo.
 
-| Item | Valor |
-| --- | --- |
-| WhatsApp comercial do CRM | (11) 96332-2546 |
-| E-mail | planejamento@grssolucao.com.br |
-| CNPJ | 63.562.890/0001-45 |
-| Sede | R. Evangelina, 321 — Vila Carrão, São Paulo/SP |
+| Pendência | Situação | O que fazer |
+| --- | --- | --- |
+| **Domínio** | Padrão é o placeholder `https://dominio-a-definir.newsec` | Preencher `NEXT_PUBLIC_SITE_URL` com o domínio real. Não é `newsec.com` — esse é de um grupo nórdico de consultoria imobiliária |
+| **WhatsApp** | `(11) 96332-2546`, a **mesma linha do institucional da GRS** | O perfil comercial dela no WhatsApp aparece como GRS Soluções: o primeiro contato entrega a desenvolvedora. Precisa de linha própria |
+| **E-mail** | Vazio — a linha some do rodapé | Criar um endereço no domínio da NewSec e preencher `NEXT_PUBLIC_EMAIL_COMERCIAL`. O anterior (`planejamento@grssolucao.com.br`) saiu porque o domínio entrega a desenvolvedora |
 
-CNPJ e endereço vieram do site institucional já publicado
-(`GRS_INSTITUCIONAL2/lib/content.js`), para que a mesma empresa não apareça
-com identificação diferente em dois sites.
+Além disso, **a página `/privacidade` identifica a desenvolvedora** — e não
+tem como não identificar. A LGPD exige que o controlador dos dados seja
+identificável, e um site que esconde isso por completo fica irregular. Hoje
+ela publica razão social, CNPJ e endereço da GRS Soluções, dizendo que
+NewSec é a marca sob a qual o sistema é comercializado. Se a NewSec vier a
+ser constituída como empresa própria, essa seção passa a citá-la e o
+conflito desaparece.
 
-O WhatsApp do CRM é **o mesmo número do institucional** desde 31/08/2026,
-quando a linha anterior da GRS foi banida e todos os sites foram unificados
-no (11) 96332-2546. Toda mensagem começa com `GRS Plataforma (CRM) —`, para o
-comercial reconhecer que o lead veio do site de software, e não do revisional.
+E **os cursos da Academy**: o site vende "Formação Comercial" e "Operação do
+CRM", mas dentro do sistema eles se chamam "Formação Comercial GRS" e
+"Operação do CRM GRS". Ou renomeia lá, ou o cliente entra e encontra nome
+diferente do que foi vendido.
 
-Para sobrescrever qualquer um desses valores, copie `.env.example` para
-`.env.local`. Como o build é estático, mudar variável exige refazer o build.
+O domínio precisa entrar **antes do primeiro deploy**: ele vai para o
+canonical, o Open Graph e o sitemap, e publicar com o endereço errado ensina
+o endereço errado ao Google.
+
+Toda mensagem de WhatsApp começa com `NewSec (CRM) —`, para o comercial
+reconhecer que o lead veio do site de software e não do revisional.
+
+Para sobrescrever qualquer valor, copie `.env.example` para `.env.local`.
+Como o build é estático, mudar variável exige refazer o build.
 
 ## Arquitetura das páginas
 
@@ -234,10 +266,6 @@ projeto** — se a medição for ativada, ele precisa ser construído antes.
 **Vercel**, decidido. O build é estático (`output: export`), que a Vercel
 serve direto — sem função serverless, sem custo de execução.
 
-Domínio ainda não definido. O padrão está em
-`https://plataforma.grssolucao.com.br`, subdomínio do domínio que a GRS já
-tem. Se for outro, mude `NEXT_PUBLIC_SITE_URL` **antes** do primeiro deploy:
-esse valor entra no canonical, no Open Graph e no sitemap, e publicar com o
-endereço errado ensina o endereço errado ao Google.
+Domínio ainda não definido — ver "Pendências antes de publicar".
 
 Nenhum deploy foi feito.

@@ -36,7 +36,7 @@ export const trial = {
   description:
     "Conheça a plataforma com a sua equipe antes de contratar. O ambiente de avaliação é liberado após o alinhamento inicial com o nosso comercial.",
   whatsappMessage:
-    "Olá! Conheci a GRS Plataforma pelo site e gostaria de solicitar o teste gratuito de 7 dias para a minha empresa.",
+    "Olá! Conheci a NewSec pelo site e gostaria de solicitar o teste gratuito de 7 dias para a minha empresa.",
 };
 
 export const hero = {
@@ -51,8 +51,11 @@ export const hero = {
   primaryCta: "Agendar demonstração",
   secondaryCta: "Testar grátis por 7 dias",
   tertiaryCta: "Explorar o sistema",
+  // O argumento continua sendo "software testado em operação de verdade",
+  // que é forte. O que saiu foi o segmento: dizer "revisão de juros" aqui
+  // identifica a desenvolvedora como concorrente de quem está lendo.
   trustLine:
-    "Nasceu e roda dentro de uma operação real de revisão de juros, com equipes comercial e jurídica próprias.",
+    "Nasceu dentro de uma operação de serviços real, com equipes comercial e jurídica usando o sistema todos os dias.",
   /**
    * Faixa de confiança da primeira dobra. Só entra aqui o que é verificável
    * no produto — nada de selo de certificação que a empresa não tem.
@@ -64,9 +67,10 @@ export const hero = {
     "Teste grátis por 7 dias",
   ],
   // As mensagens começam identificando a origem: na lista do WhatsApp o
-  // comercial já vê que o contato veio do site do CRM, não do institucional.
+  // comercial já vê que o contato veio do site da NewSec, não do
+  // institucional da GRS.
   whatsappMessage:
-    "GRS Plataforma (CRM) — vim pelo site e gostaria de agendar uma demonstração do sistema.",
+    "NewSec (CRM) — vim pelo site e gostaria de agendar uma demonstração do sistema.",
 };
 
 export const benefitStrip = [
@@ -245,7 +249,7 @@ export const implementation = {
     {
       title: "Treinamento e operação assistida",
       description:
-        "As trilhas de treinamento ficam na Academy, dentro do sistema: Formação Comercial GRS e Operação do CRM GRS.",
+        "As trilhas de treinamento ficam na Academy, dentro do sistema: Formação Comercial e Operação do CRM.",
     },
   ],
   support: {
@@ -307,16 +311,16 @@ export const finalCta = {
   formDescription:
     "Preencha os campos e o envio abre o WhatsApp com a mensagem pronta para o nosso comercial.",
   consent:
-    "Autorizo o contato comercial da GRS Soluções sobre a GRS Plataforma. Os dados preenchidos são enviados pelo seu próprio WhatsApp e não ficam armazenados neste site.",
+    "Autorizo o contato comercial da NewSec sobre o sistema. Os dados preenchidos são enviados pelo seu próprio WhatsApp e não ficam armazenados neste site.",
   submit: "Enviar pelo WhatsApp",
   specialistCta: "Falar com um especialista",
   specialistMessage:
-    "GRS Plataforma (CRM) — vim pelo site e gostaria de falar com um especialista sobre o sistema.",
+    "NewSec (CRM) — vim pelo site e gostaria de falar com um especialista sobre o sistema.",
 };
 
 export const footer = {
   description:
-    "Sistema de operação ponta a ponta para empresas de serviços com comercial, jurídico e financeiro. Desenvolvido e operado pela GRS Soluções.",
+    "Sistema de operação ponta a ponta para empresas de serviços com comercial, jurídico e financeiro.",
   columns: [
     {
       title: "O sistema",

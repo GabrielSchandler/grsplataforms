@@ -34,7 +34,7 @@ export function DemoForm() {
 
     const data = new FormData(event.currentTarget);
     const message = [
-      "GRS Plataforma (CRM) — pedido de demonstração pelo site.",
+      "NewSec (CRM) — pedido de demonstração pelo site.",
       "",
       `Nome: ${data.get("nome")}`,
       `Empresa: ${data.get("empresa")}`,

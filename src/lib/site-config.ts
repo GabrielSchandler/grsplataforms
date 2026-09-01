@@ -1,11 +1,21 @@
 /**
  * Configuração do site. O que pode mudar por ambiente vem de variáveis
- * NEXT_PUBLIC_* (ver .env.example); o que é dado fixo da empresa fica como
- * padrão aqui, então o site mostra a identificação correta mesmo sem .env.
+ * NEXT_PUBLIC_* (ver .env.example); o que é dado fixo fica como padrão
+ * aqui, então o site funciona mesmo sem .env.
  *
- * Os dados da empresa foram tirados do site institucional já publicado
- * (GRS_INSTITUCIONAL2/lib/content.js) para que CNPJ, endereço e marca não
- * apareçam diferentes em dois sites da mesma empresa.
+ * ## Por que a marca do site não é a marca de quem desenvolve
+ *
+ * O sistema é desenvolvido pela GRS Soluções, que atua em revisão de juros.
+ * O público comprador deste site inclui empresas do mesmo ramo — ou seja,
+ * concorrente direto de quem desenvolve. Um comprador que percebe estar
+ * contratando software de um concorrente desiste antes da demonstração.
+ * Por isso o produto é vendido sob a marca própria NewSec, e o site não
+ * exibe a identificação da desenvolvedora.
+ *
+ * `legalName`, `taxId` e `address` continuam existindo abaixo, mas são
+ * consumidos SÓ pela página de privacidade: a LGPD exige que o controlador
+ * dos dados seja identificável, e omitir isso do site inteiro não é opção
+ * legal. O rodapé e os dados estruturados não os publicam mais.
  */
 
 const raw = {
@@ -19,21 +29,41 @@ const raw = {
   taxId: process.env.NEXT_PUBLIC_CNPJ ?? "",
 };
 
-/** Linha comercial do CRM — mesma do institucional desde 31/08/2026. */
+/**
+ * Linha comercial do CRM.
+ *
+ * ⚠️ Este é o MESMO número do site institucional da GRS. O perfil comercial
+ * dele no WhatsApp aparece como GRS Soluções, então um lead que salvar o
+ * contato descobre a desenvolvedora no primeiro contato — o que anula o
+ * motivo de existir a marca NewSec. Trocar por uma linha própria antes de
+ * publicar, e sobrescrever aqui ou via NEXT_PUBLIC_WHATSAPP.
+ */
 const defaultWhatsapp = "5511963322546";
 
 /** Só dígitos: wa.me não aceita máscara. */
 const whatsappDigits = (raw.whatsapp || defaultWhatsapp).replace(/\D/g, "");
 
 export const siteConfig = {
-  productName: "GRS Plataforma",
-  vendorName: "GRS Soluções",
+  productName: "NewSec",
+  vendorName: "NewSec",
   tagline: "Do primeiro lead ao acompanhamento final, toda a operação em um só lugar.",
-  siteUrl: raw.siteUrl || "https://plataforma.grssolucao.com.br",
-  email: raw.email || "planejamento@grssolucao.com.br",
+  /**
+   * ⚠️ PENDENTE: domínio real da NewSec, antes do primeiro deploy. Este
+   * valor entra no canonical, no Open Graph e no sitemap — publicar com o
+   * endereço errado ensina o endereço errado ao Google, e depois custa
+   * caro desfazer. O placeholder é feio de propósito: assim aparece na
+   * revisão em vez de passar despercebido.
+   *
+   * `newsec.com` não serve: é de um grupo nórdico de consultoria
+   * imobiliária, sem relação com esta marca.
+   */
+  siteUrl: raw.siteUrl || "https://dominio-a-definir.newsec",
+  /** ⚠️ PENDENTE: e-mail no domínio da NewSec. Vazio esconde a linha. */
+  email: raw.email,
   agendaUrl: raw.agendaUrl,
   demoUrl: raw.demoUrl,
   analyticsId: raw.analyticsId,
+  /* Identificação legal — só a página de privacidade usa. Ver o cabeçalho. */
   legalName: raw.legalName || "GRS Soluções",
   taxId: raw.taxId || "63.562.890/0001-45",
   address: {
@@ -46,7 +76,7 @@ export const siteConfig = {
   hasWhatsapp: whatsappDigits.length > 0,
 } as const;
 
-/** Endereço em uma linha, para rodapé e dados estruturados. */
+/** Endereço em uma linha. Usado apenas na página de privacidade. */
 export const addressLine = `${siteConfig.address.street} — ${siteConfig.address.district}, ${siteConfig.address.city}/${siteConfig.address.state} · CEP ${siteConfig.address.zip}`;
 
 /** Âncora da seção de contato — destino de fallback e do menu. */
@@ -55,7 +85,7 @@ export const CONTACT_ANCHOR = "#demonstracao";
 /**
  * Monta o link do WhatsApp com a mensagem já preenchida. Toda mensagem
  * começa identificando a origem, para o comercial reconhecer na lista que
- * o contato veio do site do CRM e não do institucional.
+ * o contato veio do site da NewSec e não do institucional da GRS.
  */
 export function whatsappLink(message: string): string {
   if (!whatsappDigits) {

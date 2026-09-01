@@ -1,33 +1,33 @@
 {
   "distribuicao-leads": {
     "width": 2048,
-    "height": 1002,
-    "blur": "data:image/webp;base64,UklGRjQAAABXRUJQVlA4ICgAAAAwAQCdASoQAAgAA8BmJaQAA3AA/vITi93fl+WeGVMWmqqOda/BwAAA"
+    "height": 995,
+    "blur": "data:image/webp;base64,UklGRjIAAABXRUJQVlA4ICYAAACwAQCdASoQAAgAA8BmJaQAAxf+9ugQAP7yYaYV4hnjuvPtAAAAAA=="
   },
   "pipeline": {
     "width": 2048,
     "height": 995,
-    "blur": "data:image/webp;base64,UklGRjAAAABXRUJQVlA4ICQAAAAwAQCdASoQAAgAA8BmJaQAA3AA/vG/68BcDE/5Z4ZV7a0AAAA="
+    "blur": "data:image/webp;base64,UklGRi4AAABXRUJQVlA4ICIAAAAwAQCdASoQAAgAA8BmJaQAA3AA/vG/68BbX78MZUYeSQAA"
   },
   "esteira-juridica": {
     "width": 2048,
     "height": 995,
-    "blur": "data:image/webp;base64,UklGRi4AAABXRUJQVlA4ICIAAAAwAQCdASoQAAgAA8BmJaQAA3AA/vG/6nW6Vy/hjKi8xgAA"
+    "blur": "data:image/webp;base64,UklGRi4AAABXRUJQVlA4ICIAAACwAQCdASoQAAgAA8BmJaQAAxf/TBEAAP7yYaYV4h6BYAAA"
   },
   "painel-comercial": {
     "width": 2048,
     "height": 1147,
-    "blur": "data:image/webp;base64,UklGRjAAAABXRUJQVlA4ICQAAAAwAQCdASoQAAkAA8BmJZwAA3AA/vIKPZo3y/5Z4ZUxS3QQAAA="
+    "blur": "data:image/webp;base64,UklGRjAAAABXRUJQVlA4ICQAAACwAQCdASoQAAkAA8BmJZwAAxf+5/AAAP7yYaYV4heRNyAAAAA="
   },
   "relatorio-pdf": {
     "width": 2048,
-    "height": 1837,
-    "blur": "data:image/webp;base64,UklGRi4AAABXRUJQVlA4ICIAAAAwAQCdASoQAA4AA8BmJZwAA3AA/vEG9XQEhtcJfofZgQAA"
+    "height": 1862,
+    "blur": "data:image/webp;base64,UklGRjIAAABXRUJQVlA4ICYAAACwAQCdASoQAA8AA8BmJZwAAueFB8AAAP7x3PWUwwzxByRDO2EAAA=="
   },
   "imagem-resumo": {
     "width": 2048,
     "height": 1534,
-    "blur": "data:image/webp;base64,UklGRjQAAABXRUJQVlA4ICgAAACQAQCdASoQAAwAA8BmJZwAAud7W3AA/fB/PPfc3c2mwuhF6g9yW4AA"
+    "blur": "data:image/webp;base64,UklGRjYAAABXRUJQVlA4ICoAAACQAQCdASoQAAwAA8BmJZwAAud7WCAA/fB/PPfc3c2mwuhF6iBaTvmEAAA="
   },
   "portal-cliente": {
     "width": 2048,
@@ -37,6 +37,6 @@
   "academy": {
     "width": 2048,
     "height": 995,
-    "blur": "data:image/webp;base64,UklGRjAAAABXRUJQVlA4ICQAAAAwAQCdASoQAAgAA8BmJZwAA3AA/vG/6nW6Vy/hjLto+hgAAAA="
+    "blur": "data:image/webp;base64,UklGRi4AAABXRUJQVlA4ICIAAAAwAQCdASoQAAgAA8BmJZwAA3AA/vG/6nW6VyghLuUKrOAA"
   }
 }

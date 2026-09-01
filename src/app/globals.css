@@ -1,11 +1,12 @@
 @import "tailwindcss";
 
 @theme {
-  /* Preto, branco e vermelho com cinzas frios. */
-  --color-ink-950: #0a0a0b;
+  /* Preto, branco e vermelho com cinzas frios. Os extremos da escala vêm
+     da paleta NewSec: #0B0B0D (preto primário) e #1B1B1F (grafite). */
+  --color-ink-950: #0b0b0d;
   --color-ink-900: #121317;
   --color-ink-850: #17181d;
-  --color-ink-800: #1d1f25;
+  --color-ink-800: #1b1b1f;
   --color-ink-700: #2a2d35;
   --color-ink-600: #3a3e48;
 
@@ -17,13 +18,15 @@
   --color-fog-100: #f1f3f6;
   --color-bone: #faf9f7;
 
-  --color-brand-500: #c31230;
-  --color-brand-600: #9e0d26;
-  --color-brand-050: #fceef1;
-  /* Vermelho da marca não alcança 4,5:1 como texto sobre preto (fica em
-     ~2,7:1). Este tom claro existe só para texto sobre fundo escuro: dá
-     5,9:1 sobre ink-950 e mantém a leitura da marca. */
-  --color-brand-300: #f0566c;
+  --color-brand-500: #e31b23;
+  --color-brand-600: #b5121a;
+  --color-brand-050: #fdeced;
+  /* Vermelho da marca como TEXTO sobre preto fica na fronteira do WCAG AA,
+     então continua existindo um tom claro só para esse uso. O anterior
+     (#f0566c) foi derivado do vermelho GRS; este vem do #e31b23 e passa
+     com folga sobre ink-950. Como fundo de botão com texto branco, o
+     brand-500 segue válido. Conferido por `npm run audit:layout`. */
+  --color-brand-300: #ff5a5f;
 
   /* Verde-petróleo: cor de ação do produto, preservada nas telas. */
   --color-product-700: #0f766e;
@@ -32,8 +35,11 @@
   --color-product-050: #f0fdfa;
   --color-canvas: #f7f8fa;
 
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-fraunces), Georgia, serif;
+  /* Sora é a tipografia da marca NewSec e assumiu título e corpo. Antes
+     eram duas famílias (Fraunces serifada nos títulos, Inter no corpo); a
+     serifada brigava com o desenho geométrico do símbolo. */
+  --font-sans: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
 
   /* Teto de 8px em qualquer raio, inclusive nos utilitários maiores. */
   --radius-lg: 8px;
@@ -71,7 +77,6 @@
     background-color: var(--color-ink-950);
     color: var(--color-ink-950);
     font-family: var(--font-sans);
-    font-feature-settings: "cv02", "cv03", "cv04";
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
   }
@@ -92,7 +97,6 @@
 @layer base {
   .font-display {
     letter-spacing: -0.025em;
-    font-optical-sizing: auto;
   }
 }
 

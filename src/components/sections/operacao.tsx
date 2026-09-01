@@ -62,7 +62,7 @@ export function Implementation() {
             delay={(index % 2) * 110}
             className="border-t border-fog-200 pt-5"
           >
-            <span className="text-xs font-semibold tabular-nums text-brand-500">
+            <span className="text-xs font-semibold tabular-nums text-brand-600">
               Etapa {index + 1}
             </span>
             <h3 className="mt-3 text-[17px] font-semibold text-ink-950">{step.title}</h3>

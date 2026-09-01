@@ -1,8 +1,8 @@
 {
-  "name": "grs-plataforma-site",
+  "name": "newsec-site",
   "version": "0.1.0",
   "private": true,
-  "description": "Site comercial da GRS Plataforma — sistema de operação ponta a ponta.",
+  "description": "Site comercial da NewSec — sistema de operação ponta a ponta.",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

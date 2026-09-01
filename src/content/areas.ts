@@ -172,7 +172,7 @@ export const areas: readonly Area[] = [
       },
     ],
     whatsappMessage:
-      "GRS Plataforma (CRM) — vim pela página do módulo comercial e gostaria de agendar uma demonstração.",
+      "NewSec (CRM) — vim pela página do módulo comercial e gostaria de agendar uma demonstração.",
   },
   {
     slug: "juridico",
@@ -252,7 +252,7 @@ export const areas: readonly Area[] = [
       },
     ],
     whatsappMessage:
-      "GRS Plataforma (CRM) — vim pela página do módulo jurídico e gostaria de agendar uma demonstração.",
+      "NewSec (CRM) — vim pela página do módulo jurídico e gostaria de agendar uma demonstração.",
   },
   {
     slug: "financeiro",
@@ -305,7 +305,7 @@ export const areas: readonly Area[] = [
       },
     ],
     whatsappMessage:
-      "GRS Plataforma (CRM) — vim pela página do módulo financeiro e gostaria de agendar uma demonstração.",
+      "NewSec (CRM) — vim pela página do módulo financeiro e gostaria de agendar uma demonstração.",
   },
   {
     slug: "academy",
@@ -324,10 +324,10 @@ export const areas: readonly Area[] = [
       {
         title: "Dois cursos, propósitos diferentes",
         paragraph:
-          "A Formação Comercial GRS trata da venda consultiva revisional — qualificação, simulação, objeções e fechamento. A Operação do CRM GRS ensina a usar a plataforma: clientes, pré-vendas, simulações, documentos e jurídico. Os dois exigem nota mínima 85 para aprovação.",
+          "A Formação Comercial trata da venda consultiva — qualificação, simulação, objeções e fechamento. A Operação do CRM ensina a usar a plataforma: clientes, pré-vendas, simulações, documentos e jurídico. Os dois exigem nota mínima 85 para aprovação.",
         items: [
-          "Formação Comercial GRS, para quem vende e para quem acompanha vendas",
-          "Operação do CRM GRS, para o onboarding de qualquer área",
+          "Formação Comercial, para quem vende e para quem acompanha vendas",
+          "Operação do CRM, para o onboarding de qualquer área",
           "Capítulos, avaliações com nota mínima 85 e conclusão registrada",
           "Painel de acompanhamento do progresso para a gestão",
         ],
@@ -348,7 +348,7 @@ export const areas: readonly Area[] = [
       {
         question: "O treinamento está incluído ou é contratado à parte?",
         answer:
-          "As trilhas ficam dentro da própria plataforma, na Academy, nos cursos Formação Comercial GRS e Operação do CRM GRS. O que entra no pacote é definido na proposta, depois do diagnóstico.",
+          "As trilhas ficam dentro da própria plataforma, na Academy, nos cursos Formação Comercial e Operação do CRM. O que entra no pacote é definido na proposta, depois do diagnóstico.",
       },
       {
         question: "Consigo acompanhar quem já fez o treinamento?",
@@ -357,7 +357,7 @@ export const areas: readonly Area[] = [
       },
     ],
     whatsappMessage:
-      "GRS Plataforma (CRM) — vim pela página da Academy e gostaria de agendar uma demonstração.",
+      "NewSec (CRM) — vim pela página da Academy e gostaria de agendar uma demonstração.",
   },
   {
     slug: "gestao",
@@ -446,7 +446,7 @@ export const areas: readonly Area[] = [
       },
     ],
     whatsappMessage:
-      "GRS Plataforma (CRM) — vim pela página de gestão e segurança e gostaria de agendar uma demonstração.",
+      "NewSec (CRM) — vim pela página de gestão e segurança e gostaria de agendar uma demonstração.",
   },
 ];
 

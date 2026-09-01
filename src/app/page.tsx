@@ -18,20 +18,14 @@ const structuredData = {
       "@type": "Organization",
       "@id": `${siteConfig.siteUrl}/#organizacao`,
       name: siteConfig.vendorName,
-      legalName: siteConfig.legalName,
-      taxID: siteConfig.taxId,
       url: siteConfig.siteUrl,
       description:
-        "Desenvolvedora da GRS Plataforma, sistema de operação para empresas de serviços com comercial, jurídico e financeiro.",
+        "Desenvolvedora do NewSec, sistema de operação para empresas de serviços com comercial, jurídico e financeiro.",
       ...(siteConfig.email ? { email: siteConfig.email } : {}),
-      address: {
-        "@type": "PostalAddress",
-        streetAddress: siteConfig.address.street,
-        addressLocality: siteConfig.address.city,
-        addressRegion: siteConfig.address.state,
-        postalCode: siteConfig.address.zip,
-        addressCountry: "BR",
-      },
+      /* Razão social, CNPJ e endereço saíram daqui junto com o rodapé: em
+         dados estruturados eles são ainda mais fáceis de ler em massa do
+         que no texto da página. A identificação do controlador exigida
+         pela LGPD ficou em /privacidade. */
     },
     {
       "@type": "SoftwareApplication",

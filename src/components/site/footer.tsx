@@ -1,6 +1,7 @@
 import Link from "next/link";
+import { Logo } from "@/components/site/logo";
 import { footer } from "@/content/site";
-import { addressLine, siteConfig } from "@/lib/site-config";
+import { siteConfig } from "@/lib/site-config";
 
 export function Footer() {
   const year = new Date().getFullYear();
@@ -10,30 +11,24 @@ export function Footer() {
       <div className="mx-auto w-full max-w-6xl px-5 pb-28 pt-16 sm:px-8 lg:pb-16">
         <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr]">
           <div>
-            <div className="flex items-baseline gap-2">
-              <span className="font-display text-lg font-semibold tracking-tight text-white">
-                GRS
-              </span>
-              <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-brand-300">
-                Plataforma
-              </span>
-            </div>
+            <Logo />
             <p className="measure mt-4 text-[14px] leading-relaxed text-fog-400">
               {footer.description}
             </p>
-            <div className="mt-5 space-y-1.5">
-              {siteConfig.email ? (
+            {/* Só o e-mail. CNPJ e endereço saíram do rodapé: eles
+                identificam a desenvolvedora, e o comprador deste site é do
+                mesmo ramo dela. A identificação do controlador dos dados,
+                que a LGPD exige, ficou na página de privacidade. */}
+            {siteConfig.email ? (
+              <div className="mt-5">
                 <a
                   href={`mailto:${siteConfig.email}`}
                   className="block text-[14px] font-medium text-white underline-offset-4 hover:underline"
                 >
                   {siteConfig.email}
                 </a>
-              ) : null}
-              {/* Identificação completa publicada de propósito: em serviço de
-                  ticket alto, CNPJ e endereço visíveis são sinal de confiança. */}
-              <p className="text-[13px] leading-relaxed text-fog-400">{addressLine}</p>
-            </div>
+              </div>
+            ) : null}
           </div>
 
           {footer.columns.map((column) => (
@@ -59,11 +54,9 @@ export function Footer() {
 
         <div className="mt-14 border-t border-ink-800 pt-8">
           <p className="measure text-[13px] leading-relaxed text-fog-500">{footer.disclaimer}</p>
-          <p className="mt-4 text-[13px] text-fog-500">{addressLine}</p>
-          <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2">
+          <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
             <p className="text-[13px] text-fog-500">
-              © {year} {siteConfig.legalName || siteConfig.vendorName}
-              {siteConfig.taxId ? ` · CNPJ ${siteConfig.taxId}` : ""}
+              © {year} {siteConfig.vendorName}
             </p>
             <Link
               href="/privacidade"

@@ -358,14 +358,14 @@ export const academy = {
   passingScore: 85,
   tracks: [
     {
-      name: "Formação Comercial GRS",
+      name: "Formação Comercial",
       description:
-        "Venda consultiva revisional: qualificação, simulação, objeções e fechamento.",
+        "Venda consultiva: qualificação, simulação, objeções e fechamento.",
       audience: "Consultores, supervisores e gestores que acompanham vendas.",
       progress: 86,
     },
     {
-      name: "Operação do CRM GRS",
+      name: "Operação do CRM",
       description:
         "Uso profissional da plataforma: clientes, pré-vendas, simulações, documentos e jurídico.",
       audience: "Usuários comerciais, jurídicos, financeiros e administradores em onboarding.",
@@ -375,13 +375,13 @@ export const academy = {
   team: [
     {
       name: "Marina Vasques",
-      track: "Formação Comercial GRS",
+      track: "Formação Comercial",
       progress: 100,
       status: "Aprovada · 92",
     },
-    { name: "Rafael Otoni", track: "Formação Comercial GRS", progress: 78, status: "Em andamento" },
-    { name: "Camila Prado", track: "Operação do CRM GRS", progress: 55, status: "Em andamento" },
-    { name: "Diego Antunes", track: "Operação do CRM GRS", progress: 33, status: "Em andamento" },
+    { name: "Rafael Otoni", track: "Formação Comercial", progress: 78, status: "Em andamento" },
+    { name: "Camila Prado", track: "Operação do CRM", progress: 55, status: "Em andamento" },
+    { name: "Diego Antunes", track: "Operação do CRM", progress: 33, status: "Em andamento" },
   ],
 };
 

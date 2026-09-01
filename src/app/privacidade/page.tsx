@@ -7,7 +7,7 @@ import { privacidade } from "@/content/privacidade";
 export const metadata: Metadata = {
   title: privacidade.title,
   description:
-    "Como os dados são tratados no site da GRS Plataforma: o que é coletado, com quem é compartilhado e como exercer seus direitos.",
+    "Como os dados são tratados no site da NewSec: o que é coletado, com quem é compartilhado e como exercer seus direitos.",
   alternates: { canonical: "/privacidade" },
 };
 

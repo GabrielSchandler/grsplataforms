@@ -1,20 +1,18 @@
 import type { Metadata } from "next";
-import { Fraunces, Inter } from "next/font/google";
+import { Sora } from "next/font/google";
 import { Analytics } from "@/components/site/analytics";
 import { siteConfig } from "@/lib/site-config";
 import "./globals.css";
 
-const inter = Inter({
+/**
+ * Sora é a tipografia da marca NewSec, e aqui ela serve título e corpo.
+ * Uma família só derruba um arquivo de fonte da primeira dobra em relação
+ * ao par anterior (Fraunces + Inter).
+ */
+const sora = Sora({
   subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--font-sora",
   display: "swap",
-});
-
-const fraunces = Fraunces({
-  subsets: ["latin"],
-  variable: "--font-fraunces",
-  display: "swap",
-  axes: ["opsz"],
 });
 
 const title = `${siteConfig.productName} — sistema de operação do lead ao pós-atendimento`;
@@ -35,7 +33,6 @@ export const metadata: Metadata = {
     "CRM com esteira jurídica",
     "software para escritório de advocacia e comercial",
     "sistema com relatório de simulação automático",
-    "sistema para empresa de revisão de juros",
   ],
   authors: [{ name: siteConfig.vendorName }],
   creator: siteConfig.vendorName,
@@ -74,7 +71,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="pt-BR" className={`${inter.variable} ${fraunces.variable}`}>
+    <html lang="pt-BR" className={sora.variable}>
       <head>
         {/* Só a cena do hero é pré-carregada: é o único recurso acima da
             dobra que decide a primeira impressão. O resto entra preguiçoso. */}

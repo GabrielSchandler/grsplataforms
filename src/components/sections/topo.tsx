@@ -232,7 +232,7 @@ export function Problems() {
             delay={(index % 3) * 110}
             className="group border-t border-fog-200 pt-5"
           >
-            <span className="text-xs font-semibold tabular-nums text-brand-500">
+            <span className="text-xs font-semibold tabular-nums text-brand-600">
               {String(index + 1).padStart(2, "0")}
             </span>
             <h3 className="mt-3 text-[17px] font-semibold leading-snug text-ink-950">
@@ -249,7 +249,10 @@ export function Problems() {
         <p className="mt-12 text-[15px] text-ink-800">
           <a
             href={CONTACT_ANCHOR}
-            className="group inline-flex items-center gap-2 font-semibold text-brand-500 underline-offset-4 hover:underline"
+            /* brand-600, não brand-500: este link fica sobre fundo claro, e
+               o vermelho da marca não alcança 4,5:1 ali. Mesma lógica do
+               brand-300 no escuro — um tom por tipo de fundo. */
+            className="group inline-flex items-center gap-2 font-semibold text-brand-600 underline-offset-4 hover:underline"
           >
             Ver como isso fica em um sistema só
             <ArrowRight
