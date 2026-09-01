@@ -16,6 +16,7 @@ import {
 export function Header() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [pastHero, setPastHero] = useState(false);
   const pathname = usePathname();
 
   // `trailingSlash` deixa o caminho como "/comercial/"; a comparação ignora
@@ -25,6 +26,13 @@ export function Header() {
   useEffect(() => {
     function onScroll() {
       setScrolled(window.scrollY > 24);
+      // O hero tem o proprio CTA. Enquanto ele estiver na tela, o botao do
+      // cabecalho seria a segunda vez que a mesma frase aparece na mesma
+      // vista — medido em 1440x900: "Agendar demonstracao" em y=16 e de novo
+      // em y=513. Duas chamadas simultaneas competem em vez de somar, que e
+      // a mesma razao pela qual a barra fixa do celular so sobe depois do
+      // hero. Passado o hero, o cabecalho volta a ser a unica acao a vista.
+      setPastHero(window.scrollY > 420);
     }
 
     onScroll();
@@ -81,7 +89,13 @@ export function Header() {
             {...(ctaHref.startsWith("http")
               ? { target: "_blank", rel: "noopener noreferrer" }
               : {})}
-            className="hidden rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-600 sm:inline-flex"
+            aria-hidden={!pastHero}
+            tabIndex={pastHero ? 0 : -1}
+            className={`hidden rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-semibold text-white transition duration-300 hover:bg-brand-600 sm:inline-flex ${
+              pastHero
+                ? "pointer-events-auto translate-y-0 opacity-100"
+                : "pointer-events-none -translate-y-1 opacity-0"
+            }`}
           >
             {nav.cta}
           </a>

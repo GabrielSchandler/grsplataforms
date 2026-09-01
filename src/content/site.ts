@@ -46,8 +46,12 @@ export const hero = {
   // final..."): esta diz a mesma coisa em metade das palavras e sobrevive
   // melhor sobre a fotografia, onde linha longa disputa com a cena.
   title: "O CRM que conecta sua operação inteira.",
+  // 33 palavras viravam sete linhas no celular e empurravam o CTA para 68%
+  // da primeira dobra. Encurtado para 21: o que saiu ("gestão", "fluxo
+  // conectado", "acompanhamento centralizado") ou repetia o eyebrow logo
+  // acima, ou repetia o próprio título.
   subtitle:
-    "Comercial, jurídico, financeiro, gestão e relacionamento com o cliente em um fluxo conectado, com documentos, automações e acompanhamento centralizado, em um ambiente configurado com a identidade da sua empresa.",
+    "Comercial, jurídico, financeiro e relacionamento com o cliente em um fluxo só, com documentos e automações no ambiente da sua empresa.",
   primaryCta: "Agendar demonstração",
   secondaryCta: "Testar grátis por 7 dias",
   tertiaryCta: "Explorar o sistema",
@@ -59,12 +63,23 @@ export const hero = {
   /**
    * Faixa de confiança da primeira dobra. Só entra aqui o que é verificável
    * no produto — nada de selo de certificação que a empresa não tem.
+   *
+   * Eram quatro. Saíram dois:
+   *
+   * - "Teste grátis por 7 dias" repetia, em texto morto, o botão que fica
+   *   logo acima. Chip que repete o CTA não acrescenta confiança.
+   * - "Demonstração com dados fictícios" é ressalva, não é benefício, e
+   *   se defendia de uma dúvida que o visitante ainda não teve. A ressalva
+   *   continua onde importa: no selo e na nota da própria seção de
+   *   demonstração.
+   *
+   * Os chips ficam DEPOIS dos botões no DOM, então mexer neles não altera
+   * a altura em que o CTA cai. Quem controla isso é o texto acima dele.
    */
   trustChips: [
     "Ambiente exclusivo da sua empresa",
     "Comercial, jurídico e financeiro conectados",
-    "Demonstração com dados fictícios",
-    "Teste grátis por 7 dias",
+    "Contratos e relatórios gerados pelo próprio sistema",
   ],
   // As mensagens começam identificando a origem: na lista do WhatsApp o
   // comercial já vê que o contato veio do site da NewSec, não do
