@@ -140,7 +140,10 @@ divergem:
    `/financeiro` e `/gestao`. A barra lateral é clicável e troca a tela dentro
    da própria página.
 2. **Demo com abas** na home, cobrindo as telas de destaque e os dois
-   documentos gerados pela simulação.
+   documentos gerados pela simulação. A tela ativa fica na URL
+   (`?tela=esteira-juridica`), para o comercial mandar ao lead o endereço
+   de uma tela específica em vez de "abre o site e clica na terceira aba".
+   Mesmo padrão do tour guiado, que já aceitava `?passo=14`.
 3. **Imagens estáticas** onde a tela não é navegável, geradas por
    `npm run capture`.
 
@@ -217,12 +220,43 @@ Duas regras que valem para qualquer efeito novo:
   recálculo de layout durante a rolagem. Leituras de scroll ficam agrupadas em
   `requestAnimationFrame`, e há um único `IntersectionObserver` compartilhado.
 - **O estado inicial escondido mora dentro de
-  `@media (prefers-reduced-motion: no-preference)`.** Quem pede menos
-  movimento vê a página pronta mesmo que o JavaScript não execute — página que
-  depende de JS para revelar texto fica em branco quando algo falha.
+  `@media (prefers-reduced-motion: no-preference)`**, e há um `<noscript>`
+  no `<head>` que o neutraliza. As duas coisas são necessárias, e por muito
+  tempo só a primeira existia.
+
+  A média cobre quem **pediu** menos movimento. Não cobre JavaScript
+  bloqueado, quebrado ou ainda não carregado — que é justamente quando o
+  problema acontece. Medido antes da correção, com JS desativado e
+  preferência de movimento normal: **1.325 palavras invisíveis na home**,
+  630 em `/comercial`, 570 em `/gestao`, 371 em `/juridico`. Texto que
+  existe no HTML, que o leitor não vê, porque o observador que devolveria
+  a opacidade nunca rodou.
+
+  Regra prática: se a revelação depende de JS, o estado escondido precisa
+  de uma saída que não dependa de JS.
 
 Feito à mão em vez de biblioteca: custa cerca de 1 kB no bundle, contra os
 ~40 kB de uma biblioteca de animação.
+
+## Estado que vem da URL, sem quebrar a hidratação
+
+`?passo=14` e `?tela=esteira-juridica` precisam valer já na primeira pintura
+— ver a etapa 1 piscar antes da etapa pedida denuncia o truque. Mas o HTML
+é gerado no build, sem saber a URL de quem vai visitar: ler
+`window.location` **durante a renderização** faz o cliente desenhar algo
+diferente do que o servidor gerou, e o React descarta a árvore e renderiza
+tudo de novo. É o erro #418, e ele existia em `/?passo=9` desde que o link
+por etapa foi criado.
+
+A saída é `useLayoutEffect`, embrulhado em `useAntesDaPintura`
+(`src/lib/use-antes-da-pintura.ts`): servidor e cliente desenham a mesma
+coisa na primeira passada, e a correção pela URL entra depois da hidratação
+e **antes da pintura**. Medido: em `/?passo=9`, aos 350ms a etapa 9 já está
+ativa, sem passar pela etapa 1.
+
+Regra: componente que lê a URL, o `localStorage`, o tamanho da janela ou o
+relógio começa com o mesmo valor que o build gerou, e corrige em
+`useAntesDaPintura`.
 
 ## Regras de conteúdo que foram seguidas
 

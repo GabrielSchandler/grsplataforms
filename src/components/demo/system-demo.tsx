@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import { Compass, Route } from "lucide-react";
+import { useAntesDaPintura } from "@/lib/use-antes-da-pintura";
 import { GuidedTour } from "./guided-tour";
-import { InteractiveDemo } from "./interactive-demo";
+import { InteractiveDemo, temTelaNaUrl } from "./interactive-demo";
 
 /**
  * Os dois jeitos de conhecer o sistema na home.
@@ -11,9 +12,18 @@ import { InteractiveDemo } from "./interactive-demo";
  * O tour vem primeiro por padrão: quem chega frio não sabe o que procurar, e
  * um roteiro converte melhor que uma tela em branco esperando um clique. Quem
  * quiser bisbilhotar troca para a exploração livre.
+ *
+ * A exceção é o link com `?tela=`: as abas da exploração livre só existem
+ * nesse modo, então um link para uma tela específica precisa abrir nele —
+ * caso contrário o lead recebe o endereço de uma tela e cai no tour, que é
+ * o mesmo que o link não existir.
  */
 export function SystemDemo() {
   const [modo, setModo] = useState<"tour" | "livre">("tour");
+
+  useAntesDaPintura(() => {
+    if (temTelaNaUrl()) setModo("livre");
+  }, []);
 
   const modos = [
     { id: "tour" as const, label: "Tour guiado", icone: Route },

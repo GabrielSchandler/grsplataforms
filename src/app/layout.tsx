@@ -73,6 +73,23 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" className={sora.variable}>
       <head>
+        {/* Rede de segurança do sistema de revelação.
+            
+            O estado inicial de [data-reveal] é opacity:0, e quem devolve a
+            opacidade é o IntersectionObserver. Sem JavaScript o observador
+            nunca roda e o texto simplesmente não aparece: medido em
+            1.325 palavras invisíveis na home, 630 em /comercial, 570 em
+            /gestao e 371 em /juridico.
+
+            A proteção que existia — esconder o estado inicial dentro de
+            @media (prefers-reduced-motion: no-preference) — só cobre quem
+            pediu menos movimento. Não cobre JavaScript bloqueado, quebrado
+            ou ainda não carregado, que é quando o problema realmente
+            acontece. Esta regra cobre. */}
+        <noscript>
+          <style>{`[data-reveal]{opacity:1!important;transform:none!important;clip-path:none!important;filter:none!important}`}</style>
+        </noscript>
+
         {/* Só a cena do hero é pré-carregada: é o único recurso acima da
             dobra que decide a primeira impressão. O resto entra preguiçoso. */}
         <link

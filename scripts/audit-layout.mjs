@@ -338,13 +338,27 @@ async function main() {
             a.textContent?.includes("Agendar"),
           ),
         ),
-        // Um elemento abaixo da dobra, que legitimamente espera o
-        // IntersectionObserver: sem JavaScript ele tem de continuar
-        // escondido. Se estivesse visível, o teste acima passaria por
-        // vacuidade — o CSS de revelação simplesmente não estaria ativo.
-        revealEscondido: (() => {
-          const alvo = document.querySelector("[data-reveal]");
-          return alvo ? Number(getComputedStyle(alvo).opacity) < 0.05 : null;
+        // Prova de que o JavaScript realmente não rodou — sem ela, os
+        // testes acima poderiam passar por vacuidade.
+        //
+        // Antes isso era verificado exigindo que um [data-reveal]
+        // estivesse ESCONDIDO. Esse detector morreu junto com o defeito
+        // que ele acompanhava: agora existe um <noscript> que revela
+        // esses elementos de propósito, porque sem JavaScript o
+        // IntersectionObserver nunca roda e o texto sumia de verdade
+        // (1.325 palavras só na home).
+        //
+        // O detector novo é a classe `is-visible`: só o observador a
+        // aplica. Nenhuma ocorrência dela significa que o JavaScript
+        // não executou — que é exatamente o que se quer provar, e sem
+        // depender de o texto estar invisível.
+        semRastroDeJs:
+          document.querySelectorAll("[data-reveal].is-visible").length === 0,
+        // O conteúdo revelado por JS precisa aparecer mesmo sem JS.
+        revealLegivel: (() => {
+          const alvos = [...document.querySelectorAll("[data-reveal]")];
+          if (!alvos.length) return null;
+          return alvos.every((a) => Number(getComputedStyle(a).opacity) > 0.95);
         })(),
       };
     });
@@ -356,8 +370,12 @@ async function main() {
     );
     check(dobra.botao, "sem JavaScript: CTA do hero ausente");
     check(
-      dobra.revealEscondido === true,
-      "sem JavaScript: elemento [data-reveal] deveria estar escondido — se nao esta, a checagem acima nao prova nada",
+      dobra.semRastroDeJs === true,
+      "sem JavaScript: achei [data-reveal].is-visible, entao o JS rodou e as checagens acima nao provam nada",
+    );
+    check(
+      dobra.revealLegivel === true,
+      "sem JavaScript: ha [data-reveal] com opacidade baixa — o <noscript> que os revela nao esta valendo, e esse texto some para quem nao tem JS",
     );
     await semJs.close();
 

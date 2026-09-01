@@ -6,6 +6,7 @@ import { DemoNavContext } from "./chrome";
 import { ScaledStage } from "./scaled-stage";
 import { screenMap } from "./screen-map";
 import { tourDepartments, tourSteps } from "@/content/tour";
+import { useAntesDaPintura } from "@/lib/use-antes-da-pintura";
 
 /**
  * Tour guiado: percorre o caminho de um cliente, do lead que cai na planilha
@@ -108,12 +109,24 @@ function etapaInicial() {
 }
 
 export function GuidedTour() {
-  // Estado inicial de verdade, ja na primeira renderizacao do cliente: ler a
-  // URL num efeito fazia a etapa 1 piscar antes da etapa pedida.
-  const [indice, setIndice] = useState(etapaInicial);
+  // O estado inicial e sempre a etapa 1, igual ao HTML gerado no build. A
+  // etapa pedida na URL entra logo abaixo, em efeito de layout: ler
+  // `window` durante a renderizacao fazia o cliente desenhar diferente do
+  // servidor e quebrava a hidratacao (erro #418 do React, reproduzivel em
+  // /?passo=9). O efeito roda antes da pintura, entao a etapa 1 nao chega
+  // a aparecer.
+  const [indice, setIndice] = useState(0);
   const [direcao, setDirecao] = useState<1 | -1>(1);
   // Link para uma etapa especifica quer aquela etapa, nao um filme rodando.
-  const [tocando, setTocando] = useState(() => etapaInicial() === 0);
+  const [tocando, setTocando] = useState(true);
+
+  useAntesDaPintura(() => {
+    const pedida = etapaInicial();
+    if (pedida === 0) return;
+
+    setIndice(pedida);
+    setTocando(false);
+  }, []);
   const [realce, setRealce] = useState<Caixa | null>(null);
   const [legenda, setLegenda] = useState<{ top: number; left: number } | null>(
     null,
