@@ -56,7 +56,7 @@ todas dependem de decisão ou de cadastro externo.
 
 | Pendência | Situação | O que fazer |
 | --- | --- | --- |
-| **Domínio** | Padrão é o placeholder `https://dominio-a-definir.newsec` | Preencher `NEXT_PUBLIC_SITE_URL` com o domínio real. Não é `newsec.com` — esse é de um grupo nórdico de consultoria imobiliária |
+| ~~Domínio~~ | **Resolvido em 01/09/2026:** `https://www.newsec.com.br`, na Vercel | — |
 | **WhatsApp** | `(11) 96332-2546`, a **mesma linha do institucional da GRS** | O perfil comercial dela no WhatsApp aparece como GRS Soluções: o primeiro contato entrega a desenvolvedora. Precisa de linha própria |
 | **E-mail** | Vazio — a linha some do rodapé | Criar um endereço no domínio da NewSec e preencher `NEXT_PUBLIC_EMAIL_COMERCIAL`. O anterior (`planejamento@grssolucao.com.br`) saiu porque o domínio entrega a desenvolvedora |
 
@@ -73,9 +73,17 @@ CRM", mas dentro do sistema eles se chamam "Formação Comercial GRS" e
 "Operação do CRM GRS". Ou renomeia lá, ou o cliente entra e encontra nome
 diferente do que foi vendido.
 
-O domínio precisa entrar **antes do primeiro deploy**: ele vai para o
-canonical, o Open Graph e o sitemap, e publicar com o endereço errado ensina
-o endereço errado ao Google.
+### O que já deu errado com o domínio
+
+O primeiro deploy foi ao ar com o placeholder `dominio-a-definir.newsec` no
+canonical, no `og:url` e em todas as URLs do sitemap, com o `robots.txt`
+liberando o rastreamento. Canonical apontando para um host inexistente diz
+ao buscador que o endereço verdadeiro é outro, e isso derruba a indexação
+do domínio que serve a página.
+
+Por isso o domínio de produção agora é o **padrão do código**, não só uma
+variável da Vercel: build sem a variável definida voltaria a publicar o
+endereço errado.
 
 Toda mensagem de WhatsApp começa com `NewSec (CRM) —`, para o comercial
 reconhecer que o lead veio do site de software e não do revisional.
@@ -266,6 +274,4 @@ projeto** — se a medição for ativada, ele precisa ser construído antes.
 **Vercel**, decidido. O build é estático (`output: export`), que a Vercel
 serve direto — sem função serverless, sem custo de execução.
 
-Domínio ainda não definido — ver "Pendências antes de publicar".
-
-Nenhum deploy foi feito.
+Publicado em **https://www.newsec.com.br**. Push no `main` republica.

@@ -48,16 +48,17 @@ export const siteConfig = {
   vendorName: "NewSec",
   tagline: "Do primeiro lead ao acompanhamento final, toda a operação em um só lugar.",
   /**
-   * ⚠️ PENDENTE: domínio real da NewSec, antes do primeiro deploy. Este
-   * valor entra no canonical, no Open Graph e no sitemap — publicar com o
-   * endereço errado ensina o endereço errado ao Google, e depois custa
-   * caro desfazer. O placeholder é feio de propósito: assim aparece na
-   * revisão em vez de passar despercebido.
+   * Domínio de produção, confirmado em 01/09/2026. Entra no canonical, no
+   * Open Graph e no sitemap.
    *
-   * `newsec.com` não serve: é de um grupo nórdico de consultoria
-   * imobiliária, sem relação com esta marca.
+   * Manter o `www`: é a forma que responde no ar. Canonical em host
+   * diferente do que serve a página divide o sinal entre dois endereços.
+   *
+   * Vale como padrão do código, e não só como variável da Vercel, porque
+   * um build sem a variável definida voltaria a publicar o endereço
+   * errado — foi o que aconteceu no primeiro deploy.
    */
-  siteUrl: raw.siteUrl || "https://dominio-a-definir.newsec",
+  siteUrl: raw.siteUrl || "https://www.newsec.com.br",
   /** ⚠️ PENDENTE: e-mail no domínio da NewSec. Vazio esconde a linha. */
   email: raw.email,
   agendaUrl: raw.agendaUrl,
