@@ -407,20 +407,25 @@ export const areas: readonly Area[] = [
           "Controles técnicos para apoiar governança, proteção e isolamento dos dados da sua empresa. Abaixo está o que existe implementado no sistema.",
         items: [
           "Políticas de acesso e isolamento lógico dos dados, aplicados no banco e não somente na tela",
+          // "Fim a fim" seria falso: HTTPS cifra o transporte, não a ponta.
+          "Tráfego sempre sobre conexão cifrada e banco em nuvem gerenciada com criptografia em repouso",
+          "Credenciais de e-mail e de integrações guardadas com AES-256-GCM, cada registro com vetor próprio",
           "Documentos e logos em armazenamento privado, com link temporário que expira",
           "Permissão por função e departamento",
           "Histórico de auditoria com o usuário responsável, a data, o horário e o contexto da ação",
           "Linha do tempo com o histórico de alterações de cada cliente",
+          "Cabeçalhos de segurança no navegador, incluindo política de conteúdo e bloqueio de enquadramento em site de terceiro",
+          "Limite de tentativas na consulta pública do cliente, para impedir varredura por CPF",
           "Rotinas de backup e restauração conforme a configuração do ambiente e do pacote contratado",
           "Backups podem ser mantidos fora do banco de produção, conforme a configuração do ambiente",
           "Restauração completa ou limitada a um cliente específico",
-          "Tokens de e-mail e integrações guardados cifrados",
+          "Backup do ambiente inteiro, com dados e documentos, gerado e baixado pela própria empresa",
         ],
       },
       {
         title: "Implantação e suporte",
         paragraph:
-          "O ambiente da empresa é liberado para o administrador da empresa, que cadastra os usuários, define os perfis e configura a identidade visual. A migração de base anterior corre em paralelo, sem impedir ninguém de trabalhar: importamos de planilhas e de sistemas anteriores quando há exportação disponível, com tratamento dos dados antes da carga. O cronograma sai do diagnóstico, porque depende do que a sua base entrega. O suporte é pelo WhatsApp, em horário comercial, nas condições definidas em contrato.",
+          "O ambiente é liberado em menos de 24 horas para o administrador da empresa, que cadastra os usuários, define os perfis e configura a identidade visual — a equipe opera a partir daí. A migração da base anterior tem prazo próprio e corre em paralelo, sem impedir ninguém de trabalhar: importamos de planilhas e de sistemas anteriores quando há exportação disponível, com tratamento dos dados antes da carga. É a etapa mais demorada, porque base antiga costuma chegar com duplicidade e campo faltando, e o cronograma sai do diagnóstico, depois de olhar a sua. O suporte é pelo WhatsApp, em horário comercial, nas condições definidas em contrato.",
       },
     ],
     faq: [
@@ -433,6 +438,11 @@ export const areas: readonly Area[] = [
         question: "E se alguém apagar algo por engano?",
         answer:
           "Há rotinas de backup e restauração, definidas conforme a configuração do ambiente e do pacote contratado. Os backups podem ser mantidos fora do banco de produção, e a restauração pode ser completa ou limitada a um cliente específico.",
+      },
+      {
+        question: "Se eu sair, levo meus dados comigo?",
+        answer:
+          "Leva, e não há fidelidade prendendo a empresa a um prazo. O sistema gera um backup completo do seu ambiente em arquivo compactado, com os dados das tabelas e os documentos armazenados — o mesmo recurso da rotina de cópia, disparado pela própria empresa.",
       },
       {
         question: "O sistema fica com a marca da minha empresa?",

@@ -40,8 +40,11 @@ export const trial = {
 };
 
 export const hero = {
-  eyebrow:
-    "Sistema de operação para empresas de serviços com comercial e jurídico",
+  // Nomeia o segmento em vez de "empresas de serviços". Quem chega do Google
+  // precisa se reconhecer na primeira linha; abstração faz o visitante certo
+  // ir embora achando que a página não é para ele. Também ficou mais curto,
+  // e o eyebrow ocupava três linhas no celular.
+  eyebrow: "Sistema de operação para empresas de revisão de juros",
   // Testei contra a versão anterior ("Do primeiro lead ao acompanhamento
   // final..."): esta diz a mesma coisa em metade das palavras e sobrevive
   // melhor sobre a fotografia, onde linha longa disputa com a cena.
@@ -214,26 +217,40 @@ export const areasIndex = {
     "Cada área é um conjunto de módulos, configurados conforme o pacote contratado. Entre na que interessa para a sua operação — o que não faz parte do pacote nem aparece na barra lateral da equipe.",
 };
 
+/**
+ * Segurança.
+ *
+ * Cada frase aqui corresponde a controle que existe no código do sistema.
+ * Nada de "100% seguro", nada de certificação que a empresa não tem: quem
+ * compra software que guarda CPF e contrato de terceiro costuma mandar
+ * alguém conferir, e superlativo sem lastro derruba a página inteira.
+ * Controle específico convence mais do que adjetivo.
+ */
 export const securityTeaser = {
   eyebrow: "Segurança e governança",
-  title: "Dados isolados, histórico das operações e rotinas de backup.",
+  title: "Os dados dos seus clientes não são um detalhe do contrato.",
   intro:
-    "Controles técnicos para apoiar governança, proteção e isolamento dos dados da sua empresa. Abaixo está o que existe implementado no sistema.",
+    "Sua operação guarda CPF, contrato e histórico financeiro de terceiros — dado que, vazado, é problema seu e do seu cliente. Abaixo está o que existe implementado no sistema, e não uma declaração de boas intenções.",
   highlights: [
     {
-      title: "Ambiente isolado",
+      title: "Ambiente isolado no banco",
       description:
-        "Políticas de acesso e isolamento lógico dos dados, aplicados no banco e não somente na tela.",
+        "Políticas de acesso e isolamento lógico aplicados no próprio banco de dados, não apenas na interface. Tela escondida não é controle de acesso.",
     },
     {
-      title: "Backup e restauração",
+      title: "Cifrado em trânsito e em repouso",
       description:
-        "Rotinas de cópia e restauração conforme a configuração do ambiente e do pacote contratado.",
+        "Tráfego sempre sobre conexão cifrada, banco em nuvem gerenciada com criptografia em repouso, e credenciais de integração guardadas com AES-256-GCM.",
     },
     {
       title: "Rastro de quem fez o quê",
       description:
-        "Alterações e operações relevantes ficam registradas no histórico de auditoria.",
+        "Alterações e operações relevantes ficam registradas com usuário, data, horário e contexto.",
+    },
+    {
+      title: "Backup, restauração e saída",
+      description:
+        "Rotinas de cópia, restauração completa ou de um único cliente, e backup do ambiente inteiro que a própria empresa gera e baixa.",
     },
   ],
   cta: "Ver os controles em detalhe",
@@ -242,9 +259,9 @@ export const securityTeaser = {
 
 export const implementation = {
   eyebrow: "Implantação",
-  title: "A equipe entra em operação assim que o ambiente é liberado.",
+  title: "A equipe entra em operação em menos de 24 horas.",
   intro:
-    "O ambiente da empresa é liberado para o administrador da empresa, que cadastra os usuários e define os perfis. A migração de base anterior corre em paralelo, sem impedir ninguém de trabalhar.",
+    "O ambiente é liberado para o administrador da empresa, que cadastra os usuários e define os perfis. A migração da base anterior corre em paralelo e tem prazo próprio, sem impedir ninguém de trabalhar.",
   steps: [
     {
       title: "Diagnóstico",
@@ -252,14 +269,14 @@ export const implementation = {
         "Entendemos como sua operação funciona hoje, quais módulos fazem sentido e o que existe de base para trazer.",
     },
     {
-      title: "Liberação do ambiente",
+      title: "Liberação do ambiente em menos de 24 horas",
       description:
-        "O administrador da empresa recebe o acesso, cadastra os usuários, define perfis e configura a identidade visual do ambiente.",
+        "O administrador da empresa recebe o acesso, cadastra os usuários, define perfis e configura a identidade visual do ambiente. A equipe já opera a partir daí.",
     },
     {
-      title: "Migração analisada caso a caso",
+      title: "Migração com prazo próprio",
       description:
-        "Importamos de planilhas e de sistemas anteriores quando há exportação disponível. Os dados passam por tratamento antes da carga, e o cronograma sai do diagnóstico — depende do que a sua base entrega.",
+        "Importamos de planilhas e de sistemas anteriores quando há exportação disponível. Esta etapa costuma ser a mais demorada, e por um motivo honesto: base antiga chega com duplicidade, campo faltando e formato inconsistente, e tudo isso passa por tratamento antes da carga. O cronograma sai do diagnóstico, depois de olhar a sua base. Enquanto isso, a equipe já está operando.",
     },
     {
       title: "Treinamento e operação assistida",
@@ -292,7 +309,27 @@ export const faq = {
     {
       question: "Em quanto tempo minha equipe começa a usar?",
       answer:
-        "Assim que o ambiente da empresa é liberado, o administrador da empresa cadastra os usuários e a equipe já opera — mesmo que a migração de base anterior ainda esteja em andamento. O prazo de liberação é definido no diagnóstico, porque depende do escopo contratado.",
+        "O ambiente é liberado em menos de 24 horas. A partir daí o administrador cadastra os usuários e a equipe já opera. A migração da base anterior tem prazo próprio e corre em paralelo, sem travar ninguém — é a etapa mais demorada, porque base antiga quase sempre precisa de tratamento antes de entrar.",
+    },
+    {
+      question: "Tem fidelidade ou multa para cancelar?",
+      answer:
+        "Não há fidelidade. A contratação não prende a empresa a um prazo mínimo.",
+    },
+    {
+      question: "Tem número mínimo de usuários?",
+      answer:
+        "Não. A mensalidade é por usuário contratado, sem mínimo — dá para começar com a equipe que você tem hoje e crescer depois.",
+    },
+    {
+      question: "O sistema conversa com o que já uso?",
+      answer:
+        "Em dois pontos que aparecem no dia a dia: o e-mail sai pela conta corporativa da própria empresa, conectada ao sistema, então a mensagem chega ao cliente com o seu domínio e não com o de um remetente estranho; e os documentos gerados podem ser enviados ao cliente por WhatsApp, através de integração configurada pela empresa. A entrada de leads também lê planilhas, de forma incremental.",
+    },
+    {
+      question: "Se eu sair, levo meus dados comigo?",
+      answer:
+        "Leva. O sistema gera um backup completo do ambiente da sua empresa, em arquivo compactado, com os dados das tabelas e os documentos armazenados. É o mesmo recurso usado na rotina de cópia, e quem dispara é a própria empresa.",
     },
     {
       question: "Vocês migram os dados do meu sistema atual?",
