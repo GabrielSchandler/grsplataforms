@@ -210,7 +210,7 @@ export const areas: readonly Area[] = [
       {
         title: "E-mail sem sair do processo",
         paragraph:
-          "O envio acontece pelo Microsoft Graph, com a conta da própria empresa. Dá para usar template ou texto livre, escolher se o destinatário é o cliente, o banco ou ambos, incluir cópia, cópia oculta, anexo e assinatura, e salvar como rascunho em vez de enviar.",
+          "O e-mail sai pela conta corporativa da própria empresa, conectada ao sistema — o cliente recebe do seu domínio, não de um remetente estranho que cai em spam. Dá para usar template ou texto livre, escolher se o destinatário é o cliente, o banco ou ambos, incluir cópia, cópia oculta, anexo e assinatura, e salvar como rascunho em vez de enviar.",
       },
       {
         title: "Cobranças vinculadas à pré-venda",
@@ -291,6 +291,17 @@ export const areas: readonly Area[] = [
         paragraph:
           "Os pagamentos registrados na pré-venda alimentam os indicadores comerciais de meta e comissão. Eles não se confundem com o lançamento financeiro: o módulo financeiro tem visão própria, com vendas, entradas, saídas e chargebacks, e os pagamentos jurídicos podem ser sincronizados com ele.",
       },
+      {
+        title: "A comissão sai da regra da sua empresa, não da nossa",
+        paragraph:
+          "As faixas de comissão são cadastradas pela própria empresa: cada faixa tem um valor mínimo de meta atingida e o percentual que passa a valer a partir dali. O sistema apura sobre os pagamentos efetivamente pagos no mês, mostra a faixa atual, quanto falta para a próxima e quantos dias úteis restam. Ninguém precisa refazer a conta em planilha no fim do mês, e o consultor para de perguntar quanto vai receber.",
+        items: [
+          "Faixas por valor mínimo de meta, com o percentual de cada uma",
+          "Apuração sobre pagamentos pagos dentro do mês, não sobre venda prometida",
+          "Faixa atual, quanto falta para a próxima e dias úteis restantes",
+          "Ticket médio necessário para fechar a meta no prazo que sobrou",
+        ],
+      },
     ],
     faq: [
       {
@@ -302,6 +313,16 @@ export const areas: readonly Area[] = [
         question: "Como o chargeback é tratado?",
         answer:
           "Como categoria própria de lançamento, e não como um estorno solto. Isso mantém o valor visível no resultado do período em vez de sumir do relatório.",
+      },
+      {
+        question: "Quem da equipe enxerga o financeiro?",
+        answer:
+          "Só quem o administrador da empresa autorizar. A permissão é por função e por departamento, e o consultor não navega por tela de financeiro. O alcance de cada perfil é definido pela sua empresa, não por nós.",
+      },
+      {
+        question: "As faixas de comissão são fixas?",
+        answer:
+          "Não. Sua empresa cadastra as próprias faixas, cada uma com o valor mínimo de meta e o percentual correspondente. A apuração considera os pagamentos efetivamente pagos dentro do mês.",
       },
     ],
     whatsappMessage:
