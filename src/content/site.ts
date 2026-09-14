@@ -35,8 +35,11 @@ export const trial = {
   cta: "Testar grátis por 7 dias",
   description:
     "Conheça a plataforma com a sua equipe antes de contratar. O ambiente de avaliação é liberado após o alinhamento inicial com o nosso comercial.",
+  // Com dois produtos no site, toda mensagem precisa dizer de qual veio: sem o
+  // prefixo, o comercial recebe um pedido de teste sem saber se é do CRM ou do
+  // Focus.
   whatsappMessage:
-    "Olá! Conheci a NewSec pelo site e gostaria de solicitar o teste gratuito de 7 dias para a minha empresa.",
+    "NewSec (CRM) — vim pelo site e gostaria de solicitar o teste gratuito de 7 dias para a minha empresa.",
 };
 
 export const hero = {
@@ -370,25 +373,33 @@ export const finalCta = {
     "NewSec (CRM) — vim pelo site e gostaria de falar com um especialista sobre o sistema.",
 };
 
+/**
+ * Rodapé da marca, não de um produto: desde que o Focus existe, o rodapé é o
+ * único lugar do site em que os dois aparecem lado a lado em todas as páginas.
+ */
 export const footer = {
   description:
-    "Sistema de operação ponta a ponta para empresas de serviços com comercial, jurídico e financeiro.",
+    "Software para empresas de serviços: o CRM que conecta comercial, jurídico e financeiro, e o Focus, que mostra como a equipe usa o tempo nas estações Windows.",
   columns: [
     {
-      title: "O sistema",
-      links: areas.map((area) => ({
-        label: area.navLabel,
-        href: `/${area.slug}`,
-      })),
+      title: "NewSec CRM",
+      links: [
+        { label: "Visão geral", href: "/" },
+        ...areas.map((area) => ({
+          label: area.navLabel,
+          href: `/${area.slug}`,
+        })),
+        { label: "Perguntas frequentes", href: "/#perguntas" },
+      ],
     },
     {
-      title: "Site",
+      title: "NewSec Focus",
       links: [
-        { label: "Início", href: "/" },
-        { label: "Ambiente demonstrativo", href: "/#demonstrativo" },
-        { label: "Implantação", href: "/#implantacao" },
-        { label: "Perguntas frequentes", href: "/#perguntas" },
-        { label: "Política de privacidade", href: "/privacidade" },
+        { label: "Visão geral", href: "/focus" },
+        { label: "O painel", href: "/focus#painel" },
+        { label: "O que é coletado", href: "/focus#coleta" },
+        { label: "Implantação", href: "/focus#implantacao" },
+        { label: "Perguntas frequentes", href: "/focus#perguntas" },
       ],
     },
   ],

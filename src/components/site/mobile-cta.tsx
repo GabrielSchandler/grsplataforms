@@ -12,7 +12,7 @@ import { whatsappLink } from "@/lib/site-config";
  *
  * Some no desktop, onde o cabeçalho fixo já carrega o CTA.
  */
-export function MobileCta({ message }: { message: string }) {
+export function MobileCta({ message, rotulo = trial.cta }: { message: string; rotulo?: string }) {
   const [visible, setVisible] = useState(false);
   const [atContact, setAtContact] = useState(false);
 
@@ -26,10 +26,9 @@ export function MobileCta({ message }: { message: string }) {
 
     const contato = document.getElementById("demonstracao");
     const observer = contato
-      ? new IntersectionObserver(
-          ([entry]) => setAtContact(entry.isIntersecting),
-          { rootMargin: "-20% 0px" },
-        )
+      ? new IntersectionObserver(([entry]) => setAtContact(entry.isIntersecting), {
+          rootMargin: "-20% 0px",
+        })
       : null;
 
     if (contato && observer) {
@@ -62,7 +61,7 @@ export function MobileCta({ message }: { message: string }) {
         tabIndex={showing ? 0 : -1}
         className="flex w-full items-center justify-center gap-2 rounded-lg bg-brand-500 px-5 py-3.5 text-sm font-semibold text-white"
       >
-        {trial.cta}
+        {rotulo}
         <ArrowUpRight aria-hidden="true" className="h-4 w-4" />
       </a>
     </div>

@@ -1,20 +1,21 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { ArrowLeft, ArrowRight, Pause, Play, RotateCcw } from "lucide-react";
 import { DemoNavContext } from "./chrome";
-import { ScaledStage } from "./scaled-stage";
+import { ScaledStage, LARGURA_BASE } from "./scaled-stage";
 import { screenMap } from "./screen-map";
 import { tourDepartments, tourSteps } from "@/content/tour";
 import { useAntesDaPintura } from "@/lib/use-antes-da-pintura";
 
 /**
- * Tour guiado: percorre o caminho de um cliente, do lead que cai na planilha
- * ao número que a gestão lê no fim do mês.
+ * Tour guiado: percorre um caminho dentro da réplica do sistema, etapa por
+ * etapa, com a explicação **dentro da área escurecida da própria tela**,
+ * ancorada ao ponto destacado. O olho não precisa sair da interface para ler.
  *
- * A explicação não fica num cartão à parte: ela mora **dentro da área
- * escurecida da própria tela**, ancorada ao ponto destacado, como um tour de
- * produto de verdade. O olho não precisa sair da interface para ler.
+ * O componente é genérico: serve ao CRM (`GuidedTour`, no fim do arquivo) e
+ * ao Focus, que tem tela, cores e roteiro próprios. O que muda é a lista de
+ * etapas e quem desenha a tela de cada uma.
  *
  * `?passo=N` abre direto na etapa pedida, para um link compartilhado levar a
  * pessoa ao ponto certo. Sem o parâmetro, começa em 1.
@@ -22,20 +23,21 @@ import { useAntesDaPintura } from "@/lib/use-antes-da-pintura";
  * Nada aqui escreve na URL durante o uso, e essa é uma decisão: manter o
  * histórico sincronizado com as etapas exigia disputar o controle da pilha
  * com o roteador do Next, e o resultado era o botão voltar saltando para um
- * ponto arbitrário. Sem escrita, o comportamento fica previsível — recarregar
- * volta ao começo e o voltar sai da página, como em qualquer outra seção.
+ * ponto arbitrário.
  */
 
 const PARAM = "passo";
 const DURACAO = 7200;
 
-/** Cor de cada área, para o realce e o rótulo mudarem junto com o assunto. */
-const corDoDepartamento: Record<string, string> = {
-  Marketing: "#c31230",
-  Comercial: "#c31230",
-  Jurídico: "#3b6ef0",
-  Financeiro: "#12a594",
-  Gestão: "#d98324",
+export type EtapaTour = {
+  /** Agrupa as etapas na trilha acima da cena (área, assunto). */
+  grupo: string;
+  titulo: string;
+  texto: string;
+  /** Valor de `data-tour` do elemento a destacar dentro da tela. */
+  destaque?: string;
+  /** Identifica a tela da etapa: troca de valor dispara a animação de entrada. */
+  chave: string;
 };
 
 type Caixa = { top: number; left: number; width: number; height: number };
@@ -50,20 +52,37 @@ const limitar = (valor: number, minimo: number, maximo: number) =>
   Math.min(Math.max(valor, minimo), Math.max(minimo, maximo));
 
 /**
+ * Preto ou branco sobre a cor do grupo, conforme o que enxerga melhor.
+ *
+ * As cores do CRM são escuras e pediam texto branco; as do Focus são claras
+ * (ciano, âmbar, verde) e, com branco por cima, o rótulo sumia — 1,81:1 contra
+ * os 4,5:1 que a auditoria exige. Escolher aqui resolve para qualquer cor que
+ * um tour futuro use.
+ */
+function corDoTexto(fundo: string): string {
+  const hex = fundo.replace("#", "");
+  const canal = (valor: number) =>
+    valor <= 0.04045 ? valor / 12.92 : ((valor + 0.055) / 1.055) ** 2.4;
+
+  const [r, g, b] = [0, 2, 4].map((posicao) =>
+    canal(parseInt(hex.slice(posicao, posicao + 2), 16) / 255),
+  );
+  const luz = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+
+  const contraste = (outra: number) =>
+    (Math.max(luz, outra) + 0.05) / (Math.min(luz, outra) + 0.05);
+
+  return contraste(0) > contraste(1) ? "#0b0b0d" : "#ffffff";
+}
+
+/**
  * Escolhe onde a legenda cabe sem tapar o que está sendo explicado: tenta
  * abaixo, acima, à esquerda e à direita do realce, nessa ordem, e só então
  * cai no canto superior esquerdo.
  */
-function posicionarLegenda(
-  anel: Caixa,
-  base: { width: number; height: number },
-) {
+function posicionarLegenda(anel: Caixa, base: { width: number; height: number }) {
   const alturaUtil = base.height - RESERVA_CONTROLES;
-  const esquerdaAlinhada = limitar(
-    anel.left,
-    MARGEM,
-    base.width - LARGURA_LEGENDA - MARGEM,
-  );
+  const esquerdaAlinhada = limitar(anel.left, MARGEM, base.width - LARGURA_LEGENDA - MARGEM);
   const topoAlinhado = limitar(anel.top, MARGEM, alturaUtil - ALTURA_ESTIMADA);
 
   const abaixo = base.height - (anel.top + anel.height);
@@ -91,46 +110,56 @@ function posicionarLegenda(
  * Le a etapa pedida na URL. Serve a link compartilhado (`?passo=14`), e nao a
  * recarregamento comum: o avanco automatico nao escreve o parametro, entao
  * uma pagina recarregada sem link explicito volta para a etapa 1.
- *
- * Valor invalido, abaixo de 1 ou acima do total cai na etapa 1.
  */
-function etapaInicial() {
+function etapaInicial(total: number) {
   if (typeof window === "undefined") return 0;
 
   const bruto = new URLSearchParams(window.location.search).get(PARAM);
   if (bruto === null) return 0;
 
   const numero = Number(bruto);
-  if (!Number.isInteger(numero) || numero < 1 || numero > tourSteps.length) {
-    return 0;
-  }
+  if (!Number.isInteger(numero) || numero < 1 || numero > total) return 0;
 
   return numero - 1;
 }
 
-export function GuidedTour() {
+export function TourGuiado({
+  etapas,
+  grupos,
+  cores,
+  renderTela,
+  largura = LARGURA_BASE,
+  classeTela = "overflow-hidden rounded border border-slate-200",
+  escurecimento = "rgba(8, 8, 10, 0.74)",
+}: {
+  etapas: readonly EtapaTour[];
+  grupos: readonly string[];
+  cores: Record<string, string>;
+  /** Desenha a tela da etapa. Recebe o índice para quem precisa dele. */
+  renderTela: (indice: number) => ReactNode;
+  largura?: number;
+  classeTela?: string;
+  escurecimento?: string;
+}) {
   // O estado inicial e sempre a etapa 1, igual ao HTML gerado no build. A
-  // etapa pedida na URL entra logo abaixo, em efeito de layout: ler
-  // `window` durante a renderizacao fazia o cliente desenhar diferente do
-  // servidor e quebrava a hidratacao (erro #418 do React, reproduzivel em
-  // /?passo=9). O efeito roda antes da pintura, entao a etapa 1 nao chega
-  // a aparecer.
+  // etapa pedida na URL entra logo abaixo, em efeito de layout: ler `window`
+  // durante a renderizacao fazia o cliente desenhar diferente do servidor e
+  // quebrava a hidratacao (erro #418 do React).
   const [indice, setIndice] = useState(0);
   const [direcao, setDirecao] = useState<1 | -1>(1);
   // Link para uma etapa especifica quer aquela etapa, nao um filme rodando.
   const [tocando, setTocando] = useState(true);
 
   useAntesDaPintura(() => {
-    const pedida = etapaInicial();
+    const pedida = etapaInicial(etapas.length);
     if (pedida === 0) return;
 
     setIndice(pedida);
     setTocando(false);
   }, []);
+
   const [realce, setRealce] = useState<Caixa | null>(null);
-  const [legenda, setLegenda] = useState<{ top: number; left: number } | null>(
-    null,
-  );
+  const [legenda, setLegenda] = useState<{ top: number; left: number } | null>(null);
 
   const palcoRef = useRef<HTMLDivElement>(null);
   const roloRef = useRef<HTMLDivElement>(null);
@@ -141,13 +170,13 @@ export function GuidedTour() {
   const irPara = useCallback(
     (proximo: number, opcoes: { parar?: boolean } = {}) => {
       const { parar = true } = opcoes;
-      const alvo = Math.min(Math.max(proximo, 0), tourSteps.length - 1);
+      const alvo = Math.min(Math.max(proximo, 0), etapas.length - 1);
 
       setDirecao(alvo >= indice ? 1 : -1);
       setIndice(alvo);
       if (parar) setTocando(false);
     },
-    [indice],
+    [indice, etapas.length],
   );
 
   /* ---------- reprodução automática ---------- */
@@ -157,7 +186,7 @@ export function GuidedTour() {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     const tempo = window.setTimeout(() => {
-      if (indice + 1 >= tourSteps.length) {
+      if (indice + 1 >= etapas.length) {
         setTocando(false);
         return;
       }
@@ -167,25 +196,21 @@ export function GuidedTour() {
     }, DURACAO);
 
     return () => window.clearTimeout(tempo);
-  }, [indice, tocando]);
+  }, [indice, tocando, etapas.length]);
 
   /* ---------- medida do realce e da legenda ---------- */
 
-  const passo = tourSteps[indice];
-  const tela = screenMap[passo.screen];
-  const Tela = tela.component;
-  const cor = corDoDepartamento[passo.department] ?? "#c31230";
+  const passo = etapas[indice];
+  const cor = cores[passo.grupo] ?? "#c31230";
 
   useEffect(() => {
     const palco = palcoRef.current;
     if (!palco) return;
 
     const id = window.setTimeout(() => {
-      const alvo = passo.highlight
-        ? palco.querySelector<HTMLElement>(`[data-tour="${passo.highlight}"]`)
+      const alvo = passo.destaque
+        ? palco.querySelector<HTMLElement>(`[data-tour="${passo.destaque}"]`)
         : null;
-
-      const base = palco.getBoundingClientRect();
 
       if (!alvo) {
         setRealce(null);
@@ -193,8 +218,23 @@ export function GuidedTour() {
         return;
       }
 
-      const caixa = alvo.getBoundingClientRect();
       const escala = escalaRef.current || 1;
+
+      // A réplica do Focus rola por dentro, como a janela de um aplicativo.
+      // Antes de medir, traz o alvo para a área visível — senão o anel seria
+      // desenhado num ponto que ninguém vê.
+      const rolagem = alvo.closest<HTMLElement>("[data-rolagem]");
+      if (rolagem) {
+        const caixaAlvo = alvo.getBoundingClientRect();
+        const caixaRolagem = rolagem.getBoundingClientRect();
+        const deslocamento = (caixaAlvo.top - caixaRolagem.top) / escala;
+        const alturaAlvo = caixaAlvo.height / escala;
+        const folga = Math.max(24, (rolagem.clientHeight - alturaAlvo) / 2);
+        rolagem.scrollTop = Math.max(0, rolagem.scrollTop + deslocamento - folga);
+      }
+
+      const base = palco.getBoundingClientRect();
+      const caixa = alvo.getBoundingClientRect();
       const margem = 10;
       const anel: Caixa = {
         top: (caixa.top - base.top) / escala - margem,
@@ -219,59 +259,57 @@ export function GuidedTour() {
     }, 300);
 
     return () => window.clearTimeout(id);
-  }, [indice, passo.highlight]);
+  }, [indice, passo.destaque]);
 
   const conteudoLegenda = (
     <>
       <div className="flex flex-wrap items-center gap-2.5">
         <span
-          className="rounded px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-white"
-          style={{ backgroundColor: cor }}
+          className="rounded px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide"
+          style={{ backgroundColor: cor, color: corDoTexto(cor) }}
         >
-          {passo.department}
+          {passo.grupo}
         </span>
         <span className="text-[12px] tabular-nums text-fog-400">
-          Etapa {indice + 1} de {tourSteps.length}
+          Etapa {indice + 1} de {etapas.length}
         </span>
       </div>
       <h3 className="font-display mt-3 text-xl leading-snug font-semibold text-white">
-        {passo.title}
+        {passo.titulo}
       </h3>
-      <p className="mt-2 text-[14px] leading-relaxed text-fog-300">
-        {passo.text}
-      </p>
+      <p className="mt-2 text-[14px] leading-relaxed text-fog-300">{passo.texto}</p>
     </>
   );
 
   return (
     <div onMouseEnter={() => setTocando(false)}>
-      {/* Trilha por área, acima da cena */}
+      {/* Trilha por grupo, acima da cena */}
       <div className="scroll-x flex items-end gap-3 pb-1 sm:gap-4">
-        {tourDepartments.map((area) => {
-          const etapas = tourSteps
+        {grupos.map((grupo) => {
+          const doGrupo = etapas
             .map((etapa, posicao) => ({ etapa, posicao }))
-            .filter(({ etapa }) => etapa.department === area);
+            .filter(({ etapa }) => etapa.grupo === grupo);
 
-          if (etapas.length === 0) return null;
-          const ativa = etapas.some(({ posicao }) => posicao === indice);
+          if (doGrupo.length === 0) return null;
+          const ativa = doGrupo.some(({ posicao }) => posicao === indice);
 
           return (
-            <div key={area} className="shrink-0">
+            <div key={grupo} className="shrink-0">
               <p
                 className={`mb-1.5 text-[9px] font-semibold uppercase tracking-wide transition-colors sm:text-[10px] ${
                   ativa ? "text-white" : "text-fog-400"
                 }`}
               >
-                {area}
+                {grupo}
               </p>
               <div className="flex gap-1">
-                {etapas.map(({ etapa, posicao }) => (
+                {doGrupo.map(({ etapa, posicao }) => (
                   <button
-                    key={`${etapa.screen}-${posicao}`}
+                    key={`${etapa.chave}-${posicao}`}
                     type="button"
                     onClick={() => irPara(posicao)}
                     aria-current={posicao === indice ? "step" : undefined}
-                    title={etapa.title}
+                    title={etapa.titulo}
                     className={`h-1.5 rounded transition-all duration-500 ${
                       posicao === indice
                         ? "w-8 sm:w-10"
@@ -279,12 +317,10 @@ export function GuidedTour() {
                           ? "w-4 bg-fog-500 sm:w-5"
                           : "w-4 bg-ink-700 hover:bg-fog-600 sm:w-5"
                     }`}
-                    style={
-                      posicao === indice ? { backgroundColor: cor } : undefined
-                    }
+                    style={posicao === indice ? { backgroundColor: cor } : undefined}
                   >
                     <span className="sr-only">
-                      Etapa {posicao + 1}: {etapa.title}
+                      Etapa {posicao + 1}: {etapa.titulo}
                     </span>
                   </button>
                 ))}
@@ -309,19 +345,13 @@ export function GuidedTour() {
           }
         }}
       >
-        <ScaledStage onScaleChange={(valor) => (escalaRef.current = valor)}>
+        <ScaledStage largura={largura} onScaleChange={(valor) => (escalaRef.current = valor)}>
           <div ref={palcoRef} className="relative overflow-hidden rounded">
             <div
-              key={indice}
-              className={`overflow-hidden rounded border border-slate-200 ${
-                direcao === 1 ? "slide-from-right" : "slide-from-left"
-              }`}
+              key={`${passo.chave}-${indice}`}
+              className={`${classeTela} ${direcao === 1 ? "slide-from-right" : "slide-from-left"}`}
             >
-              <DemoNavContext.Provider
-                value={{ workspace: tela.workspace, active: tela.nav }}
-              >
-                <Tela />
-              </DemoNavContext.Provider>
+              {renderTela(indice)}
             </div>
 
             {/* Anel de destaque. O box-shadow gigante escurece todo o resto. */}
@@ -335,7 +365,7 @@ export function GuidedTour() {
                   width: realce.width,
                   height: realce.height,
                   border: `2px solid ${cor}`,
-                  boxShadow: `0 0 0 9999px rgba(8, 8, 10, 0.74), 0 0 30px ${cor}66`,
+                  boxShadow: `0 0 0 9999px ${escurecimento}, 0 0 30px ${cor}66`,
                 }}
               />
             ) : null}
@@ -377,9 +407,7 @@ export function GuidedTour() {
                   onClick={() => setTocando((valor) => !valor)}
                   className="inline-flex h-9 w-9 items-center justify-center rounded text-white transition-colors hover:bg-white/10"
                 >
-                  <span className="sr-only">
-                    {tocando ? "Pausar" : "Reproduzir"}
-                  </span>
+                  <span className="sr-only">{tocando ? "Pausar" : "Reproduzir"}</span>
                   {tocando ? (
                     <Pause aria-hidden="true" className="h-4 w-4" />
                   ) : (
@@ -388,13 +416,13 @@ export function GuidedTour() {
                 </button>
 
                 <span className="px-2 text-[12px] tabular-nums text-fog-400">
-                  {indice + 1}/{tourSteps.length}
+                  {indice + 1}/{etapas.length}
                 </span>
 
                 <button
                   type="button"
                   onClick={() => irPara(indice + 1)}
-                  disabled={indice === tourSteps.length - 1}
+                  disabled={indice === etapas.length - 1}
                   className="inline-flex h-9 items-center gap-1.5 rounded px-3 text-sm font-semibold text-white transition-colors hover:bg-white/10 disabled:opacity-30"
                 >
                   Próxima
@@ -419,9 +447,7 @@ export function GuidedTour() {
                 className="h-full origin-left"
                 style={{
                   backgroundColor: cor,
-                  animation: tocando
-                    ? `tour-timer ${DURACAO}ms linear both`
-                    : "none",
+                  animation: tocando ? `tour-timer ${DURACAO}ms linear both` : "none",
                   transform: tocando ? undefined : "scaleX(0)",
                 }}
               />
@@ -431,7 +457,7 @@ export function GuidedTour() {
       </div>
 
       {/* No celular a legenda e os controles ficam abaixo da cena: sobrepor
-          texto numa tela que já rola de lado atrapalharia a leitura. */}
+          texto numa tela pequena atrapalharia a leitura. */}
       <div
         data-tour-caption="mobile"
         className="mt-4 rounded-lg border border-ink-700 bg-ink-950 p-5 lg:hidden"
@@ -451,7 +477,7 @@ export function GuidedTour() {
           <button
             type="button"
             onClick={() => irPara(indice + 1)}
-            disabled={indice === tourSteps.length - 1}
+            disabled={indice === etapas.length - 1}
             className="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-lg bg-brand-500 text-sm font-semibold text-white disabled:opacity-30"
           >
             Próxima
@@ -468,5 +494,49 @@ export function GuidedTour() {
         </div>
       </div>
     </div>
+  );
+}
+
+/* -------------------------------------------------------------------------
+   Tour do CRM
+   ------------------------------------------------------------------------- */
+
+/** Cor de cada área, para o realce e o rótulo mudarem junto com o assunto. */
+const corDoDepartamento: Record<string, string> = {
+  Marketing: "#c31230",
+  Comercial: "#c31230",
+  Jurídico: "#3b6ef0",
+  Financeiro: "#12a594",
+  Gestão: "#d98324",
+};
+
+const etapasDoCrm: EtapaTour[] = tourSteps.map((passo) => ({
+  grupo: passo.department,
+  titulo: passo.title,
+  texto: passo.text,
+  destaque: passo.highlight,
+  chave: passo.screen,
+}));
+
+/**
+ * Tour do CRM: o caminho de um cliente, do lead que cai na planilha ao número
+ * que a gestão lê no fim do mês.
+ */
+export function GuidedTour() {
+  return (
+    <TourGuiado
+      etapas={etapasDoCrm}
+      grupos={tourDepartments}
+      cores={corDoDepartamento}
+      renderTela={(indice) => {
+        const tela = screenMap[tourSteps[indice].screen];
+        const Tela = tela.component;
+        return (
+          <DemoNavContext.Provider value={{ workspace: tela.workspace, active: tela.nav }}>
+            <Tela />
+          </DemoNavContext.Provider>
+        );
+      }}
+    />
   );
 }

@@ -1,8 +1,10 @@
 import { notFound } from "next/navigation";
 import { PainelComercial } from "@/components/demo/screens-comercial";
 import { demoScreens } from "@/components/demo/registry";
+import { PreviaPainel } from "@/components/focus/topo";
 import { LogoMark } from "@/components/site/logo";
 import { hero } from "@/content/site";
+import { fonteFocus, fonteFocusMono } from "@/lib/fontes-focus";
 import { siteConfig } from "@/lib/site-config";
 
 /**
@@ -16,7 +18,11 @@ import { siteConfig } from "@/lib/site-config";
 export const dynamicParams = false;
 
 export function generateStaticParams() {
-  return [...demoScreens.map((screen) => ({ id: screen.id })), { id: "og" }];
+  return [
+    ...demoScreens.map((screen) => ({ id: screen.id })),
+    { id: "og" },
+    { id: "og-focus" },
+  ];
 }
 
 export const metadata = {
@@ -62,11 +68,56 @@ function OpenGraphCard() {
   );
 }
 
+/** A mesma peça, para o Focus: o painel dele no lugar do painel comercial. */
+function OpenGraphFocusCard() {
+  return (
+    <div
+      id="alvo"
+      className={`relative flex h-[630px] w-[1200px] flex-col justify-between overflow-hidden bg-ink-950 p-16 ${fonteFocus.variable} ${fonteFocusMono.variable}`}
+    >
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+        <div className="absolute -right-32 top-16 w-[1100px] opacity-[0.22]">
+          <div className="overflow-hidden rounded-lg border border-foco-borda">
+            <PreviaPainel />
+          </div>
+        </div>
+        <div className="absolute inset-0 bg-gradient-to-r from-ink-950 via-ink-950/92 to-ink-950/50" />
+      </div>
+
+      <div className="relative flex items-center gap-3 text-white">
+        <LogoMark className="h-12 w-auto" />
+        <span className="text-3xl font-extrabold uppercase tracking-[0.02em]">NewSec</span>
+        <span className="rounded bg-cyan-500/15 px-3 py-1 text-xl font-semibold text-cyan-300">
+          Focus
+        </span>
+      </div>
+
+      <div className="relative max-w-3xl">
+        <h1 className="font-display text-[54px] leading-[1.05] font-semibold text-white">
+          Veja para onde vai o tempo da sua equipe.
+        </h1>
+        <p className="mt-6 text-2xl text-fog-400">
+          Sem captura de tela e sem registrar o que é digitado.
+        </p>
+      </div>
+
+      <div className="relative flex items-center gap-3">
+        <span aria-hidden="true" className="h-px w-10 bg-brand-500" />
+        <span className="text-lg text-fog-500">newsec.com.br/focus</span>
+      </div>
+    </div>
+  );
+}
+
 export default async function CapturePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
   if (id === "og") {
     return <OpenGraphCard />;
+  }
+
+  if (id === "og-focus") {
+    return <OpenGraphFocusCard />;
   }
 
   const screen = demoScreens.find((item) => item.id === id);

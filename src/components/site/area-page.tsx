@@ -19,7 +19,7 @@ export function areaMetadata(area: Area) {
       type: "website" as const,
       locale: "pt_BR",
       url: `${siteConfig.siteUrl}/${area.slug}`,
-      siteName: siteConfig.productName,
+      siteName: siteConfig.brandName,
       title: `${area.metaTitle} — ${siteConfig.productName}`,
       description: area.metaDescription,
       images: [{ url: "/og.png", width: 1200, height: 630, alt: area.headline }],
@@ -46,7 +46,7 @@ function structuredData(area: Area) {
           {
             "@type": "ListItem",
             position: 1,
-            name: siteConfig.productName,
+            name: siteConfig.brandName,
             item: siteConfig.siteUrl,
           },
           {

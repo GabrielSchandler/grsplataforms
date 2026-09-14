@@ -16,7 +16,9 @@ import {
  * um Kanban e não entende nada. Aqui ela é reduzida por inteiro, como a
  * fotografia de um produto: pequena, mas completa e legível como composição.
  *
- * Acima de `LARGURA_BASE` não há redução nenhuma.
+ * Acima da largura natural não há redução nenhuma. O padrão é a do CRM; a
+ * réplica do Focus passa a própria (`largura`), porque o painel dele tem
+ * barra lateral e grade de cinco colunas que não cabem em 1.040px.
  */
 
 export const LARGURA_BASE = 1040;
@@ -25,11 +27,14 @@ export function ScaledStage({
   children,
   className = "",
   onScaleChange,
+  largura = LARGURA_BASE,
 }: {
   children: ReactNode;
   className?: string;
   /** Avisa a escala vigente, para quem precisa converter medidas. */
   onScaleChange?: (escala: number) => void;
+  /** Largura natural do conteúdo, em px. */
+  largura?: number;
 }) {
   const externoRef = useRef<HTMLDivElement>(null);
   const internoRef = useRef<HTMLDivElement>(null);
@@ -42,13 +47,13 @@ export function ScaledStage({
     if (!externo || !interno) return;
 
     const disponivel = externo.clientWidth;
-    const nova = Math.min(1, disponivel / LARGURA_BASE);
+    const nova = Math.min(1, disponivel / largura);
 
     setEscala(nova);
     // `offsetHeight` ignora o transform, então é a altura real do conteúdo.
     setAltura(interno.offsetHeight * nova);
     onScaleChange?.(nova);
-  }, [onScaleChange]);
+  }, [onScaleChange, largura]);
 
   useEffect(() => {
     medir();
@@ -71,7 +76,7 @@ export function ScaledStage({
       <div
         ref={internoRef}
         style={{
-          width: LARGURA_BASE,
+          width: largura,
           transform: escala < 1 ? `scale(${escala})` : undefined,
           transformOrigin: "top left",
         }}

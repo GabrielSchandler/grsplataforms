@@ -27,7 +27,34 @@ const raw = {
   analyticsId: process.env.NEXT_PUBLIC_ANALYTICS_ID ?? "",
   legalName: process.env.NEXT_PUBLIC_RAZAO_SOCIAL ?? "",
   taxId: process.env.NEXT_PUBLIC_CNPJ ?? "",
+  painelFocus: process.env.NEXT_PUBLIC_PAINEL_FOCUS ?? "",
 };
+
+/**
+ * Os produtos vendidos sob a marca NewSec.
+ *
+ * Até 09/2026 marca e produto eram a mesma palavra: "NewSec" queria dizer o
+ * CRM. Com o Focus, a marca passa a ser a casa e cada produto ganha nome
+ * próprio — é o que permite uma página nova sem tirar o CRM do lugar.
+ */
+export const produtos = [
+  {
+    id: "crm",
+    nome: "NewSec CRM",
+    curto: "CRM",
+    href: "/",
+    descricao: "Comercial, jurídico, financeiro e documentos no mesmo sistema.",
+  },
+  {
+    id: "focus",
+    nome: "NewSec Focus",
+    curto: "Focus",
+    href: "/focus",
+    descricao: "Produtividade da equipe nas estações Windows, por pessoa e por equipe.",
+  },
+] as const;
+
+export type ProdutoId = (typeof produtos)[number]["id"];
 
 /**
  * Linha comercial do CRM.
@@ -44,8 +71,13 @@ const defaultWhatsapp = "5511963322546";
 const whatsappDigits = (raw.whatsapp || defaultWhatsapp).replace(/\D/g, "");
 
 export const siteConfig = {
-  productName: "NewSec",
+  /** A marca, que agora abriga mais de um produto. */
+  brandName: "NewSec",
+  /** O produto desta home. O Focus tem página e nome próprios. */
+  productName: "NewSec CRM",
   vendorName: "NewSec",
+  /** Onde o cliente do Focus entra no painel dele. */
+  painelFocus: raw.painelFocus || "https://newsecfocus.vercel.app",
   tagline: "Do primeiro lead ao acompanhamento final, toda a operação em um só lugar.",
   /**
    * Domínio de produção, confirmado em 01/09/2026. Entra no canonical, no

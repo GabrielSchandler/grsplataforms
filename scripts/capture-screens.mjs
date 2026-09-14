@@ -33,6 +33,13 @@ const PUBLIC_DIR = path.join(ROOT, "public");
 const EXPORT_DIR = path.join(ROOT, ".next-capture");
 
 /**
+ * `--og` gera só as imagens de compartilhamento. Serve para quando muda a
+ * peça de Open Graph de um produto e as telas do outro continuam iguais:
+ * refotografar tudo mudaria bytes de arquivos que ninguém alterou.
+ */
+const somenteOg = process.argv.includes("--og");
+
+/**
  * Só entram aqui as telas que aparecem como imagem em alguma página. As
  * demais existem apenas dentro do demo navegável, onde são renderizadas ao
  * vivo — gerar imagem delas seria peso no repositório sem nenhum uso.
@@ -118,7 +125,7 @@ async function main() {
 
   // Remove imagens de telas que não existem mais, para o repositório não
   // acumular arquivo órfão que ninguém referencia.
-  const existentes = await readdir(OUT_DIR).catch(() => []);
+  const existentes = somenteOg ? [] : await readdir(OUT_DIR).catch(() => []);
   for (const arquivo of existentes) {
     const id = arquivo.replace(/\.webp$/, "");
     if (!screens.includes(id)) {
@@ -151,7 +158,7 @@ async function main() {
       deviceScaleFactor: 2,
     });
 
-    for (const id of screens) {
+    for (const id of somenteOg ? [] : screens) {
       await page.goto(`${BASE}/capturas/${id}/`, { waitUntil: "load", timeout: 30000 });
       await page.waitForSelector("#alvo", { timeout: 15000 });
       await page.evaluate(() => document.fonts.ready);
@@ -179,23 +186,31 @@ async function main() {
     }
 
     // Open Graph em PNG: formato que todo agregador aceita sem discussão.
-    await page.goto(`${BASE}/capturas/og/`, { waitUntil: "load", timeout: 30000 });
-    await page.waitForSelector("#alvo", { timeout: 15000 });
-    await page.evaluate(() => document.fonts.ready);
+    // Uma por produto — a do CRM mostra o painel comercial; a do Focus, o
+    // painel de produtividade.
+    for (const [rota, arquivo] of [
+      ["og", "og.png"],
+      ["og-focus", "og-focus.png"],
+    ]) {
+      await page.goto(`${BASE}/capturas/${rota}/`, { waitUntil: "load", timeout: 30000 });
+      await page.waitForSelector("#alvo", { timeout: 15000 });
+      await page.evaluate(() => document.fonts.ready);
 
-    const ogRaw = await page.locator("#alvo").screenshot({ type: "png" });
-    const ogFile = path.join(PUBLIC_DIR, "og.png");
-    await sharp(ogRaw).resize(1200, 630).png({ compressionLevel: 9 }).toFile(ogFile);
+      const ogRaw = await page.locator("#alvo").screenshot({ type: "png" });
+      const ogFile = path.join(PUBLIC_DIR, arquivo);
+      await sharp(ogRaw).resize(1200, 630).png({ compressionLevel: 9 }).toFile(ogFile);
 
-    const { size: ogSize } = await stat(ogFile);
-    console.log(`  ${"og.png".padEnd(20)} ${(ogSize / 1024).toFixed(0)} KB`);
+      const { size: ogSize } = await stat(ogFile);
+      console.log(`  ${arquivo.padEnd(20)} ${(ogSize / 1024).toFixed(0)} KB`);
+    }
   } finally {
     await browser.close();
     server.close();
   }
 
   // O componente lê estas dimensões para reservar o espaço da imagem.
-  await writeFile(
+  if (!somenteOg)
+    await writeFile(
     path.join(ROOT, "src", "content", "screenshot-sizes.json"),
     `${JSON.stringify(manifest, null, 2)}\n`,
     "utf8",

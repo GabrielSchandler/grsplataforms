@@ -20,7 +20,7 @@ const structuredData = {
       name: siteConfig.vendorName,
       url: siteConfig.siteUrl,
       description:
-        "Desenvolvedora do NewSec, sistema de operação para empresas de serviços com comercial, jurídico e financeiro.",
+        "Desenvolvedora do NewSec CRM, sistema de operação para empresas de serviços, e do NewSec Focus, telemetria de produtividade para estações Windows.",
       ...(siteConfig.email ? { email: siteConfig.email } : {}),
       /* Razão social, CNPJ e endereço saíram daqui junto com o rodapé: em
          dados estruturados eles são ainda mais fáceis de ler em massa do
@@ -89,6 +89,26 @@ const structuredData = {
 export default function Home() {
   return (
     <>
+      {/* Só a cena do hero é pré-carregada, e só nesta página: é o único
+          recurso acima da dobra que decide a primeira impressão daqui. O React
+          leva estas tags para o <head> sozinho, mesmo declaradas na página. */}
+      <link
+        rel="preload"
+        as="image"
+        href="/img/hero/cena-1672.avif"
+        type="image/avif"
+        media="(min-width: 641px)"
+        fetchPriority="high"
+      />
+      <link
+        rel="preload"
+        as="image"
+        href="/img/hero/cena-mobile.avif"
+        type="image/avif"
+        media="(max-width: 640px)"
+        fetchPriority="high"
+      />
+
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}

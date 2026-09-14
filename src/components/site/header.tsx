@@ -1,37 +1,124 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { Logo } from "@/components/site/logo";
 import { hero, nav, trial } from "@/content/site";
+import { focusMensagens, focusNav } from "@/content/focus";
 import {
   CONTACT_ANCHOR,
   primaryCtaHref,
+  produtos,
   siteConfig,
   whatsappLink,
+  type ProdutoId,
 } from "@/lib/site-config";
 
-export function Header() {
+/**
+ * Cabeçalho do site, agora com dois produtos.
+ *
+ * O seletor "CRM · Focus" fica ao lado do logo, com os dois nomes à vista.
+ * Com apenas dois produtos, esconder o Focus dentro de um menu suspenso seria
+ * esconder justamente o que se quer mostrar — e dois links não custam
+ * JavaScript nenhum. O resto do menu muda conforme o produto da página: nas
+ * páginas do CRM, as cinco áreas; no Focus, as seções da própria página.
+ */
+
+/** Destaca o item do menu conforme a seção que está na tela. */
+function useSecaoAtiva(ids: string[]) {
+  const chave = ids.join(",");
+  const [ativa, setAtiva] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!chave) return;
+
+    const secoes = chave
+      .split(",")
+      .map((id) => document.getElementById(id))
+      .filter((no): no is HTMLElement => no !== null);
+
+    if (secoes.length === 0) return;
+
+    const naFaixa = new Set<string>();
+
+    const observador = new IntersectionObserver(
+      (entradas) => {
+        for (const entrada of entradas) {
+          if (entrada.isIntersecting) naFaixa.add(entrada.target.id);
+          else naFaixa.delete(entrada.target.id);
+        }
+
+        // Quando nenhuma seção do menu está na faixa central — no topo da
+        // página, por exemplo —, ninguém fica marcado. Guardar o último aceso
+        // deixaria um item destacado sem relação com o que está na tela.
+        const primeira = secoes.find((secao) => naFaixa.has(secao.id));
+        setAtiva(primeira?.id ?? null);
+      },
+      { rootMargin: "-45% 0px -45% 0px", threshold: [0, 0.3, 1] },
+    );
+
+    for (const secao of secoes) observador.observe(secao);
+    return () => observador.disconnect();
+  }, [chave]);
+
+  return ativa;
+}
+
+function SeletorProduto({ atual, className = "" }: { atual: ProdutoId; className?: string }) {
+  return (
+    <div
+      role="group"
+      aria-label="Produtos NewSec"
+      className={`flex items-center gap-0.5 rounded-lg border border-ink-800 bg-ink-900/70 p-0.5 ${className}`}
+    >
+      {produtos.map((produto) => {
+        const ativo = produto.id === atual;
+
+        return (
+          <Link
+            key={produto.id}
+            href={produto.href}
+            aria-current={ativo ? "true" : undefined}
+            title={produto.descricao}
+            className={`rounded-md px-2.5 py-1 text-xs font-semibold transition-colors ${
+              ativo ? "bg-ink-800 text-white" : "text-fog-400 hover:text-white"
+            }`}
+          >
+            {produto.curto}
+          </Link>
+        );
+      })}
+    </div>
+  );
+}
+
+export function Header({ produto = "crm" }: { produto?: ProdutoId }) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [pastHero, setPastHero] = useState(false);
   const pathname = usePathname();
 
+  const ehFocus = produto === "focus";
+  const links = ehFocus ? focusNav.links : nav.links;
+
   // `trailingSlash` deixa o caminho como "/comercial/"; a comparação ignora
   // a barra final para o item certo ficar marcado.
   const atual = pathname?.replace(/\/$/, "") || "/";
+
+  const ancoras = useMemo(
+    () => (ehFocus ? links.map((link) => link.href.replace("#", "")) : []),
+    [ehFocus, links],
+  );
+  const secaoAtiva = useSecaoAtiva(ancoras);
 
   useEffect(() => {
     function onScroll() {
       setScrolled(window.scrollY > 24);
       // O hero tem o proprio CTA. Enquanto ele estiver na tela, o botao do
       // cabecalho seria a segunda vez que a mesma frase aparece na mesma
-      // vista — medido em 1440x900: "Agendar demonstracao" em y=16 e de novo
-      // em y=513. Duas chamadas simultaneas competem em vez de somar, que e
-      // a mesma razao pela qual a barra fixa do celular so sobe depois do
-      // hero. Passado o hero, o cabecalho volta a ser a unica acao a vista.
+      // vista. Passado o hero, o cabecalho volta a ser a unica acao a vista.
       setPastHero(window.scrollY > 420);
     }
 
@@ -40,7 +127,11 @@ export function Header() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const ctaHref = primaryCtaHref(hero.whatsappMessage);
+  const ctaHref = ehFocus
+    ? whatsappLink(focusMensagens.teste)
+    : primaryCtaHref(hero.whatsappMessage);
+  const ctaRotulo = ehFocus ? focusNav.cta : nav.cta;
+  const inicio = ehFocus ? "/focus" : "/";
 
   return (
     <header
@@ -50,17 +141,17 @@ export function Header() {
           : "border-b border-transparent"
       }`}
     >
-      <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-6 px-5 py-4 sm:px-8">
-        <Link href="/" aria-label={`${siteConfig.productName} — página inicial`}>
-          <Logo />
-        </Link>
+      <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-5 px-5 py-4 sm:px-8">
+        <div className="flex items-center gap-3">
+          <Link href={inicio} aria-label={`${siteConfig.brandName} — página inicial`}>
+            <Logo />
+          </Link>
+          <SeletorProduto atual={produto} className="hidden lg:flex" />
+        </div>
 
-        <nav
-          aria-label="Páginas do site"
-          className="hidden items-center gap-6 lg:flex"
-        >
-          {nav.links.map((link) => {
-            const ativo = link.href === atual;
+        <nav aria-label="Seções do site" className="hidden items-center gap-6 lg:flex">
+          {links.map((link) => {
+            const ativo = ehFocus ? link.href === `#${secaoAtiva}` : link.href === atual;
 
             return (
               <Link
@@ -84,6 +175,17 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-3">
+          {ehFocus ? (
+            <a
+              href={siteConfig.painelFocus}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden text-sm font-medium text-fog-300 transition-colors hover:text-white lg:inline-flex"
+            >
+              {focusNav.entrar}
+            </a>
+          ) : null}
+
           <a
             href={ctaHref}
             {...(ctaHref.startsWith("http")
@@ -97,7 +199,7 @@ export function Header() {
                 : "pointer-events-none -translate-y-1 opacity-0"
             }`}
           >
-            {nav.cta}
+            {ctaRotulo}
           </a>
 
           <button
@@ -107,9 +209,7 @@ export function Header() {
             aria-controls="menu-mobile"
             className="inline-flex items-center justify-center rounded-lg border border-ink-700 p-2 text-white lg:hidden"
           >
-            <span className="sr-only">
-              {open ? "Fechar menu" : "Abrir menu"}
-            </span>
+            <span className="sr-only">{open ? "Fechar menu" : "Abrir menu"}</span>
             {open ? (
               <X aria-hidden="true" className="h-5 w-5" />
             ) : (
@@ -125,8 +225,15 @@ export function Header() {
           aria-label="Menu"
           className="border-t border-ink-800 bg-ink-950 px-5 py-4 lg:hidden"
         >
-          <ul className="space-y-1">
-            {nav.links.map((link) => (
+          <div className="mb-3">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-fog-500">
+              Produtos
+            </p>
+            <SeletorProduto atual={produto} />
+          </div>
+
+          <ul className="space-y-1 border-t border-ink-800 pt-3">
+            {links.map((link) => (
               <li key={link.href}>
                 <Link
                   href={link.href}
@@ -139,25 +246,33 @@ export function Header() {
             ))}
             <li className="pt-2">
               <a
-                href={
-                  siteConfig.hasWhatsapp || siteConfig.agendaUrl
-                    ? ctaHref
-                    : CONTACT_ANCHOR
-                }
+                href={siteConfig.hasWhatsapp || siteConfig.agendaUrl ? ctaHref : CONTACT_ANCHOR}
                 onClick={() => setOpen(false)}
                 className="block rounded-lg bg-brand-500 px-3 py-2.5 text-center text-sm font-semibold text-white"
               >
-                {nav.cta}
+                {ctaRotulo}
               </a>
             </li>
             <li>
-              <a
-                href={whatsappLink(trial.whatsappMessage)}
-                onClick={() => setOpen(false)}
-                className="block rounded-lg border border-ink-700 px-3 py-2.5 text-center text-sm font-semibold text-white"
-              >
-                {trial.cta}
-              </a>
+              {ehFocus ? (
+                <a
+                  href={siteConfig.painelFocus}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setOpen(false)}
+                  className="block rounded-lg border border-ink-700 px-3 py-2.5 text-center text-sm font-semibold text-white"
+                >
+                  Entrar no painel
+                </a>
+              ) : (
+                <a
+                  href={whatsappLink(trial.whatsappMessage)}
+                  onClick={() => setOpen(false)}
+                  className="block rounded-lg border border-ink-700 px-3 py-2.5 text-center text-sm font-semibold text-white"
+                >
+                  {trial.cta}
+                </a>
+              )}
             </li>
           </ul>
         </nav>

@@ -1,7 +1,23 @@
 # Site comercial — NewSec
 
-Página de venda do sistema de operação. Objetivo único da página: agendar
-demonstração. Não exibe preço.
+Site de venda dos produtos NewSec. Não exibe preço em nenhuma página.
+
+| Produto | Onde | Objetivo da página |
+| --- | --- | --- |
+| **NewSec CRM** | `/` e as cinco páginas de área | Agendar demonstração |
+| **NewSec Focus** | `/focus` | Pedir o teste com a própria equipe |
+
+Até 09/2026 marca e produto eram a mesma palavra: "NewSec" queria dizer o CRM.
+Com o Focus, a marca passou a ser a casa e cada produto ganhou nome próprio —
+`siteConfig.brandName` é a marca, `siteConfig.productName` é o CRM, e a lista
+`produtos` (em `src/lib/site-config.ts`) alimenta o seletor do cabeçalho e as
+colunas do rodapé. Acrescentar um terceiro produto é acrescentar uma linha lá.
+
+⚠️ **O CRM não mudou de endereço.** A home, as cinco áreas e a demonstração do
+CRM continuam exatamente onde estavam: a página do Focus entra ao lado, com
+título, descrição, dados estruturados e imagem de compartilhamento próprios. As
+duas disputam buscas diferentes — "CRM para assessoria" de um lado,
+"monitoramento de produtividade" do outro.
 
 ## Por que a marca do site não é a marca de quem desenvolve
 
@@ -40,8 +56,9 @@ npm run dev        # http://localhost:3000
 | `npm run build` | Build estático em `out/` |
 | `npm run lint` | ESLint |
 | `npm run typecheck` | TypeScript sem emitir |
-| `npm run capture` | Gera as imagens das telas e a imagem de Open Graph |
-| `npm run audit:layout` | Testa as 7 páginas em 1440x900, 1280x800, 768x1024 e 390x844 |
+| `npm run capture` | Gera as imagens das telas e as duas imagens de Open Graph |
+| `npm run capture -- --og` | Só as imagens de Open Graph, sem refotografar as telas |
+| `npm run audit:layout` | Testa as 8 páginas em 1440x900, 1280x800, 768x1024 e 390x844 |
 
 A auditoria verifica overflow horizontal, imagens carregadas, **contraste de
 texto** (WCAG AA), presença das seções, um único `<h1>` por página, foco de
@@ -100,7 +117,8 @@ a mesma frase em dois arquivos.
 
 | Página | Altura em 1440px | Assunto |
 | --- | --- | --- |
-| `/` | ~11.000px | Promessa, demo, problema, jornada guiada, índice das áreas, implantação, FAQ |
+| `/` | ~11.600px | Promessa, demo, problema, jornada guiada, índice das áreas, implantação, FAQ |
+| `/focus` | ~11.400px | Promessa, números, painel navegável, leituras, celular, coleta, implantação, acessos, teste, FAQ |
 | `/comercial` | ~9.200px | Leads, pipeline, cliente, simulação, documentos gerados, painel |
 | `/gestao` | ~6.000px | Ambiente, permissões, segurança, backup, implantação |
 | `/juridico` | ~5.800px | Esteira configurável, e-mail, cobranças, portal do cliente |
@@ -159,6 +177,43 @@ As colunas de Documentos, Usuários, Backups e Logs foram lidas das tabelas do
 próprio CRM, não inventadas. A esteira jurídica mostrada é um exemplo montado
 para o site: o processo real de qualquer empresa é configurado dentro do
 sistema, e não foi publicado aqui.
+
+## A réplica do NewSec Focus
+
+A página `/focus` traz o painel do Focus **funcionando**, e não uma captura:
+barra lateral clicável, troca de período, filtro por equipe, tabela ordenável,
+detalhe de uma pessoa e classificação de aplicativo com o índice recalculando
+na hora. No celular, a mesma réplica assume o layout de aplicativo do produto,
+com as abas de baixo.
+
+Fica em `src/components/focus/demo/`:
+
+| Arquivo | O que faz |
+| --- | --- |
+| `dados.ts` | Empresa, 18 pessoas em 4 equipes, ferramentas, estações e eventos — tudo fictício |
+| `motor.ts` | Simula dia a dia e agrega como o painel agrega (período, equipe, pessoa, estação) |
+| `vivo.ts` | Atividade agora, estações, diário de bordo e registros minuto a minuto |
+| `estado.tsx` | Estado da demonstração: tela, período, filtros e classificações |
+| `kit.tsx`, `graficos.tsx`, `tabelas.tsx`, `kpis.tsx`, `filtros.tsx` | As primitivas do painel, refeitas |
+| `telas.tsx`, `casca.tsx` | As nove telas e a casca (barra lateral, topo, avisos) |
+| `tour-focus.tsx`, `painel-focus.tsx`, `sistema-focus.tsx` | Tour guiado, exploração livre e o alternador entre os dois |
+
+Três decisões que valem registro:
+
+- **Nada de relógio nem de sorteio.** O "agora" é fixo (28/08/2026, 16h40) e a
+  variação vem de um hash da chave (pessoa + dia + medida). O HTML sai do build
+  e o navegador calcula o mesmo número — senão a hidratação quebra (erro #418).
+- **Sem Recharts.** O painel usa a biblioteca; aqui os três gráficos são SVG
+  feito à mão, com a mesma leitura. Mais de 100 kB numa página que já carrega a
+  réplica inteira não se justificava.
+- **A frase de conformidade da LGPD não foi copiada.** O painel escreve "Coleta
+  em conformidade com a LGPD" na barra lateral; a réplica escreve o que o
+  agente faz ("Coleta só metadados de uso. Sem conteúdo digitado nem captura de
+  tela."). A regra do site contra selo vale também dentro da tela demonstrativa
+  — e o produto deveria adotar a mesma frase.
+
+O conteúdo da página fica em `src/content/focus.ts`, com um cabeçalho listando
+o que a página **não** diz e por quê.
 
 ### Nada de imagem de UI gerada por IA
 

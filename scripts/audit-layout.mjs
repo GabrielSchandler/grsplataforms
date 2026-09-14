@@ -48,6 +48,20 @@ const expectedSections = [
 /** Páginas de área — cada uma precisa se sustentar sozinha. */
 const areaSlugs = ["comercial", "juridico", "financeiro", "academy", "gestao"];
 
+/** Seções da página do Focus, na ordem de leitura. */
+const focusSections = [
+  "topo",
+  "painel",
+  "respostas",
+  "celular",
+  "coleta",
+  "implantacao",
+  "acessos",
+  "teste",
+  "perguntas",
+  "demonstracao",
+];
+
 const mimes = {
   ".html": "text/html; charset=utf-8",
   ".css": "text/css; charset=utf-8",
@@ -233,11 +247,29 @@ async function checarContraste(page, rotulo) {
 
     const luminancia = ([r, g, b]) => 0.2126 * canal(r) + 0.7152 * canal(g) + 0.0722 * canal(b);
 
+    /**
+     * Resolve qualquer cor CSS pintando um pixel e lendo de volta.
+     *
+     * Antes isto lia os números direto do texto, e `oklch(0.7 0.04 256)` —
+     * que é como o Tailwind 4 escreve a paleta padrão — virava um RGB quase
+     * preto. O resultado eram falsos positivos em toda página que usa a
+     * paleta do framework, e contraste ruim de verdade passando batido.
+     */
+    const tela = document.createElement("canvas");
+    tela.width = 1;
+    tela.height = 1;
+    const pincel = tela.getContext("2d", { willReadFrequently: true });
+
     const paraRgb = (cor) => {
-      const partes = cor.match(/[\d.]+/g);
-      if (!partes) return null;
-      const [r, g, b, a = "1"] = partes;
-      return { rgb: [Number(r), Number(g), Number(b)], alpha: Number(a) };
+      if (!cor) return null;
+
+      pincel.clearRect(0, 0, 1, 1);
+      pincel.fillStyle = "#000000";
+      pincel.fillStyle = cor;
+      pincel.fillRect(0, 0, 1, 1);
+
+      const [r, g, b, a] = pincel.getImageData(0, 0, 1, 1).data;
+      return { rgb: [r, g, b], alpha: a / 255 };
     };
 
     const fundoDe = (elemento) => {
@@ -572,6 +604,86 @@ async function main() {
           await page.waitForTimeout(250);
           await page.screenshot({ path: path.join(SHOT_DIR, "areas", `${slug}.png`) });
         }
+      }
+
+      /* ---------- página do Focus ---------- */
+
+      await page.goto(`${BASE}/focus/`, { waitUntil: "load", timeout: 30000 });
+      await prepararPagina(page);
+
+      const rotuloFocus = `${viewport.name} /focus`;
+      await checarOverflow(page, rotuloFocus);
+      await checarImagens(page, rotuloFocus);
+      await checarContraste(page, rotuloFocus);
+      await registrarAltura(page, "/focus", viewport);
+
+      const focus = await page.evaluate(
+        (ids) => ({
+          h1: document.querySelectorAll("h1").length,
+          temFaq: Boolean(document.querySelector("#perguntas details")),
+          temCta: Boolean(document.querySelector("#demonstracao")),
+          faltando: ids.filter((id) => !document.getElementById(id)),
+          // A réplica do painel precisa estar montada, e não só o texto em volta.
+          temReplica: Boolean(document.querySelector("#painel [data-demo]")),
+        }),
+        focusSections,
+      );
+
+      check(focus.h1 === 1, `${rotuloFocus}: deveria ter exatamente 1 h1, tem ${focus.h1}`);
+      check(focus.temFaq, `${rotuloFocus}: sem FAQ proprio`);
+      check(focus.temCta, `${rotuloFocus}: sem secao de chamada final`);
+      check(focus.temReplica, `${rotuloFocus}: a replica do painel nao foi montada`);
+      check(
+        focus.faltando.length === 0,
+        `${rotuloFocus}: secoes ausentes — ${focus.faltando.join(", ")}`,
+      );
+
+      if (viewport.width === 1440 || viewport.width === 390) {
+        const pasta = viewport.width === 1440 ? "focus" : "focus-mobile";
+
+        for (const id of focusSections) {
+          await page.evaluate((sectionId) => {
+            document.getElementById(sectionId)?.scrollIntoView();
+          }, id);
+          await page.waitForTimeout(500);
+          await page
+            .locator(`#${id}`)
+            .screenshot({ path: path.join(SHOT_DIR, pasta, `${id}.png`) })
+            .catch(() => {});
+        }
+      }
+
+      /* ---------- tour do Focus: avancar muda a etapa ---------- */
+
+      if (viewport.width === 1440) {
+        const semMovimentoFocus = await browser.newContext({
+          reducedMotion: "reduce",
+          viewport: { width: 1440, height: 900 },
+        });
+        const paginaFocus = await semMovimentoFocus.newPage();
+
+        await paginaFocus.goto(`${BASE}/focus/`, { waitUntil: "load", timeout: 30000 });
+        await paginaFocus.evaluate(() => document.fonts.ready);
+        await paginaFocus.waitForTimeout(600);
+
+        const contadorFocus = paginaFocus
+          .locator("#painel span")
+          .filter({ hasText: /^\d+\/10$/ })
+          .first();
+        const antesFocus = Number((await contadorFocus.textContent())?.split("/")[0]);
+
+        await paginaFocus.getByRole("button", { name: "Próxima" }).first().click();
+        await paginaFocus.waitForTimeout(700);
+
+        const depoisFocus = Number((await contadorFocus.textContent())?.split("/")[0]);
+
+        check(antesFocus === 1, `${viewport.name} /focus: tour deveria abrir na etapa 1, abriu na ${antesFocus}`);
+        check(
+          depoisFocus === antesFocus + 1,
+          `${viewport.name} /focus: tour nao avancou a etapa (${antesFocus} -> ${depoisFocus})`,
+        );
+
+        await semMovimentoFocus.close();
       }
 
       /* ---------- política de privacidade ---------- */

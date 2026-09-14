@@ -23,10 +23,12 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.siteUrl),
   title: {
     default: title,
-    template: `%s — ${siteConfig.productName}`,
+    // O sufixo é a marca, não o produto: as páginas de área são do CRM, e a
+    // do Focus traz o nome dela no próprio título.
+    template: `%s — ${siteConfig.brandName}`,
   },
   description,
-  applicationName: siteConfig.productName,
+  applicationName: siteConfig.brandName,
   keywords: [
     "sistema de gestão para assessoria de crédito",
     "CRM para assessoria",
@@ -42,7 +44,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "pt_BR",
     url: siteConfig.siteUrl,
-    siteName: siteConfig.productName,
+    siteName: siteConfig.brandName,
     title,
     description,
     images: [
@@ -90,24 +92,10 @@ export default function RootLayout({
           <style>{`[data-reveal]{opacity:1!important;transform:none!important;clip-path:none!important;filter:none!important}`}</style>
         </noscript>
 
-        {/* Só a cena do hero é pré-carregada: é o único recurso acima da
-            dobra que decide a primeira impressão. O resto entra preguiçoso. */}
-        <link
-          rel="preload"
-          as="image"
-          href="/img/hero/cena-1672.avif"
-          type="image/avif"
-          media="(min-width: 641px)"
-          fetchPriority="high"
-        />
-        <link
-          rel="preload"
-          as="image"
-          href="/img/hero/cena-mobile.avif"
-          type="image/avif"
-          media="(max-width: 640px)"
-          fetchPriority="high"
-        />
+        {/* O pré-carregamento da cena do hero mora na home (src/app/page.tsx),
+            e não aqui: aqui ele valia para o site inteiro, e as páginas de
+            área e a do Focus baixavam uma imagem que não usam bem na hora que
+            decide a primeira impressão delas. */}
       </head>
       <body className="bg-ink-950 text-white antialiased">
         <a

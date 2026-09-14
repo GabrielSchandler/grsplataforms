@@ -373,9 +373,192 @@
 @utility spotlight {
   background-image: radial-gradient(
     460px circle at var(--mx, 50%) var(--my, 0%),
-    rgba(195, 18, 48, 0.14),
+    var(--spot, rgba(195, 18, 48, 0.14)),
     transparent 68%
   );
+}
+
+/* ==========================================================================
+   NewSec Focus
+   --------------------------------------------------------------------------
+   Tokens da réplica do painel e efeitos da página /focus. As cores são as do
+   próprio Focus (tailwind.config do painel) e só valem dentro da réplica e
+   das peças que a envolvem. A moldura da página continua sendo a da NewSec:
+   Sora, fundos alternados e botão vermelho.
+   ========================================================================== */
+
+@theme {
+  --color-foco-fundo: #090d16;
+  --color-foco-suave: #0d121e;
+  --color-foco-cartao: #0f1524;
+  --color-foco-borda: #1e293b;
+  /* `rounded-xl2` do painel (1,25rem). O teto de 8px vale para a moldura da
+     NewSec, não para a réplica de um produto que usa outro raio. */
+  --radius-foco: 1.25rem;
+}
+
+/* Inter e JetBrains Mono, como no painel. As variáveis vêm de
+   src/lib/fontes-focus.ts e só são declaradas onde o Focus aparece. */
+.foco-app {
+  font-family: var(--fonte-foco, ui-sans-serif), ui-sans-serif, system-ui, sans-serif;
+  font-feature-settings: "cv11", "ss01";
+  letter-spacing: normal;
+  color: #e2e8f0;
+  -webkit-font-smoothing: antialiased;
+}
+
+.foco-mono {
+  font-family: var(--fonte-foco-mono, ui-monospace), ui-monospace, monospace;
+}
+
+/* `shadow-glow` do painel: um fio ciano e um halo baixo. */
+.foco-glow {
+  box-shadow:
+    0 0 0 1px rgba(34, 211, 238, 0.08),
+    0 8px 40px -12px rgba(34, 211, 238, 0.25);
+}
+
+/* `vidro` do painel, sem o desfoque de fundo: dentro de uma réplica reduzida,
+   dezenas de backdrop-filter custam caro e quase não aparecem sobre o fundo
+   liso do painel. */
+.foco-vidro {
+  background: linear-gradient(180deg, rgba(15, 21, 36, 0.78), rgba(9, 13, 22, 0.7));
+  border: 1px solid rgba(30, 41, 59, 0.8);
+}
+
+/* Brilho de fundo do painel (`fundo-aurora`), preso à réplica e não à janela. */
+.foco-aurora {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.foco-aurora::before,
+.foco-aurora::after {
+  content: "";
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(120px);
+  opacity: 0.35;
+}
+
+.foco-aurora::before {
+  width: 520px;
+  height: 520px;
+  top: -140px;
+  left: -80px;
+  background: radial-gradient(circle, #22d3ee, transparent 70%);
+}
+
+.foco-aurora::after {
+  width: 620px;
+  height: 620px;
+  bottom: -220px;
+  right: -120px;
+  background: radial-gradient(circle, #a78bfa, transparent 70%);
+}
+
+@keyframes foco-pulso {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .foco-pulso {
+    animation: foco-pulso 1.8s ease-in-out infinite;
+  }
+
+  /* Troca de tela dentro da réplica: curta, só para o olho notar a mudança. */
+  .foco-entra {
+    animation: hero-rise 380ms var(--ease-out-quint) both;
+  }
+}
+
+/* Rolagem interna da réplica: a janela do painel rola, a página não. */
+.foco-rolagem {
+  scrollbar-width: thin;
+  scrollbar-color: #1e293b transparent;
+  overscroll-behavior: contain;
+}
+
+/* --------------------------------------------------------------------------
+   Feixe na borda (Border Beam, do catálogo 21st.dev), feito à mão.
+
+   Um quadrado com gradiente cônico gira atrás de uma moldura de 1px. Só
+   `transform` anima, então o trabalho fica com o compositor e a rolagem não
+   sente. Quem pede menos movimento vê a moldura parada.
+   -------------------------------------------------------------------------- */
+@keyframes feixe-giro {
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+.feixe-moldura {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.feixe-giro {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: -1;
+  width: var(--feixe-tamanho, 160%);
+  aspect-ratio: 1 / 1;
+  transform: translate(-50%, -50%);
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg 250deg,
+    var(--feixe-cor-1, #22d3ee) 305deg,
+    var(--feixe-cor-2, #a78bfa) 340deg,
+    transparent 360deg
+  );
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .feixe-giro {
+    animation: feixe-giro var(--feixe-duracao, 8s) linear infinite;
+  }
+
+  /* Fora da tela o feixe para: animação que ninguém vê é bateria gasta. */
+  .feixe-pausado .feixe-giro {
+    animation-play-state: paused;
+  }
+}
+
+/* Linhas do diagrama de implantação (Animated Beam, do 21st.dev). */
+@keyframes feixe-linha {
+  from {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: -400;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .feixe-linha {
+    animation: feixe-linha 2.6s linear infinite;
+  }
+}
+
+/* Malha de pontos de fundo (Dot Pattern, do 21st.dev). */
+@utility padrao-pontos {
+  background-image: radial-gradient(
+    circle at 1px 1px,
+    rgba(255, 255, 255, 0.085) 1px,
+    transparent 0
+  );
+  background-size: 22px 22px;
 }
 
 /* Costura entre seções: fio fino com um traço vermelho no início. */

@@ -4,9 +4,8 @@ import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { finalCta } from "@/content/site";
-import { siteConfig, whatsappLink } from "@/lib/site-config";
-
-const teamSizes = ["1 a 5", "6 a 15", "16 a 40", "41 a 100", "Mais de 100"];
+import { focusFinal, focusMensagens } from "@/content/focus";
+import { siteConfig, whatsappLink, type ProdutoId } from "@/lib/site-config";
 
 const fields = [
   { name: "nome", label: "Nome", type: "text", autoComplete: "name", required: true },
@@ -17,12 +16,38 @@ const fields = [
 ] as const;
 
 /**
+ * Cada produto pergunta o tamanho da operação com a unidade que importa nele:
+ * o CRM cobra por usuário, o Focus por estação monitorada.
+ */
+const porProduto = {
+  crm: {
+    cabecalho: "NewSec (CRM) — pedido de demonstração pelo site.",
+    rotuloTamanho: "Tamanho da equipe",
+    campoTamanho: "Tamanho da equipe",
+    opcoes: ["1 a 5", "6 a 15", "16 a 40", "41 a 100", "Mais de 100"],
+    sufixo: "pessoas",
+    consentimento: finalCta.consent,
+    enviar: finalCta.submit,
+  },
+  focus: {
+    cabecalho: focusMensagens.formulario,
+    rotuloTamanho: "Quantos computadores",
+    campoTamanho: "Computadores",
+    opcoes: ["1 a 10", "11 a 25", "26 a 50", "51 a 100", "Mais de 100"],
+    sufixo: "computadores",
+    consentimento: focusFinal.consent,
+    enviar: focusFinal.submit,
+  },
+} as const;
+
+/**
  * O envio monta a mensagem e abre o WhatsApp do visitante. Não há backend,
  * então o formulário nunca exibe confirmação de recebimento — quem confirma
  * é a própria conversa que abre.
  */
-export function DemoForm() {
+export function DemoForm({ produto = "crm" }: { produto?: ProdutoId }) {
   const [blocked, setBlocked] = useState(false);
+  const config = porProduto[produto];
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -34,14 +59,14 @@ export function DemoForm() {
 
     const data = new FormData(event.currentTarget);
     const message = [
-      "NewSec (CRM) — pedido de demonstração pelo site.",
+      config.cabecalho,
       "",
       `Nome: ${data.get("nome")}`,
       `Empresa: ${data.get("empresa")}`,
       `Cargo: ${data.get("cargo")}`,
       `Telefone: ${data.get("telefone")}`,
       `E-mail: ${data.get("email")}`,
-      `Tamanho da equipe: ${data.get("equipe")}`,
+      `${config.campoTamanho}: ${data.get("equipe")}`,
     ].join("\n");
 
     window.open(whatsappLink(message), "_blank", "noopener,noreferrer");
@@ -74,7 +99,7 @@ export function DemoForm() {
             htmlFor="equipe"
             className="block text-xs font-semibold uppercase tracking-wide text-fog-400"
           >
-            Tamanho da equipe
+            {config.rotuloTamanho}
           </label>
           <select
             id="equipe"
@@ -86,9 +111,9 @@ export function DemoForm() {
             <option value="" disabled>
               Selecione
             </option>
-            {teamSizes.map((size) => (
+            {config.opcoes.map((size) => (
               <option key={size} value={size}>
-                {size} pessoas
+                {size} {config.sufixo}
               </option>
             ))}
           </select>
@@ -104,7 +129,7 @@ export function DemoForm() {
           className="mt-1 h-4 w-4 shrink-0 rounded border-ink-700 bg-ink-900 accent-brand-500"
         />
         <label htmlFor="consentimento" className="text-[13px] leading-relaxed text-fog-400">
-          {finalCta.consent} Leia a{" "}
+          {config.consentimento} Leia a{" "}
           <Link
             href="/privacidade"
             className="text-white underline underline-offset-4"
@@ -120,14 +145,19 @@ export function DemoForm() {
         type="submit"
         className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-brand-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-600"
       >
-        {finalCta.submit}
+        {config.enviar}
         <ArrowUpRight aria-hidden="true" className="h-4 w-4" />
       </button>
 
       {blocked ? (
-        <p role="alert" className="rounded-lg border border-brand-500 bg-brand-500/10 px-3 py-2.5 text-[13px] text-white">
+        <p
+          role="alert"
+          className="rounded-lg border border-brand-500 bg-brand-500/10 px-3 py-2.5 text-[13px] text-white"
+        >
           O número de WhatsApp ainda não foi configurado neste ambiente. Defina
-          <code className="mx-1 rounded bg-ink-800 px-1 py-0.5 text-[12px]">NEXT_PUBLIC_WHATSAPP</code>
+          <code className="mx-1 rounded bg-ink-800 px-1 py-0.5 text-[12px]">
+            NEXT_PUBLIC_WHATSAPP
+          </code>
           antes de publicar.
         </p>
       ) : null}
