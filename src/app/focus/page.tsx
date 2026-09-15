@@ -2,13 +2,13 @@ import type { Metadata } from "next";
 import { ScrollProgress } from "@/components/motion/motion";
 import { FaixaNumeros, HeroFocus, SecaoDemo } from "@/components/focus/topo";
 import {
-  SecaoAcessos,
   SecaoCelular,
   SecaoChamadaFinal,
   SecaoColeta,
   SecaoImplantacao,
   SecaoOferta,
   SecaoPerguntas,
+  SecaoProblema,
   SecaoRespostas,
 } from "@/components/focus/secoes";
 import { Footer } from "@/components/site/footer";
@@ -146,13 +146,13 @@ export default function PaginaFocus() {
       <Header produto="focus" />
       <main id="conteudo">
         <HeroFocus />
+        <SecaoProblema />
         <FaixaNumeros />
         <SecaoDemo />
         <SecaoRespostas />
         <SecaoCelular />
         <SecaoColeta />
         <SecaoImplantacao />
-        <SecaoAcessos />
         <SecaoOferta />
         <SecaoPerguntas />
         <SecaoChamadaFinal />

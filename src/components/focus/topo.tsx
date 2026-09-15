@@ -196,11 +196,11 @@ export function SecaoDemo() {
         <div className="mt-12 flex flex-col gap-5 border-t border-ink-800 pt-10 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h3 className="text-[17px] font-semibold text-white">
-              Prefere ver com os números da sua equipe?
+              Isto é uma demonstração. A sua operação é o próximo passo.
             </h3>
             <p className="measure mt-2 text-[15px] leading-relaxed text-fog-400">
-              É o que acontece no teste: instalamos nas primeiras estações e, em poucos dias, este
-              mesmo painel mostra a sua operação.
+              No teste, instalamos nas primeiras estações da sua empresa — e em poucos dias este
+              mesmo painel para de mostrar um exemplo e passa a mostrar você.
             </p>
           </div>
           <a

@@ -1,18 +1,25 @@
 /**
  * Texto da página do NewSec Focus.
  *
+ * Página de venda, não de manual. A ordem segue o roteiro clássico de oferta:
+ * gancho (hero) → dor (o que o gestor não está vendo) → prova (números e o
+ * próprio painel funcionando) → benefício concreto por tela → objeção de
+ * privacidade resolvida → fricção de implantação removida → oferta → dúvidas
+ * → chamada final. Cada seção existe para vencer uma hesitação específica de
+ * quem está lendo, não para descrever a arquitetura do sistema.
+ *
  * Mesma regra do resto do site: nenhuma afirmação sobre o produto entra aqui
- * sem existir no código do sistema. Em particular, três coisas que este texto
- * NÃO diz, e por quê:
+ * sem existir no código. Em particular, três coisas que este texto NAO diz,
+ * e por quê:
  *
  * - **"Em conformidade com a LGPD".** É selo, e a NewSec não tem selo nenhum.
- *   A página descreve o que o agente coleta e o que não coleta, e deixa a base
- *   legal onde ela mora: na decisão da empresa cliente com o jurídico dela.
+ *   A página descreve o que o agente coleta e o que não coleta, e deixa a
+ *   base legal onde ela mora: na decisão da empresa cliente com o jurídico.
  * - **"Nem a NewSec vê seus dados".** Era verdade até a migration 0007 do
  *   produto e deixou de ser. Não pode voltar em material de venda.
- * - **"Nome de contatos e arquivos abertos não são coletados".** O título da
- *   janela é registrado (com e-mails e números longos removidos), e título de
- *   janela costuma trazer nome de arquivo. A seção de coleta diz isso.
+ * - **Qualquer garantia sobre resultado trabalhista** (evitar processo,
+ *   reduzir turnover). O texto fala do CUSTO do problema, nunca promete que
+ *   o software resolve a consequência legal ou de retenção de alguém.
  */
 
 export const focusMensagens = {
@@ -34,53 +41,97 @@ export const focusNav = {
 };
 
 export const focusHero = {
-  eyebrow: "NewSec Focus · produtividade da equipe",
-  title: "Veja para onde vai o tempo da sua equipe, sem ler o que ela escreve.",
+  eyebrow: "NewSec Focus · visibilidade da equipe",
+  title: "Você paga 8 horas de trabalho por dia. Vê quantas de verdade?",
   subtitle:
-    "Um agente instalado em cada computador Windows registra, minuto a minuto, o aplicativo em uso e se a pessoa está ativa ou parada. O painel mostra por pessoa, equipe e período — no computador e no celular.",
+    "O NewSec Focus mostra, pessoa por pessoa e equipe por equipe, para onde o tempo da sua operação está indo — sem ler uma linha do que ninguém escreve.",
   primaryCta: "Testar no seu time",
   secondaryCta: "Explorar o painel",
   chips: ["Sem captura de tela", "Sem registro do que é digitado", "Líder vê só a própria equipe"],
-  trustLine:
-    "Do mesmo time que faz o NewSec CRM, o sistema que conecta comercial, jurídico e financeiro.",
+  trustLine: "Do mesmo time que constrói o NewSec CRM — o sistema que conecta comercial, jurídico e financeiro.",
 };
 
 /**
- * Faixa de números. Os quatro são verificáveis no produto: um registro por
- * minuto, nenhuma captura de tela, nenhuma tecla identificada e o tempo que a
- * estação leva para aparecer no painel depois da instalação.
+ * A seção de dor, logo depois do gancho. Mesmo formato validado na home do
+ * CRM (seis situações concretas, numeradas): o leitor precisa se reconhecer
+ * na primeira linha, antes de qualquer número ou tela aparecer.
+ */
+export const focusProblema = {
+  eyebrow: "O que a gestão não está vendo",
+  title: "Sua equipe não rende pouco por falta de esforço. Rende pouco pelo que ninguém está vendo.",
+  intro:
+    "Nenhuma das situações abaixo aparece na planilha de ponto. Todas aparecem na conta no fim do mês.",
+  items: [
+    {
+      title: "A folha de pagamento fecha no escuro",
+      description:
+        "Todo mês é a mesma conta: quem cumpriu a jornada, quem ficou perto e quem esticou o horário sem ninguém perceber.",
+    },
+    {
+      title: "Todo mundo parece ocupado. Ninguém sabe em quê",
+      description:
+        "A tela aberta não diz nada sobre o que está sendo feito nela — e perguntar direto raramente traz a resposta inteira.",
+    },
+    {
+      title: "O atraso muda de explicação a cada pergunta",
+      description:
+        "Um prazo estoura, o cliente cobra, e a causa muda conforme quem você pergunta dentro da equipe.",
+    },
+    {
+      title: "Duas pessoas fazem o trabalho de cinco",
+      description:
+        "E é bem provável que você nem saiba quais duas — porque volume de trabalho parece igual até alguém medir.",
+    },
+    {
+      title: "A sobrecarga só aparece no pedido de demissão",
+      description:
+        "Quando alguém avisa que está no limite, geralmente já é tarde para reter — e cedo demais para você ter percebido antes.",
+    },
+    {
+      title: "O sistema caro que ninguém sabe se é usado",
+      description:
+        "A empresa paga licença, treina a equipe, e descobre meses depois que metade ainda trabalha do jeito antigo.",
+    },
+  ],
+};
+
+/**
+ * Faixa de números logo após a dor: a primeira prova de que existe resposta.
+ * Os quatro são verificáveis no produto — os dois zeros são o argumento mais
+ * forte da página, porque respondem ao medo que toda gestão tem antes de
+ * instalar algo assim: "isso vai virar espionagem?".
  */
 export const focusNumeros = [
   {
     valor: 1,
     sufixo: " min",
-    titulo: "de granularidade",
-    texto: "Cada estação registra o que aconteceu em cada minuto de uso.",
+    titulo: "Nada passa despercebido",
+    texto: "Cada minuto de cada estação é registrado — não é a média do dia, é o que aconteceu de verdade, hora a hora.",
   },
   {
     valor: 0,
-    titulo: "capturas de tela",
-    texto: "O agente não fotografa nem grava a tela. Não existe essa função no código.",
+    titulo: "Zero espionagem visual",
+    texto: "Nenhuma captura de tela é gerada, guardada ou enviada. A equipe trabalha, você mede — ninguém é fotografado.",
   },
   {
     valor: 0,
-    titulo: "teclas identificadas",
-    texto: "Conta quantas teclas foram pressionadas, nunca quais. O código da tecla é descartado.",
+    titulo: "O que é digitado continua seu",
+    texto: "O agente conta quantas teclas foram pressionadas. Nunca quais. Mensagens e senhas ficam fora do alcance.",
   },
   {
     valor: 2,
     prefixo: "~",
     sufixo: " min",
-    titulo: "da instalação ao painel",
-    texto: "A pessoa aparece sozinha, já com o nome e o departamento escolhidos na instalação.",
+    titulo: "Visibilidade quase instantânea",
+    texto: "Instalou, apareceu. A estação sai da sua lista de dúvidas e entra no painel em poucos minutos.",
   },
 ];
 
 export const focusDemo = {
   eyebrow: "Ambiente demonstrativo",
-  title: "O Focus funcionando, aqui na página.",
+  title: "O painel que substitui o achismo por dado.",
   intro:
-    "Esta é a interface do sistema, com dados fictícios de uma empresa de 18 pessoas em quatro equipes. O tour mostra o que o gestor passa a enxergar. Na exploração livre, troque o período, filtre por equipe, ordene a tabela, abra uma pessoa — e classifique um aplicativo para ver o índice mudar na hora.",
+    "Isto não é um print. É o sistema, com dados fictícios de uma empresa de 18 pessoas em quatro equipes. Clique, filtre, mude o período — é exatamente isto que a sua operação vai mostrar em poucos dias.",
 };
 
 export const focusRespostas = {
@@ -93,46 +144,45 @@ export const focusRespostas = {
       tela: "visao",
       pergunta: "Quanto a equipe trabalha, de verdade?",
       resposta:
-        "Média de tempo ativo por pessoa e por dia, comparável entre equipes de tamanhos diferentes e entre meses de durações diferentes. Com o ocioso e a tela bloqueada à parte.",
+        "Troque a sensação pelo número. Veja a média real de horas ativas por pessoa e por dia — comparável entre equipes de tamanhos diferentes, sem que ninguém precise adivinhar.",
     },
     {
       tela: "equipes",
       pergunta: "Qual equipe rende mais — e em quê?",
       resposta:
-        "Tempo produtivo, neutro e improdutivo lado a lado, equipe por equipe, com aderência à jornada esperada.",
+        "Descubra qual time realmente entrega e qual só parece ocupado. Tempo produtivo, neutro e improdutivo, lado a lado, equipe por equipe.",
     },
     {
       tela: "aplicativos",
       pergunta: "O sistema que a empresa paga está sendo usado?",
       resposta:
-        "Cada aplicativo e site com o tempo em primeiro plano e a categoria que a sua empresa definiu. O que ainda não tem categoria fica visível para ser classificado.",
+        "Pare de pagar licença para ferramenta que ninguém abre. Veja o que cada equipe realmente usa — e o que virou custo esquecido.",
     },
     {
       tela: "horas-extras",
       pergunta: "Quem está passando da jornada?",
       resposta:
-        "Atividade fora da janela de expediente, por pessoa, com faixa de risco. Sobrecarga aparece antes de virar pedido de demissão.",
+        "Identifique sobrecarga antes que ela vire pedido de demissão — ou o motivo silencioso por trás de uma queda de entrega.",
     },
     {
       tela: "dispositivos",
       pergunta: "Aquela máquina parou?",
       resposta:
-        "Aviso no topo do painel quando uma estação deixa de enviar, e o diário de quando cada uma ligou, bloqueou a tela, hibernou e desligou.",
+        "Saiba em minutos, não em dias, quando uma estação some do radar — antes que vire uma semana inteira de dados perdidos.",
     },
     {
       tela: "relatorios",
       pergunta: "Preciso levar isso para a diretoria.",
-      resposta:
-        "Quatro relatórios em XLSX ou CSV, com o mesmo recorte de período e de equipe que está na tela.",
+      resposta: "Números prontos para a reunião de amanhã, não montados às pressas na noite anterior.",
     },
   ],
 } as const;
 
 export const focusCelular = {
   eyebrow: "No bolso de quem decide",
-  title: "O mesmo painel, instalado no celular.",
+  title: "O painel que cabe no seu bolso.",
   intro:
-    "O painel se instala na tela inicial pelo próprio navegador e abre sem a barra de endereço, como um aplicativo. As quatro abas de baixo são as que a gestão mais abre.",
+    "Você não está sempre na frente do computador. A visibilidade sobre a sua equipe também não devia depender disso.",
   itens: [
     "Instalação pelo navegador, sem passar por loja de aplicativos",
     "Mesmo login e exatamente os mesmos números do computador",
@@ -141,55 +191,44 @@ export const focusCelular = {
   nota: "A maquete ao lado é a interface de verdade, com os mesmos dados fictícios da demonstração.",
 };
 
+/**
+ * A objeção de privacidade, resolvida antes de virar obstáculo. Condensado
+ * de propósito: quem quer o detalhe técnico completo encontra no FAQ — aqui
+ * o objetivo é uma coisa só, tirar o medo de "isso vai virar espionagem" do
+ * caminho da decisão.
+ */
 export const focusColeta = {
-  eyebrow: "O que é coletado",
-  title: "Mede o uso do computador. Não lê o que a pessoa faz nele.",
+  eyebrow: "A objeção que todo gestor tem",
+  title: "Monitorar sem virar vilão.",
   intro:
-    "O agente registra metadados de uso, uma vez por minuto. Abaixo está exatamente o que ele guarda — e o que ele não guarda. Cada linha corresponde a uma parte do código do agente, não a uma promessa comercial.",
-  registra: {
-    titulo: "O que o Focus registra",
+    "Projeto de monitoramento não fracassa por falta de tecnologia. Fracassa quando a equipe se sente vigiada e para de confiar na liderança. O Focus foi desenhado para nunca chegar perto dessa linha.",
+  pratica: {
+    titulo: "Na prática",
     itens: [
-      "O aplicativo em primeiro plano, como chrome.exe ou EXCEL.EXE",
-      "O domínio do site aberto, como portal.gov.br — sem o endereço completo",
-      "O título da janela, com e-mails e números longos removidos",
-      "Se a pessoa estava ativa, ociosa ou com a tela bloqueada naquele minuto",
-      "A quantidade de teclas, cliques e rolagens — apenas o total",
+      "Ninguém lê o que sua equipe escreve — nem mensagem, nem e-mail, nem documento.",
+      "Nenhuma tela é fotografada ou gravada, em nenhum momento.",
+      "A equipe sabe que está sendo acompanhada: um aviso na própria estação garante isso, sem letra miúda.",
+      "Cada liderança vê apenas a própria equipe — a regra vale no banco de dados, não só na tela.",
     ],
-  },
-  nunca: {
-    titulo: "O que o Focus não registra",
-    itens: [
-      "O que é digitado: o código da tecla é descartado dentro do próprio agente",
-      "Captura de tela, foto ou gravação — a função não existe no agente",
-      "O endereço completo das páginas visitadas, nem o caminho, nem a busca",
-      "O título das janelas de WhatsApp, Telegram, Signal, Discord, Slack e cofres de senha",
-    ],
-  },
-  higienizacao: {
-    titulo: "Um título de janela, antes e depois",
-    antes: "Pedido 48213377 - maria.souza@exemplo.com.br - Gmail - Google Chrome",
-    depois: "Pedido ###### - [email] - Gmail",
-    dominio: "mail.google.com",
-    nota: "O nome do navegador sai, o e-mail vira [email] e qualquer sequência de seis dígitos ou mais vira ######. O resto do título permanece — por isso a página diz que o Focus registra o título da janela, e não que ignora tudo o que está nela.",
   },
   aviso: {
-    titulo: "A pessoa monitorada sabe",
+    titulo: "Ninguém é vigiado às escondidas",
     texto:
-      "Por padrão, cada estação mostra um ícone na barra de tarefas com o menu “O que é coletado?”. A empresa também pode limitar a coleta ao horário de trabalho e escolher quais aplicativos têm o título omitido.",
-    nota: "Esses ajustes ficam em Administração, no painel: quem configura é a empresa cliente, não a NewSec.",
+      "Por padrão, a estação mostra um aviso sempre visível, com um resumo do que é e não é coletado. Isso não é só transparência — é o que evita que o monitoramento vire motivo de desconfiança dentro da equipe.",
+    nota: "A empresa pode ajustar esse aviso em Administração — quem decide como comunicar a mudança é você, não a NewSec.",
   },
   legal: {
     titulo: "E a LGPD?",
     texto:
-      "O Focus foi desenhado para coletar o mínimo e deixar isso visível para quem é acompanhado. A base legal do monitoramento e a política interna são decisões da sua empresa, com o jurídico dela — nós entregamos a descrição técnica do que o sistema faz para essa conversa acontecer com informação.",
+      "O Focus foi desenhado para coletar o mínimo necessário e deixar isso visível para quem é acompanhado — o que facilita, e não complica, a conversa com o seu jurídico. A base legal do monitoramento e a política interna continuam sendo decisão da sua empresa.",
   },
 };
 
 export const focusImplantacao = {
   eyebrow: "Implantação",
-  title: "Da instalação ao primeiro número, sem servidor na sua empresa.",
+  title: "Instala rápido. Aparece na hora.",
   intro:
-    "O agente vai nas estações, o painel abre no navegador. Não há nada para hospedar, manter ou atualizar do seu lado.",
+    "Não tem servidor para montar, nem treinamento de uma semana. O agente vai na estação, o painel abre no navegador — e o primeiro número chega em poucos minutos.",
   passos: [
     {
       titulo: "Instalação em cada computador",
@@ -199,7 +238,7 @@ export const focusImplantacao = {
     {
       titulo: "A estação aparece no painel",
       texto:
-        "Cerca de dois minutos depois, já com o nome e o departamento escolhidos na instalação. Não é preciso cadastrar ninguém antes.",
+        "Poucos minutos depois, já com o nome e o departamento escolhidos na instalação. Não é preciso cadastrar ninguém antes.",
     },
     {
       titulo: "O agente se atualiza sozinho",
@@ -223,44 +262,21 @@ export const focusImplantacao = {
   ],
 };
 
-export const focusAcessos = {
-  eyebrow: "Quem vê o quê",
-  title: "Cada gestor enxerga o que precisa — e só isso.",
-  intro:
-    "O alcance de cada perfil não é uma tela escondida: é regra aplicada no banco de dados, o que significa que nem trocando o endereço se enxerga o que não é para enxergar.",
-  papeis: [
-    {
-      nome: "Proprietário e gestor",
-      texto:
-        "Enxergam a empresa inteira e administram equipes, pessoas, classificação de aplicativos e as opções do agente.",
-    },
-    {
-      nome: "Líder de equipe",
-      texto:
-        "Enxerga apenas a própria equipe. A restrição é aplicada no banco, não apenas escondida na interface.",
-    },
-    {
-      nome: "Visualização",
-      texto: "Consulta os números do recorte permitido, sem alterar configuração nenhuma.",
-    },
-  ],
-};
-
 export const focusOferta = {
-  eyebrow: "Como começar",
-  title: "Teste com a sua equipe antes de contratar.",
+  eyebrow: "Sem risco, sem letra miúda",
+  title: "Veja os números da sua própria equipe antes de decidir qualquer coisa.",
   texto:
-    "Liberamos o painel para a sua empresa e acompanhamos a instalação nas primeiras estações. Em poucos dias você está lendo os números do seu próprio time — não os de uma apresentação.",
+    "Esqueça demonstração genérica. No teste, o Focus roda nas primeiras estações da sua empresa — em poucos dias, o painel mostra a sua operação, não um exemplo.",
   inclui: [
-    "Painel liberado para a sua empresa, com o seu nome",
-    "Instalação acompanhada pelo nosso time nas primeiras estações",
-    "Catálogo de classificação já aplicado, para o índice começar a valer desde o primeiro dia",
-    "Ajuste da janela de expediente, que é o que liga o acompanhamento de horas extras",
+    "Painel ativo para a sua empresa, com o seu nome",
+    "Nosso time acompanha a instalação nas primeiras estações — você não configura nada sozinho",
+    "Classificação de produtividade já aplicada, para o índice valer desde o primeiro dia",
+    "Ajuste da jornada esperada, que é o que liga o alerta de hora extra",
   ],
   contratacao: {
     titulo: "Contratação",
     texto:
-      "Por número de estações monitoradas. O valor é apresentado na proposta, depois de uma conversa rápida sobre o tamanho da operação.",
+      "Por número de estações monitoradas. O valor é apresentado na proposta, depois de entendermos o tamanho da sua operação.",
   },
   cta: "Testar no seu time",
   ctaSecundario: "Falar com um especialista",
@@ -290,6 +306,16 @@ export const focusFaq = {
       question: "E as conversas de WhatsApp?",
       answer:
         "No WhatsApp instalado no computador — e também em Telegram, Signal, Discord, Slack e cofres de senha como KeePass, 1Password e Bitwarden — nem o título da janela é registrado: fica apenas o aplicativo e se havia atividade. No WhatsApp Web, aberto no navegador, entra o domínio web.whatsapp.com e o título da aba.",
+    },
+    {
+      question: "Minha equipe vai desconfiar disso?",
+      answer:
+        "É a reação mais comum quando o monitoramento é malfeito. O Focus foi desenhado para reduzir esse risco: a estação avisa que está sendo acompanhada, nenhum conteúdo é lido, e o que chega ao painel é padrão de uso — não uma gravação de cada segundo da pessoa. Como a mudança é comunicada para a equipe continua sendo o fator que mais pesa na aceitação, e essa decisão é sua, não do sistema.",
+    },
+    {
+      question: "O Focus substitui uma conversa de avaliação de desempenho?",
+      answer:
+        "Não. O Focus mostra padrão de uso do tempo — não substitui a conversa entre gestor e colaborador sobre entrega, contexto ou resultado. Ele é o ponto de partida de uma decisão bem informada, não o substituto dela.",
     },
     {
       question: "Funciona com a equipe em home office?",
@@ -330,9 +356,9 @@ export const focusFaq = {
 
 export const focusFinal = {
   eyebrow: "Próximo passo",
-  title: "Veja o Focus com a sua equipe em mente.",
+  title: "Chega de decidir no escuro.",
   description:
-    "Conte quantos computadores a sua operação tem e o que você precisa enxergar. Respondemos pelo WhatsApp com o teste e a proposta.",
+    "Diga quantos computadores a sua operação tem e o que você mais precisa enxergar primeiro. Respondemos pelo WhatsApp com o teste e a proposta.",
   formTitle: "Pedir o teste",
   formDescription:
     "Preencha os campos e o envio abre o WhatsApp com a mensagem pronta para o nosso comercial.",

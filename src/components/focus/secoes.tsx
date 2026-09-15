@@ -12,8 +12,6 @@ import {
   PlugZap,
   Plus,
   ShieldCheck,
-  Users,
-  X,
 } from "lucide-react";
 import { Contador } from "@/components/efeitos/contador";
 import { MolduraFeixe } from "@/components/efeitos/feixe-borda";
@@ -22,7 +20,6 @@ import { Reveal, Spotlight } from "@/components/motion/motion";
 import { DemoForm } from "@/components/site/demo-form";
 import { Eyebrow, Lead, Section, SectionTitle } from "@/components/site/primitives";
 import {
-  focusAcessos,
   focusCelular,
   focusColeta,
   focusFaq,
@@ -30,6 +27,7 @@ import {
   focusImplantacao,
   focusMensagens,
   focusOferta,
+  focusProblema,
   focusRespostas,
 } from "@/content/focus";
 import { whatsappLink } from "@/lib/site-config";
@@ -255,68 +253,17 @@ export function SecaoColeta() {
         <Lead tone="bone">{focusColeta.intro}</Lead>
       </Reveal>
 
-      <div className="mt-12 grid gap-px overflow-hidden rounded-lg border border-fog-200 bg-fog-200 lg:grid-cols-2">
-        <Reveal className="bg-white p-6 sm:p-8">
-          <h3 className="text-[17px] font-semibold text-ink-950">{focusColeta.registra.titulo}</h3>
-          <ul className="mt-5 grid gap-3.5">
-            {focusColeta.registra.itens.map((item) => (
+      <div className="mt-12 grid gap-6 lg:grid-cols-[1.1fr_1fr] lg:items-start">
+        <Reveal className="rounded-lg border border-fog-200 bg-white p-6 sm:p-8">
+          <h3 className="text-[17px] font-semibold text-ink-950">{focusColeta.pratica.titulo}</h3>
+          <ul className="mt-5 grid gap-4">
+            {focusColeta.pratica.itens.map((item) => (
               <li key={item} className="flex gap-3">
                 <Check aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0 text-product-700" />
                 <span className="text-[15px] leading-relaxed text-ink-800">{item}</span>
               </li>
             ))}
           </ul>
-        </Reveal>
-
-        <Reveal delay={110} className="bg-white p-6 sm:p-8">
-          <h3 className="text-[17px] font-semibold text-ink-950">{focusColeta.nunca.titulo}</h3>
-          <ul className="mt-5 grid gap-3.5">
-            {focusColeta.nunca.itens.map((item) => (
-              <li key={item} className="flex gap-3">
-                <X aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0 text-brand-600" />
-                <span className="text-[15px] leading-relaxed text-ink-800">{item}</span>
-              </li>
-            ))}
-          </ul>
-        </Reveal>
-      </div>
-
-      <div className="mt-6 grid gap-6 lg:grid-cols-[1.2fr_1fr] lg:items-start">
-        <Reveal className="rounded-lg border border-fog-200 bg-white p-6 sm:p-8">
-          <h3 className="text-[17px] font-semibold text-ink-950">
-            {focusColeta.higienizacao.titulo}
-          </h3>
-
-          <dl className="mt-5 grid gap-4">
-            <div>
-              <dt className="text-xs font-semibold uppercase tracking-wide text-fog-600">
-                Título original, na estação
-              </dt>
-              <dd className="mt-1.5 overflow-x-auto rounded border border-fog-200 bg-bone px-3 py-2 font-mono text-[13px] text-ink-800">
-                {focusColeta.higienizacao.antes}
-              </dd>
-            </div>
-            <div>
-              <dt className="text-xs font-semibold uppercase tracking-wide text-fog-600">
-                O que chega ao painel
-              </dt>
-              <dd className="mt-1.5 overflow-x-auto rounded border border-product-100 bg-product-050 px-3 py-2 font-mono text-[13px] text-product-800">
-                {focusColeta.higienizacao.depois}
-              </dd>
-            </div>
-            <div>
-              <dt className="text-xs font-semibold uppercase tracking-wide text-fog-600">
-                Do endereço, só o domínio
-              </dt>
-              <dd className="mt-1.5 font-mono text-[13px] text-ink-800">
-                {focusColeta.higienizacao.dominio}
-              </dd>
-            </div>
-          </dl>
-
-          <p className="mt-5 text-[14px] leading-relaxed text-fog-600">
-            {focusColeta.higienizacao.nota}
-          </p>
         </Reveal>
 
         <Reveal delay={110} className="flex flex-col gap-6">
@@ -476,29 +423,55 @@ function DiagramaFluxo() {
 }
 
 /* -------------------------------------------------------------------------
-   Quem vê o quê
+   O problema — logo depois do gancho, antes de qualquer prova
+
+   Mesmo formato validado na home do CRM (seis situações concretas,
+   numeradas, tom="bone"): o leitor precisa se reconhecer na primeira linha,
+   antes de qualquer número ou tela aparecer.
    ------------------------------------------------------------------------- */
 
-export function SecaoAcessos() {
+export function SecaoProblema() {
   return (
-    <Section id="acessos" tone="light">
+    <Section id="problema" tone="bone">
       <Reveal>
-        <Eyebrow tone="light">{focusAcessos.eyebrow}</Eyebrow>
-        <SectionTitle className="max-w-3xl text-ink-950">{focusAcessos.title}</SectionTitle>
-        <Lead tone="light">{focusAcessos.intro}</Lead>
+        <Eyebrow tone="bone">{focusProblema.eyebrow}</Eyebrow>
+        <SectionTitle className="max-w-3xl text-ink-950">{focusProblema.title}</SectionTitle>
+        <Lead tone="bone">{focusProblema.intro}</Lead>
       </Reveal>
 
-      <div className="mt-12 grid gap-px overflow-hidden rounded-lg border border-fog-200 bg-fog-200 sm:grid-cols-3">
-        {focusAcessos.papeis.map((papel, indice) => (
-          <Reveal key={papel.nome} as="article" delay={indice * 110} className="bg-white p-6">
-            <div className="flex items-center gap-2.5">
-              <Users aria-hidden="true" className="h-4 w-4 shrink-0 text-brand-500" />
-              <h3 className="text-[15px] font-semibold text-ink-950">{papel.nome}</h3>
-            </div>
-            <p className="mt-2.5 text-[14px] leading-relaxed text-fog-600">{papel.texto}</p>
+      <div className="mt-12 grid gap-x-10 gap-y-9 sm:grid-cols-2 lg:grid-cols-3">
+        {focusProblema.items.map((item, indice) => (
+          <Reveal
+            key={item.title}
+            as="article"
+            delay={(indice % 3) * 110}
+            className="border-t border-fog-200 pt-5"
+          >
+            <span className="text-xs font-semibold tabular-nums text-brand-600">
+              {String(indice + 1).padStart(2, "0")}
+            </span>
+            <h3 className="mt-3 text-[17px] font-semibold leading-snug text-ink-950">
+              {item.title}
+            </h3>
+            <p className="mt-2.5 text-[15px] leading-relaxed text-fog-600">{item.description}</p>
           </Reveal>
         ))}
       </div>
+
+      <Reveal delay={120}>
+        <p className="mt-12 text-[15px] text-ink-800">
+          <a
+            href="#painel"
+            className="group inline-flex items-center gap-2 font-semibold text-brand-600 underline-offset-4 hover:underline"
+          >
+            Ver a operação com dados, não com impressão
+            <ArrowRight
+              aria-hidden="true"
+              className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1"
+            />
+          </a>
+        </p>
+      </Reveal>
     </Section>
   );
 }

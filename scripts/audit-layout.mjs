@@ -51,12 +51,12 @@ const areaSlugs = ["comercial", "juridico", "financeiro", "academy", "gestao"];
 /** Seções da página do Focus, na ordem de leitura. */
 const focusSections = [
   "topo",
+  "problema",
   "painel",
   "respostas",
   "celular",
   "coleta",
   "implantacao",
-  "acessos",
   "teste",
   "perguntas",
   "demonstracao",
