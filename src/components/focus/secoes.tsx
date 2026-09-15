@@ -331,7 +331,7 @@ export function SecaoImplantacao() {
         <DiagramaFluxo />
       </Reveal>
 
-      <ol className="mt-12 grid gap-8 sm:grid-cols-2">
+      <ol className="focus-etapas mt-12 grid gap-8 sm:grid-cols-2">
         {focusImplantacao.passos.map((passo, indice) => (
           <Reveal key={passo.titulo} as="li" delay={(indice % 2) * 110} className="border-t border-ink-800 pt-5">
             <span className="text-xs font-semibold tabular-nums text-cyan-300">
@@ -404,7 +404,7 @@ function DiagramaFluxo() {
         ))}
       </svg>
 
-      <div className="relative grid gap-4 lg:grid-cols-3">
+      <div className="focus-fluxo relative grid gap-4 lg:grid-cols-3">
         {nos.map(({ titulo, texto, Icone }) => (
           <div
             key={titulo}
@@ -439,7 +439,7 @@ export function SecaoProblema() {
         <Lead tone="bone">{focusProblema.intro}</Lead>
       </Reveal>
 
-      <div className="mt-12 grid gap-x-10 gap-y-9 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="focus-problemas mt-12 grid gap-x-10 gap-y-9 sm:grid-cols-2 lg:grid-cols-3">
         {focusProblema.items.map((item, indice) => (
           <Reveal
             key={item.title}

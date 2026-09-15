@@ -54,7 +54,7 @@ export function HeroFocus() {
         </div>
       </div>
 
-      <div className="relative mx-auto flex min-h-[86vh] w-full max-w-6xl flex-col justify-center px-5 pb-24 pt-32 sm:px-8 sm:pt-36">
+      <div className="focus-abertura relative mx-auto flex min-h-[86vh] w-full max-w-6xl flex-col justify-center px-5 pb-24 pt-32 sm:px-8 sm:pt-36">
         <div className="max-w-xl lg:max-w-[34rem] xl:max-w-2xl">
           <div className="hero-in">
             <Eyebrow>{focusHero.eyebrow}</Eyebrow>
@@ -73,7 +73,7 @@ export function HeroFocus() {
           </div>
 
           <div className="hero-in" style={{ "--delay": "220ms" } as React.CSSProperties}>
-            <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
+            <div className="focus-acoes mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
               <a
                 href={testeHref}
                 {...(testeHref.startsWith("http")
@@ -96,7 +96,7 @@ export function HeroFocus() {
           </div>
 
           <div className="hero-in" style={{ "--delay": "260ms" } as React.CSSProperties}>
-            <ul className="mt-7 flex flex-wrap gap-x-2 gap-y-2">
+            <ul className="focus-garantias mt-7 flex flex-wrap gap-x-2 gap-y-2">
               {focusHero.chips.map((chip) => (
                 <li
                   key={chip}
@@ -149,7 +149,7 @@ function ConteudoPrevia() {
  */
 export function FaixaNumeros() {
   return (
-    <div className="border-y border-ink-800 bg-ink-900">
+    <div className="focus-numeros border-y border-ink-800 bg-ink-900">
       <div className="mx-auto grid w-full max-w-6xl gap-px px-5 sm:grid-cols-2 sm:px-8 lg:grid-cols-4">
         {focusNumeros.map((numero, indice) => (
           <Reveal

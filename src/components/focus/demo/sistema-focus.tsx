@@ -54,7 +54,7 @@ export function SistemaFocus() {
   ];
 
   return (
-    <div>
+    <div className="focus-demonstracao">
       <div role="tablist" aria-label="Modo de demonstração" className="flex flex-wrap gap-1.5">
         {modos.map(({ id, rotulo, Icone }) => {
           const ativo = modo === id;

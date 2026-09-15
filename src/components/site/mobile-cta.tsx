@@ -12,9 +12,33 @@ import { whatsappLink } from "@/lib/site-config";
  *
  * Some no desktop, onde o cabeçalho fixo já carrega o CTA.
  */
-export function MobileCta({ message, rotulo = trial.cta }: { message: string; rotulo?: string }) {
+export function MobileCta({ message, rotulo = trial.cta, secoesSemBarra = [] }: {
+  message: string;
+  rotulo?: string;
+  /** Mantém a demonstração e os botões do topo livres de sobreposição. */
+  secoesSemBarra?: readonly string[];
+}) {
   const [visible, setVisible] = useState(false);
   const [atContact, setAtContact] = useState(false);
+  const [secaoVisivel, setSecaoVisivel] = useState(false);
+  const chaveSecoes = secoesSemBarra.join(",");
+
+  useEffect(() => {
+    if (!chaveSecoes) return;
+    const visiveis = new Set<string>();
+    const observador = new IntersectionObserver((entradas) => {
+      for (const entrada of entradas) {
+        if (entrada.isIntersecting) visiveis.add(entrada.target.id);
+        else visiveis.delete(entrada.target.id);
+      }
+      setSecaoVisivel(visiveis.size > 0);
+    });
+    for (const id of chaveSecoes.split(",")) {
+      const secao = document.getElementById(id);
+      if (secao) observador.observe(secao);
+    }
+    return () => observador.disconnect();
+  }, [chaveSecoes]);
 
   useEffect(() => {
     function onScroll() {
@@ -42,10 +66,11 @@ export function MobileCta({ message, rotulo = trial.cta }: { message: string; ro
   }, []);
 
   const href = whatsappLink(message);
-  const showing = visible && !atContact;
+  const showing = visible && !atContact && !secaoVisivel;
 
   return (
     <div
+      data-barra-contato
       aria-hidden={!showing}
       // A folga inferior respeita a barra de gestos do aparelho.
       style={{ paddingBottom: "calc(0.75rem + env(safe-area-inset-bottom))" }}

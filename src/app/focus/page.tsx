@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import "./mobile.css";
 import { ScrollProgress } from "@/components/motion/motion";
 import { FaixaNumeros, HeroFocus, SecaoDemo } from "@/components/focus/topo";
 import {
@@ -137,7 +138,7 @@ const dadosEstruturados = {
 export default function PaginaFocus() {
   return (
     // As fontes do painel valem só nesta página: a marca continua em Sora.
-    <div className={`${fonteFocus.variable} ${fonteFocusMono.variable}`}>
+    <div className={`pagina-focus ${fonteFocus.variable} ${fonteFocusMono.variable}`}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(dadosEstruturados) }}
@@ -158,7 +159,7 @@ export default function PaginaFocus() {
         <SecaoChamadaFinal />
       </main>
       <Footer />
-      <MobileCta message={focusMensagens.teste} rotulo={focusNav.cta} />
+      <MobileCta message={focusMensagens.teste} rotulo={focusNav.cta} secoesSemBarra={["topo", "painel"]} />
     </div>
   );
 }

@@ -9,9 +9,15 @@
  * quem está lendo, não para descrever a arquitetura do sistema.
  *
  * Mesma regra do resto do site: nenhuma afirmação sobre o produto entra aqui
- * sem existir no código. Em particular, duas coisas que este texto NAO diz,
+ * sem existir no código. Em particular, três coisas que este texto NAO diz,
  * e por quê:
  *
+ * - **"Em conformidade com a LGPD" / "tudo dentro da LGPD".** É selo, e a
+ *   NewSec não tem selo nenhum — nem auditoria, nem certificação. ⚠️ Essa
+ *   frase chegou a entrar no subtítulo do hero (commit `be27b44`, 15/09) e
+ *   foi corrigida no mesmo dia: a página descreve o que o agente coleta e o
+ *   que não coleta (comportamento verificável), e deixa a base legal onde
+ *   ela mora — na decisão da empresa cliente com o jurídico dela.
  * - **"Nem a NewSec vê seus dados".** Era verdade até a migration 0007 do
  *   produto e deixou de ser. Não pode voltar em material de venda.
  * - **Qualquer garantia sobre resultado trabalhista** (evitar processo,
@@ -41,7 +47,7 @@ export const focusHero = {
   eyebrow: "NewSec Focus · visibilidade da equipe",
   title: "Você paga 8 horas de trabalho por dia. Vê quantas de verdade?",
   subtitle:
-    "O NewSec Focus mostra, pessoa por pessoa e equipe por equipe, para onde o tempo da sua operação está indo — respeitando a privacidade dos seus colaboradores, tudo dentro da LGPD.",
+    "O NewSec Focus mostra, pessoa por pessoa e equipe por equipe, para onde o tempo da sua operação está indo — sem invadir a privacidade de quem você acompanha.",
   primaryCta: "Testar no seu time",
   secondaryCta: "Explorar o painel",
   chips: ["Sem captura de tela", "Sem registro do que é digitado", "Líder vê só a própria equipe"],
