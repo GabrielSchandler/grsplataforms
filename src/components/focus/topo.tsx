@@ -108,12 +108,6 @@ export function HeroFocus() {
             </ul>
           </div>
 
-          <div className="hero-in" style={{ "--delay": "330ms" } as React.CSSProperties}>
-            <p className="mt-7 flex max-w-md items-start gap-2.5 text-[13px] leading-relaxed text-fog-500">
-              <span aria-hidden="true" className="mt-[0.62em] h-px w-5 shrink-0 bg-brand-500" />
-              {focusHero.trustLine}
-            </p>
-          </div>
         </div>
       </div>
     </section>
