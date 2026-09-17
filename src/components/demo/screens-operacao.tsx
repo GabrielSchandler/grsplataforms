@@ -89,10 +89,10 @@ export function PortalCliente() {
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5">
             <div className="flex h-9 w-9 items-center justify-center rounded-md bg-slate-900 text-xs font-bold text-white">
-              AA
+              SE
             </div>
             <div>
-              <p className="text-sm font-semibold text-slate-950">Ativa Assessoria</p>
+              <p className="text-sm font-semibold text-slate-950">SuaEmpresa</p>
               <p className="text-[11px] text-slate-500">Acompanhamento do atendimento</p>
             </div>
           </div>

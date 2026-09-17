@@ -11,8 +11,8 @@
  */
 
 export const demoCompany = {
-  tradeName: "Ativa Assessoria",
-  initials: "AA",
+  tradeName: "SuaEmpresa",
+  initials: "SE",
 };
 
 export const consultants = [
@@ -476,7 +476,7 @@ export const logs = {
     { date: "12/08 · 11:07", user: "Diego Antunes", action: "document.uploaded", entity: "Documento", record: "DOC-4471", detail: "contrato-financiamento.pdf" },
     { date: "12/08 · 09:12", user: "Sistema", action: "leads.imported", entity: "Lead", record: "lote 2026-08-12", detail: "24 novos · 61 ignorados" },
     { date: "11/08 · 16:48", user: "Marina Vasques", action: "presale.stage_changed", entity: "Pré-venda", record: "PV-2211", detail: "Novo contato → Em negociação" },
-    { date: "11/08 · 10:20", user: "Ana Prado", action: "company.logo_uploaded", entity: "Empresa", record: "Ativa Assessoria", detail: "Logo substituída" },
+    { date: "11/08 · 10:20", user: "Ana Prado", action: "company.logo_uploaded", entity: "Empresa", record: "SuaEmpresa", detail: "Logo substituída" },
     { date: "11/08 · 00:10", user: "Sistema", action: "backup.completed", entity: "Backup", record: "backup-2026-08-11", detail: "409 MB · expira em 18/08" },
   ],
 };
@@ -503,8 +503,8 @@ export const consultas = {
  * sozinho: marca, usuários, armazenamento e quais módulos ficam ligados.
  */
 export const companySettings = {
-  name: "Ativa Assessoria",
-  legalName: "Ativa Assessoria e Consultoria Ltda",
+  name: "SuaEmpresa",
+  legalName: "SuaEmpresa Ltda",
   taxId: "00.000.000/0001-00",
   since: "Ambiente ativo desde 03/2026",
   users: { used: 18, contracted: 20 },

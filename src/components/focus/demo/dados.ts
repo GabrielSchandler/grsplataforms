@@ -2,7 +2,7 @@
  * Dados do ambiente demonstrativo do NewSec Focus. Tudo aqui é fictício,
  * por decisão: nenhuma tela deste site sai de captura de produção.
  *
- * A empresa é a mesma "Ativa Assessoria" das telas do CRM. Não é acaso: o
+ * A empresa é a mesma "SuaEmpresa" das telas do CRM. Não é acaso: o
  * comprador do Focus mais provável hoje é quem já usa o CRM, e ver a mesma
  * empresa nos dois produtos conta essa história sem precisar dizer.
  *
@@ -22,7 +22,7 @@
 import type { TipoCategoria } from "./formato";
 
 export const EMPRESA = {
-  nome: "Ativa Assessoria",
+  nome: "SuaEmpresa",
   plano: "essencial",
   maxDispositivos: 25,
   retencaoDias: 90,
