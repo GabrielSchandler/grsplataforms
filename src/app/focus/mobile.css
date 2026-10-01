@@ -228,9 +228,9 @@
   .pagina-focus #demonstracao select { font-size: 1rem; min-height: 3rem; }
   .pagina-focus #demonstracao .p-6 { padding: 1.25rem; border-radius: 1.25rem; }
 
-  .pagina-focus header { background: #0a0a0bf2; }
-  .pagina-focus header > div { gap: 0.5rem; padding: 0.75rem var(--respiro-mobile); }
-  .pagina-focus header button[aria-controls="menu-mobile"] { min-width: 2.75rem; min-height: 2.75rem; border-radius: 0.875rem; }
+  .pagina-focus > header { background: #0a0a0bf2; }
+  .pagina-focus > header > div { gap: 0.5rem; padding: 0.75rem var(--respiro-mobile); }
+  .pagina-focus > header button[aria-controls="menu-mobile"] { min-width: 2.75rem; min-height: 2.75rem; border-radius: 0.875rem; }
   .pagina-focus #menu-mobile { max-height: calc(100dvh - 4.5rem); overflow-y: auto; }
   .pagina-focus #menu-mobile a { min-height: 2.75rem; display: flex; align-items: center; }
 
@@ -250,9 +250,9 @@
 }
 
 @media (min-width: 360px) and (max-width: 639px) {
-  .pagina-focus header > div > div:first-child { gap: 0.5rem; }
-  .pagina-focus header > div [aria-label="Produtos NewSec"] { display: flex; }
-  .pagina-focus header > div [aria-label="Produtos NewSec"] a {
+  .pagina-focus > header > div > div:first-child { gap: 0.5rem; }
+  .pagina-focus > header > div [aria-label="Produtos NewSec"] { display: flex; }
+  .pagina-focus > header > div [aria-label="Produtos NewSec"] a {
     min-height: 2.75rem;
     display: flex;
     align-items: center;

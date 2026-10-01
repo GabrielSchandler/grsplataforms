@@ -32,35 +32,38 @@ import {
 } from "@/content/focus";
 import { whatsappLink } from "@/lib/site-config";
 import { MaqueteCelular } from "./demo/celular";
-import { formatarHorasCurto } from "./demo/formato";
+import { formatarDuracao } from "./demo/formato";
 import { RESUMO_PADRAO } from "./demo/motor";
 import { abrirTelaDoFocus } from "./demo/painel-focus";
+import { ATRASADAS } from "./demo/vivo";
 import type { TelaId } from "./demo/estado";
 
 /* -------------------------------------------------------------------------
    O que muda na segunda-feira — os cartões que abrem a demonstração
    ------------------------------------------------------------------------- */
 
+// Os avisos saem do mesmo ambiente da demonstração: estação parada, cadastro
+// pendente, quem mais estende o dia e o que ficou sem categoria.
 const AVISOS = [
   {
     Icone: PlugZap,
     cor: "text-amber-400",
-    texto: "BKO-03 parou de enviar — não sincroniza há 1 d",
+    texto: `${ATRASADAS[0].maquina} sem enviar dados há ${formatarDuracao(ATRASADAS[0].minutosSemEnvio)} durante o expediente`,
   },
   {
     Icone: PartyPopper,
     cor: "text-emerald-400",
-    texto: "Estação nova aguardando configuração: ATD-06",
+    texto: "Estação nova no painel: ATD-06, com cadastro pendente de revisão",
   },
   {
     Icone: AlarmClockCheck,
     cor: "text-rose-400",
-    texto: "Diego Antunes: 24% do tempo ativo fora da janela",
+    texto: `${RESUMO_PADRAO.maisFora.nome}: ${formatarDuracao(RESUMO_PADRAO.maisFora.minutos)} de atividade fora da escala no mês`,
   },
   {
     Icone: AppWindow,
     cor: "text-cyan-400",
-    texto: "3 ferramentas sem categoria ficaram de fora do índice",
+    texto: `${RESUMO_PADRAO.semClassificacao} aplicativos sem classificação ficaram fora do índice`,
   },
 ];
 
@@ -86,30 +89,30 @@ export function SecaoRespostas() {
         <Spotlight className="mt-12 overflow-hidden rounded-lg border border-ink-700">
           <div className="grid gap-px bg-ink-700 lg:grid-cols-3">
             <CartaoResposta cartao={principal} className="lg:col-span-2">
-              <div className="mt-5 flex flex-wrap items-end gap-6 rounded-lg border border-foco-borda bg-foco-cartao p-5">
+              <div className="mt-5 flex flex-wrap items-end gap-6 rounded-lg border border-ink-700 bg-ink-900 p-5">
                 <div>
                   <p className="flex items-center gap-2 text-xs text-slate-400">
                     <Gauge aria-hidden="true" className="h-3.5 w-3.5 text-cyan-400" />
-                    Média por pessoa/dia
+                    Tempo produtivo / expediente
                   </p>
                   {/* O número sai do mesmo motor da demonstração: digitado à
                       mão, bastaria mexer nos dados para o cartão passar a
                       contradizer o painel logo abaixo. */}
                   <p className="font-display mt-1 text-4xl font-semibold text-slate-100">
                     <Contador
-                      valor={RESUMO_PADRAO.mediaPessoaDia}
-                      formatar={(valor) => formatarHorasCurto(valor)}
+                      valor={RESUMO_PADRAO.indice ?? 0}
+                      formatar={(valor) => `${Math.round(valor)}%`}
                     />
                   </p>
                 </div>
                 <div className="min-w-[8rem] flex-1">
-                  <p className="text-xs text-slate-400">composição do tempo ativo</p>
+                  <p className="text-xs text-slate-400">como o expediente foi utilizado</p>
                   <div className="mt-2 flex h-3 overflow-hidden rounded-full bg-slate-800">
                     {RESUMO_PADRAO.composicao.map((faixa) => (
                       <span
-                        key={faixa.cor}
-                        className="h-full"
-                        style={{ width: `${faixa.parte}%`, background: faixa.cor }}
+                        key={faixa.chave}
+                        className={faixa.chave === "semDados" ? "h-full bg-slate-600" : "h-full"}
+                        style={{ width: `${faixa.parte}%`, background: faixa.chave === "semDados" ? undefined : faixa.cor }}
                       />
                     ))}
                   </div>
@@ -124,7 +127,7 @@ export function SecaoRespostas() {
                 itens={AVISOS.map(({ Icone, cor, texto }) => (
                   <span
                     key={texto}
-                    className="flex items-start gap-2.5 rounded-lg border border-foco-borda bg-foco-cartao px-3 py-2.5 text-[13px] leading-relaxed text-slate-300"
+                    className="flex items-start gap-2.5 rounded-lg border border-ink-700 bg-ink-900 px-3 py-2.5 text-[13px] leading-relaxed text-slate-300"
                   >
                     <Icone aria-hidden="true" className={`mt-0.5 h-4 w-4 shrink-0 ${cor}`} />
                     {texto}
@@ -155,8 +158,8 @@ export function SecaoRespostas() {
                     />
                   </div>
                   <p className="mt-2.5 text-[14px] leading-relaxed text-fog-400">
-                    O tour guiado percorre as dez leituras do painel em dois minutos, uma de cada
-                    vez.
+                    O tour guiado percorre as onze leituras do painel em pouco mais de um minuto, uma
+                    de cada vez.
                   </p>
                 </div>
                 <span className="mt-5 text-[13px] font-semibold text-cyan-300">

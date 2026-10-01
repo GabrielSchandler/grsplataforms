@@ -89,7 +89,7 @@ export function SistemaFocus() {
       </MolduraFeixe>
 
       <p className="mt-3 text-xs leading-relaxed text-fog-500">
-        Ambiente demonstrativo, com dados fictícios: a empresa, as 18 pessoas, as estações e os
+        Ambiente demonstrativo, com dados fictícios: a empresa, as 19 pessoas, as estações e os
         números foram inventados para esta página. A interface é a do sistema.
       </p>
     </div>

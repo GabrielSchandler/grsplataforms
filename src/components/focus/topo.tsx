@@ -7,9 +7,9 @@ import { Eyebrow, Lead, Section, SectionTitle } from "@/components/site/primitiv
 import { focusDemo, focusHero, focusMensagens, focusNumeros } from "@/content/focus";
 import { whatsappLink } from "@/lib/site-config";
 import { ProvedorFocus, useFocus } from "./demo/estado";
-import { GraficoArea } from "./demo/graficos";
-import { IndicadoresFocus } from "./demo/kpis";
+import { UsoExpediente } from "./demo/graficos";
 import { SistemaFocus } from "./demo/sistema-focus";
+import { CartoesIndicadores, PontosAtencao } from "./demo/tela-visao";
 
 /**
  * Primeira dobra da página do Focus.
@@ -114,12 +114,15 @@ export function HeroFocus() {
   );
 }
 
-/** O topo da Visão geral, do jeito que ele existe: indicadores e a curva. */
+/**
+ * O topo da Visão geral, do jeito que ele existe: os quatro indicadores e o
+ * uso do expediente. É a mesma régua da demonstração logo abaixo — tempo
+ * produtivo sobre o expediente — e por isso o número bate com ela.
+ */
 export function PreviaPainel() {
   return (
     <ProvedorFocus layout="desktop" navegavel={false}>
-      <div data-demo="true" className="foco-app relative bg-foco-fundo p-5">
-        <div aria-hidden="true" className="foco-aurora" />
+      <div data-demo="true" className="foco-app relative w-[1000px] bg-foco-fundo p-5">
         <div className="relative space-y-4">
           <ConteudoPrevia />
         </div>
@@ -133,12 +136,11 @@ function ConteudoPrevia() {
 
   return (
     <>
-      <IndicadoresFocus rotuloAnterior="mês anterior" />
-      <GraficoArea
-        dados={recorte.serie}
-        bucket={recorte.intervalo.bucket}
-        periodoRotulo={recorte.intervalo.rotulo}
-      />
+      <CartoesIndicadores />
+      <div className="grid grid-cols-[minmax(0,1.62fr)_minmax(0,1fr)] gap-4">
+        <UsoExpediente minutos={recorte.resumo.minutos} colunas={4} />
+        <PontosAtencao pontos={recorte.pontos} />
+      </div>
     </>
   );
 }

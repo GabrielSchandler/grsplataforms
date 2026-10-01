@@ -14,46 +14,60 @@ import {
   ESCOPO_VAZIO,
   PERIODO_INICIAL,
   montarRecorte,
-  varrer,
   type Classificacoes,
   type EscopoDemo,
   type PeriodoDemo,
   type Recorte,
-  type Varredura,
 } from "./motor";
 
-/** As telas do painel que a réplica reproduz. */
+/**
+ * As telas do painel que a réplica reproduz. O menu é o do painel desde o
+ * redesenho de 16/09/2026: três olhares (Visão geral, Equipes, Pessoas) mais
+ * Aplicativos e sites, Jornada e Relatórios. Dispositivos não está no menu —
+ * no painel também não; chega-se a ela pelos avisos de dentro das telas.
+ */
 export type TelaId =
   | "visao"
   | "equipes"
+  | "equipe"
   | "pessoas"
   | "pessoa"
   | "aplicativos"
-  | "dispositivos"
-  | "horas-extras"
-  | "registros"
-  | "relatorios";
+  | "jornada"
+  | "relatorios"
+  | "dispositivos";
 
 export type LayoutFocus = "desktop" | "celular";
+
+export type AbaVisao = "atividade" | "ritmo" | "registros";
+export type FiltroApps = "todos" | "aplicativos" | "sites" | "sem";
+export type TipoRelatorio = "diario" | "colaboradores" | "equipes" | "aplicativos";
 
 type Contexto = {
   tela: TelaId;
   pessoaId: string | null;
+  equipeId: string | null;
   periodo: PeriodoDemo;
   escopo: EscopoDemo;
   classificacoes: Classificacoes;
-  avisoFechado: boolean;
+  abaVisao: AbaVisao;
+  filtroApps: FiltroApps;
+  tipoRelatorio: TipoRelatorio;
+  /** Dia escolhido na linha do tempo da pessoa e no comparativo de jornada. */
+  dia: number | null;
   nota: string | null;
   layout: LayoutFocus;
   /** No tour a réplica é só para olhar: a barra lateral não navega. */
   navegavel: boolean;
-  varredura: Varredura;
   recorte: Recorte;
-  abrirTela: (tela: TelaId, pessoaId?: string | null) => void;
+  abrirTela: (tela: TelaId, alvo?: { pessoaId?: string; equipeId?: string }) => void;
   definirPeriodo: (periodo: PeriodoDemo) => void;
   definirEscopo: (mudancas: Partial<EscopoDemo>) => void;
   classificar: (alvo: string, tipo: TipoCategoria) => void;
-  fecharAviso: () => void;
+  definirAbaVisao: (aba: AbaVisao) => void;
+  definirFiltroApps: (filtro: FiltroApps) => void;
+  definirTipoRelatorio: (tipo: TipoRelatorio) => void;
+  definirDia: (dia: number | null) => void;
   mostrarNota: (texto: string) => void;
 };
 
@@ -81,34 +95,42 @@ export function ProvedorFocus({
 }) {
   const [tela, setTela] = useState<TelaId>(telaInicial);
   const [pessoaId, setPessoaId] = useState<string | null>(null);
+  const [equipeId, setEquipeId] = useState<string | null>(null);
   const [periodo, setPeriodo] = useState<PeriodoDemo>(PERIODO_INICIAL);
   const [escopo, setEscopo] = useState<EscopoDemo>(ESCOPO_VAZIO);
   const [classificacoes, setClassificacoes] = useState<Classificacoes>({});
-  const [avisoFechado, setAvisoFechado] = useState(false);
+  const [abaVisao, setAbaVisao] = useState<AbaVisao>("atividade");
+  const [filtroApps, setFiltroApps] = useState<FiltroApps>("todos");
+  const [tipoRelatorio, setTipoRelatorio] = useState<TipoRelatorio>("diario");
+  const [dia, setDia] = useState<number | null>(null);
   const [nota, setNota] = useState<string | null>(null);
 
-  // A varredura é cara o suficiente para não repetir a cada clique, e barata
-  // o suficiente para refazer quando o período ou uma classificação muda.
-  const varredura = useMemo(() => varrer(periodo, classificacoes), [periodo, classificacoes]);
-  const recorte = useMemo(() => montarRecorte(varredura, escopo), [varredura, escopo]);
+  const recorte = useMemo(() => montarRecorte(periodo, escopo, classificacoes), [periodo, escopo, classificacoes]);
 
   const abrirTela = useCallback(
-    (proxima: TelaId, pessoa: string | null = null) => {
+    (proxima: TelaId, alvo: { pessoaId?: string; equipeId?: string } = {}) => {
       setTela(proxima);
-      setPessoaId(pessoa);
+      setPessoaId(alvo.pessoaId ?? null);
+      setEquipeId(alvo.equipeId ?? null);
+      setDia(null);
       aoTrocarTela?.(proxima);
     },
     [aoTrocarTela],
   );
+
+  const definirPeriodo = useCallback((novo: PeriodoDemo) => {
+    setPeriodo(novo);
+    // O dia da linha do tempo acompanha o período: senão a tela mostraria um
+    // dia de outro mês, fora do recorte que o gestor acabou de escolher.
+    setDia(null);
+  }, []);
 
   const definirEscopo = useCallback((mudancas: Partial<EscopoDemo>) => {
     setEscopo((atual) => {
       const proximo = { ...atual, ...mudancas };
       // Trocar de equipe zera a pessoa: senão sobra o filtro de alguém que não
       // pertence à equipe escolhida e a tela volta vazia sem explicação.
-      if (mudancas.equipeId !== undefined && mudancas.equipeId !== atual.equipeId) {
-        proximo.colaboradorId = null;
-      }
+      if (mudancas.equipeId !== undefined && mudancas.equipeId !== atual.equipeId) proximo.colaboradorId = null;
       return proximo;
     });
   }, []);
@@ -129,38 +151,31 @@ export function ProvedorFocus({
     () => ({
       tela,
       pessoaId,
+      equipeId,
       periodo,
       escopo,
       classificacoes,
-      avisoFechado,
+      abaVisao,
+      filtroApps,
+      tipoRelatorio,
+      dia,
       nota,
       layout,
       navegavel,
-      varredura,
       recorte,
       abrirTela,
-      definirPeriodo: setPeriodo,
+      definirPeriodo,
       definirEscopo,
       classificar,
-      fecharAviso: () => setAvisoFechado(true),
+      definirAbaVisao: setAbaVisao,
+      definirFiltroApps: setFiltroApps,
+      definirTipoRelatorio: setTipoRelatorio,
+      definirDia: setDia,
       mostrarNota,
     }),
     [
-      tela,
-      pessoaId,
-      periodo,
-      escopo,
-      classificacoes,
-      avisoFechado,
-      nota,
-      layout,
-      navegavel,
-      varredura,
-      recorte,
-      abrirTela,
-      definirEscopo,
-      classificar,
-      mostrarNota,
+      tela, pessoaId, equipeId, periodo, escopo, classificacoes, abaVisao, filtroApps, tipoRelatorio,
+      dia, nota, layout, navegavel, recorte, abrirTela, definirPeriodo, definirEscopo, classificar, mostrarNota,
     ],
   );
 

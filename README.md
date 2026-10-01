@@ -181,36 +181,43 @@ sistema, e não foi publicado aqui.
 ## A réplica do NewSec Focus
 
 A página `/focus` traz o painel do Focus **funcionando**, e não uma captura:
-barra lateral clicável, troca de período, filtro por equipe, tabela ordenável,
-detalhe de uma pessoa e classificação de aplicativo com o índice recalculando
-na hora. No celular, a mesma réplica assume o layout de aplicativo do produto,
-com as abas de baixo.
+barra lateral clicável, troca de período, filtro por equipe, detalhe de equipe
+e de pessoa (com a linha do tempo do dia), jornada e classificação de
+aplicativo com o índice recalculando na hora. No celular, a mesma réplica
+assume o layout de aplicativo do produto, com as abas de baixo.
+
+Desde 01/10/2026 a réplica segue o painel **redesenhado em 16/09/2026**: tema
+claro corporativo, menu de três olhares (Visão geral, Equipes, Pessoas) mais
+Aplicativos e sites, Jornada e Relatórios, e o índice medido contra o
+**expediente** (tempo produtivo ÷ expediente previsto na escala, média simples
+por pessoa). Os perfis de `dados.ts` foram calibrados para essa régua — a
+empresa fictícia fica perto de 37%, as pessoas entre ~23% e ~43%.
 
 Fica em `src/components/focus/demo/`:
 
 | Arquivo | O que faz |
 | --- | --- |
-| `dados.ts` | Empresa, 18 pessoas em 4 equipes, ferramentas, estações e eventos — tudo fictício |
-| `motor.ts` | Simula dia a dia e agrega como o painel agrega (período, equipe, pessoa, estação) |
+| `dados.ts` | Empresa, 19 pessoas em 4 equipes (cada equipe com a sua escala), ferramentas, estações e eventos — tudo fictício |
+| `motor.ts` | Monta o dia de cada pessoa minuto a minuto e agrega como o painel (expediente, cobertura, fora da escala, comparativo alinhado no relógio) |
 | `vivo.ts` | Atividade agora, estações, diário de bordo e registros minuto a minuto |
 | `estado.tsx` | Estado da demonstração: tela, período, filtros e classificações |
-| `kit.tsx`, `graficos.tsx`, `tabelas.tsx`, `kpis.tsx`, `filtros.tsx` | As primitivas do painel, refeitas |
-| `telas.tsx`, `casca.tsx` | As nove telas e a casca (barra lateral, topo, avisos) |
+| `kit.tsx`, `graficos.tsx`, `filtros.tsx` | As primitivas do painel, refeitas (cartões, avisos, selos, gráficos em SVG, período) |
+| `tela-*.tsx`, `casca.tsx` | As telas (visão geral, equipes, pessoas, aplicativos, jornada, relatórios, dispositivos) e a casca (barra lateral, topo, abas do celular) |
 | `tour-focus.tsx`, `painel-focus.tsx`, `sistema-focus.tsx` | Tour guiado, exploração livre e o alternador entre os dois |
 
 Três decisões que valem registro:
 
-- **Nada de relógio nem de sorteio.** O "agora" é fixo (28/08/2026, 16h40) e a
+- **Nada de relógio nem de sorteio.** O "agora" é fixo (25/09/2026, 16h40) e a
   variação vem de um hash da chave (pessoa + dia + medida). O HTML sai do build
   e o navegador calcula o mesmo número — senão a hidratação quebra (erro #418).
-- **Sem Recharts.** O painel usa a biblioteca; aqui os três gráficos são SVG
-  feito à mão, com a mesma leitura. Mais de 100 kB numa página que já carrega a
+- **Sem Recharts.** O painel usa a biblioteca; aqui os gráficos são SVG
+  feitos à mão, com a mesma leitura. Mais de 100 kB numa página que já carrega a
   réplica inteira não se justificava.
-- **A frase de conformidade da LGPD não foi copiada.** O painel escreve "Coleta
-  em conformidade com a LGPD" na barra lateral; a réplica escreve o que o
-  agente faz ("Coleta só metadados de uso. Sem conteúdo digitado nem captura de
-  tela."). A regra do site contra selo vale também dentro da tela demonstrativa
-  — e o produto deveria adotar a mesma frase.
+- **A frase de conformidade da LGPD não foi copiada.** O painel ainda escreve
+  "coletados em conformidade com a LGPD" na tela de login (a barra lateral do
+  redesenho já não tem a frase). A réplica não mostra login e não usa a frase em
+  lugar nenhum: a regra do site contra selo vale também dentro da tela
+  demonstrativa — e o produto deveria tirar a frase do login.
 
 O conteúdo da página fica em `src/content/focus.ts`, com um cabeçalho listando
 o que a página **não** diz e por quê.

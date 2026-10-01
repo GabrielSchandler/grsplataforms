@@ -1,29 +1,30 @@
 /**
  * Motor do ambiente demonstrativo do NewSec Focus.
  *
- * Simula, dia a dia, a atividade de cada pessoa de `dados.ts` e agrega do
- * mesmo jeito que o painel agrega: por período, equipe, pessoa e estação. É
- * isto que deixa a réplica navegável de verdade — trocar para semana, voltar
- * para julho ou filtrar o Jurídico recalcula tudo, e os números continuam
- * fechando entre si.
+ * Monta, minuto a minuto, o dia de cada pessoa de `dados.ts` (trechos ativos,
+ * ociosos e de tela bloqueada, cada trecho ativo num aplicativo ou site) e
+ * agrega do mesmo jeito que o painel agrega. É isto que deixa a réplica
+ * navegável de verdade — trocar para semana, voltar para agosto, filtrar o
+ * Jurídico ou classificar um aplicativo recalcula tudo, e os números
+ * continuam fechando entre si.
  *
- * Duas regras que não podem ser quebradas aqui:
+ * Três regras que não podem ser quebradas aqui:
  *
  * 1. **Nada de relógio nem de sorteio.** O "agora" é fixo em `dados.ts` e a
  *    variação vem de um hash da chave (pessoa + dia + medida). O HTML gerado
  *    no build e o navegador do visitante calculam exatamente o mesmo número —
  *    senão a hidratação quebra (erro #418 do React).
- * 2. **As fórmulas de leitura são as do painel**: média por pessoa/dia sobre
- *    os dias com registro, índice como tempo produtivo sobre tempo
- *    classificado, aderência como tempo ativo sobre a jornada esperada.
+ * 2. **A régua é a do painel** (newsecfocus `lib/produtividade.ts` e a
+ *    migration 0036): índice = tempo produtivo ÷ expediente decorrido da
+ *    escala (sem o intervalo, cortado no "agora"); a média da empresa e da
+ *    equipe é a MÉDIA SIMPLES do % de cada pessoa; atividade fora da escala
+ *    nunca entra no índice.
+ * 3. **O comparativo é alinhado no relógio.** Às 16h40, "vs mês anterior"
+ *    compara com o mês anterior até o mesmo ponto, e o dia compara com o
+ *    último dia COM expediente (segunda compara com sexta).
  */
 
-import {
-  CORES_TIPO,
-  PALETA_SERIES,
-  type BucketSerie,
-  type TipoCategoria,
-} from "./formato";
+import { CORES_EXPEDIENTE, type TipoCategoria } from "./formato";
 import {
   AGORA_MINUTOS,
   APPS,
@@ -33,8 +34,27 @@ import {
   HOJE,
   PESOS,
   PESSOAS,
+  type BaseCategoria,
+  type Escala,
   type PerfilPessoa,
 } from "./dados";
+
+/* -------------------------------------------------------------------------
+   Limiares de leitura (newsecfocus `lib/regras.ts`)
+   ------------------------------------------------------------------------- */
+
+export const REGRAS = {
+  /** Cobertura mínima para comparar dois períodos. */
+  coberturaMinimaComparacao: 50,
+  /** Variação de índice, em p.p., que vira ponto de atenção. */
+  variacaoRelevantePp: 5,
+  /** Pessoas com menos que isto de cobertura aparecem como dado incompleto. */
+  coberturaBaixa: 50,
+  /** Fora da escala abaixo disto, no período, é ruído. */
+  minutosForaEscalaRelevante: 15,
+  maxPontosAtencao: 3,
+  coberturaMinimaPontoEvolucao: 50,
+} as const;
 
 /* -------------------------------------------------------------------------
    Tipos
@@ -54,157 +74,132 @@ export type PeriodoDemo = {
 export type EscopoDemo = {
   equipeId: string | null;
   colaboradorId: string | null;
-  /** Id do dispositivo é o nome da máquina — uma estação por pessoa. */
-  dispositivoId: string | null;
 };
 
-/** Classificações feitas pelo visitante na própria rosca: alvo → categoria. */
+/** Classificações feitas pelo visitante: alvo → categoria. */
 export type Classificacoes = Record<string, TipoCategoria>;
 
-export const ESCOPO_VAZIO: EscopoDemo = {
-  equipeId: null,
-  colaboradorId: null,
-  dispositivoId: null,
-};
+export const ESCOPO_VAZIO: EscopoDemo = { equipeId: null, colaboradorId: null };
+
+export type Bucket = "hour" | "day" | "week" | "month";
 
 export type Intervalo = {
   /** Dias desde 1970-01-01, em UTC. Início e fim inclusivos. */
   inicio: number;
   fim: number;
-  bucket: BucketSerie;
+  bucket: Bucket;
   rotulo: string;
 };
 
-export type KpisDemo = {
-  minutosRegistrados: number;
-  minutosAtivos: number;
-  minutosOciosos: number;
-  minutosBloqueado: number;
-  minutosProdutivos: number;
-  minutosNeutros: number;
-  minutosImprodutivos: number;
-  minutosSemClassificar: number;
-  teclas: number;
-  cliques: number;
-  rolagens: number;
-  /** NULL quando nada foi classificado. Nunca exibir como 0% nem como 100%. */
+/** Uma janela de dias, com o último dia opcionalmente cortado num minuto. */
+type Janela = { inicio: number; fim: number; corte: number | null };
+
+export type Minutos = {
+  expediente: number;
+  registrados: number;
+  ativos: number;
+  produtivos: number;
+  neutros: number;
+  improdutivos: number;
+  semClassificar: number;
+  ociosos: number;
+  bloqueado: number;
+  semDados: number;
+  ativosFora: number;
+};
+
+export type LinhaProdutividade = {
+  colaboradorId: string;
+  colaborador: string;
+  cargo: string;
+  equipeId: string;
+  equipe: string;
+  minutos: Minutos;
   indice: number | null;
-  colaboradores: number;
-  dispositivos: number;
+  cobertura: number | null;
   diasComRegistro: number;
-  topAplicacao: string | null;
-  jornadaEsperada: number;
+  diasComExpediente: number;
+  primeiroMedio: number | null;
+  ultimoMedio: number | null;
+  /** Último registro do recorte: dia + minuto. */
+  ultimoRegistro: { dia: number; minuto: number } | null;
 };
 
-export type EscalaDemo = {
-  temJanela: boolean;
-  minutosAtivosEscala: number;
-  indiceEscala: number | null;
-  minutosAtivosExtra: number;
-  indiceExtra: number | null;
-  pessoasComExtra: number;
-};
-
-export type VariacaoDemo = {
-  minutosAtivos: number | null;
-  /** Diferença em pontos percentuais. */
-  indice: number | null;
-};
-
-export type PontoSerie = {
-  chave: string;
-  rotulo: string;
-  rotuloCompleto: string;
-  ativo: number;
-  ocioso: number;
-  produtivo: number;
-  neutro: number;
-  improdutivo: number;
-  indice: number | null;
-};
-
-export type FatiaDistribuicao = {
-  nome: string;
-  tipo: TipoCategoria | null;
-  minutos: number;
+export type Resumo = {
   pessoas: number;
-  cor: string;
+  pessoasComRegistro: number;
+  indiceMedio: number | null;
+  cobertura: number | null;
+  minutos: Minutos;
 };
 
 export type LinhaEquipe = {
   equipeId: string;
   equipe: string;
-  cor: string;
   pessoas: number;
-  minutosAtivos: number;
-  minutosOciosos: number;
-  minutosProdutivos: number;
-  minutosNeutros: number;
-  minutosImprodutivos: number;
   indice: number | null;
-  aderencia: number | null;
+  cobertura: number | null;
+  minutosAtivos: number;
+  minutosForaEscala: number;
+  variacao: number | null;
+  minutos: Minutos;
 };
 
-export type LinhaPessoa = {
-  colaboradorId: string;
-  colaborador: string;
-  cargo: string;
-  equipeId: string;
-  equipe: string;
-  diasComRegistro: number;
-  minutosAtivos: number;
-  minutosOciosos: number;
-  minutosProdutivos: number;
-  minutosNeutros: number;
-  minutosImprodutivos: number;
-  teclas: number;
-  cliques: number;
-  indice: number | null;
-  aderencia: number | null;
+export type PontoEvolucao = {
+  chave: string;
+  rotulo: string;
+  rotuloCompleto: string;
+  atual: number | null;
+  anterior: number | null;
 };
 
-export type LinhaHorasExtras = {
-  colaboradorId: string;
-  colaborador: string;
-  cargo: string;
-  equipeId: string;
-  equipe: string;
-  temJanelaDefinida: boolean;
-  minutosExtras: number;
-  diasComHoraExtra: number;
-  minutosAtivosTotais: number;
-  percentualExtra: number | null;
-  janela: string;
+export type PontoAtividade = {
+  chave: string;
+  rotulo: string;
+  rotuloCompleto: string;
+  produtivo: number;
+  neutro: number;
+  improdutivo: number;
+  sem: number;
+  ocioso: number;
 };
 
-export type LinhaDia = {
-  dia: string;
-  data: string;
-  minutosAtivos: number;
-  minutosOciosos: number;
-  indice: number | null;
-  primeiroSinal: string;
-  ultimoSinal: string;
+export type LinhaApp = {
+  alvo: string;
+  site: boolean;
+  tipo: TipoCategoria | null;
+  minutos: number;
+  pessoas: number;
+  dias: number;
+};
+
+export type PontoAtencao = {
+  natureza: "dados" | "observacao";
+  titulo: string;
+  detalhe?: string;
+  acao: { rotulo: string; tela: "aplicativos" | "pessoas" | "jornada" | "equipe" | "dispositivos"; equipeId?: string };
 };
 
 export type Recorte = {
   intervalo: Intervalo;
-  kpis: KpisDemo;
-  anterior: KpisDemo;
-  variacao: VariacaoDemo;
-  escala: EscalaDemo;
-  serie: PontoSerie[];
-  distribuicao: FatiaDistribuicao[];
+  /** "01 – 25 set. 2026": o intervalo que os números cobrem, cortado em hoje. */
+  rotuloCurto: string;
+  rotuloComparacao: string | null;
+  linhas: LinhaProdutividade[];
+  anteriores: LinhaProdutividade[] | null;
+  resumo: Resumo;
+  resumoAnterior: Resumo | null;
+  variacao: number | null;
+  fora: { minutos: number; pessoas: number };
   equipes: LinhaEquipe[];
-  pessoas: LinhaPessoa[];
-  horasExtras: LinhaHorasExtras[];
+  evolucao: { pontos: PontoEvolucao[]; descricao: string; temAnterior: boolean };
+  atividade: { pontos: PontoAtividade[]; bucket: Bucket };
+  apps: LinhaApp[];
+  pontos: PontoAtencao[];
 };
 
 /* -------------------------------------------------------------------------
    Datas — tudo em dias inteiros desde 1970-01-01, em UTC.
-
-   Sem fuso, sem horário de verão e sem `new Date()` de verdade: a réplica
-   precisa dar o mesmo resultado no build e no navegador de quem visita.
    ------------------------------------------------------------------------- */
 
 const DIA_MS = 86_400_000;
@@ -220,7 +215,7 @@ export function paraIso(dia: number): string {
   return `${data.getUTCFullYear()}-${pad(data.getUTCMonth() + 1)}-${pad(data.getUTCDate())}`;
 }
 
-function partes(dia: number) {
+export function partes(dia: number) {
   const data = new Date(dia * DIA_MS);
   return {
     ano: data.getUTCFullYear(),
@@ -230,7 +225,6 @@ function partes(dia: number) {
   };
 }
 
-/** Aceita mês 0 e 13: `Date.UTC` vira o ano sozinho. */
 function diaDe(ano: number, mes: number, dia: number): number {
   return Math.round(Date.UTC(ano, mes - 1, dia) / DIA_MS);
 }
@@ -243,38 +237,28 @@ const MESES = [
   "janeiro", "fevereiro", "março", "abril", "maio", "junho",
   "julho", "agosto", "setembro", "outubro", "novembro", "dezembro",
 ];
-const MESES_CURTOS = [
-  "jan", "fev", "mar", "abr", "mai", "jun",
-  "jul", "ago", "set", "out", "nov", "dez",
-];
+export const MESES_CURTOS = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
 const DIAS_SEMANA = ["dom", "seg", "ter", "qua", "qui", "sex", "sáb"];
 
 const capitalizar = (texto: string) => texto.charAt(0).toUpperCase() + texto.slice(1);
-const clamp = (valor: number, minimo: number, maximo: number) =>
-  Math.min(maximo, Math.max(minimo, valor));
+const clamp = (valor: number, minimo: number, maximo: number) => Math.min(maximo, Math.max(minimo, valor));
 
-function rotuloDia(dia: number): string {
-  if (dia === DIA_HOJE) return "Hoje";
-  if (dia === DIA_HOJE - 1) return "Ontem";
+/** "25/09/2026". */
+export function dataCurta(dia: number): string {
   const p = partes(dia);
-  return `${pad(p.dia)} de ${MESES[p.mes - 1]} de ${p.ano}`;
+  return `${pad(p.dia)}/${pad(p.mes)}/${p.ano}`;
 }
 
-function rotuloIntervalo(inicio: number, fim: number): string {
-  const a = partes(inicio);
-  const b = partes(fim);
-  const curto = (p: { dia: number; mes: number }) => `${pad(p.dia)}/${pad(p.mes)}`;
-  if (a.ano === b.ano) return `${curto(a)} a ${curto(b)}/${a.ano}`;
-  return `${curto(a)}/${a.ano} a ${curto(b)}/${b.ano}`;
+/** "sex., 25/09". */
+export function dataComSemana(dia: number): string {
+  const p = partes(dia);
+  return `${DIAS_SEMANA[p.semana]}., ${pad(p.dia)}/${pad(p.mes)}`;
 }
 
-/** Granularidade adequada ao tamanho da janela, como no painel. */
-function bucketPara(inicio: number, fim: number): BucketSerie {
-  const dias = fim - inicio + 1;
-  if (dias <= 2) return "hour";
-  if (dias <= 92) return "day";
-  if (dias <= 400) return "week";
-  return "month";
+/** Dia com expediente na escala: segunda a sexta, fora de feriado. */
+export function temExpediente(dia: number): boolean {
+  const { semana } = partes(dia);
+  return semana >= 1 && semana <= 5 && !DIAS_FERIADO.has(dia);
 }
 
 export const PRESETS: { valor: Preset; rotulo: string }[] = [
@@ -288,22 +272,25 @@ export const PRESETS: { valor: Preset; rotulo: string }[] = [
 
 export const PERIODO_INICIAL: PeriodoDemo = { preset: "mes", ancora: HOJE };
 
+function bucketPara(inicio: number, fim: number): Bucket {
+  const dias = fim - inicio + 1;
+  if (dias <= 1) return "hour";
+  if (dias <= 62) return "day";
+  if (dias <= 400) return "week";
+  return "month";
+}
+
 export function intervalo(periodo: PeriodoDemo): Intervalo {
   const dia = paraDia(periodo.ancora);
   const p = partes(dia);
 
   switch (periodo.preset) {
     case "dia":
-      return { inicio: dia, fim: dia, bucket: "hour", rotulo: rotuloDia(dia) };
+      return { inicio: dia, fim: dia, bucket: "hour", rotulo: dataCurta(dia) };
     case "semana": {
       // Semana começa na segunda: é como a operação enxerga a própria semana.
       const segunda = dia - ((p.semana + 6) % 7);
-      return {
-        inicio: segunda,
-        fim: segunda + 6,
-        bucket: "day",
-        rotulo: `Semana de ${rotuloIntervalo(segunda, segunda + 6)}`,
-      };
+      return { inicio: segunda, fim: segunda + 6, bucket: "day", rotulo: "Semana" };
     }
     case "mes":
       return {
@@ -313,34 +300,23 @@ export function intervalo(periodo: PeriodoDemo): Intervalo {
         rotulo: capitalizar(`${MESES[p.mes - 1]} de ${p.ano}`),
       };
     case "ano":
-      return {
-        inicio: diaDe(p.ano, 1, 1),
-        fim: diaDe(p.ano + 1, 1, 1) - 1,
-        bucket: "month",
-        rotulo: String(p.ano),
-      };
+      return { inicio: diaDe(p.ano, 1, 1), fim: diaDe(p.ano + 1, 1, 1) - 1, bucket: "month", rotulo: String(p.ano) };
     case "geral":
       return { inicio: DIA_INICIO, fim: DIA_HOJE, bucket: "month", rotulo: "Todo o período" };
     case "personalizado": {
       const a = paraDia(periodo.de ?? periodo.ancora);
       const b = paraDia(periodo.ate ?? periodo.ancora);
       const [inicio, fim] = a <= b ? [a, b] : [b, a];
-      return { inicio, fim, bucket: bucketPara(inicio, fim), rotulo: rotuloIntervalo(inicio, fim) };
+      return { inicio, fim, bucket: bucketPara(inicio, fim), rotulo: "Personalizado" };
     }
   }
 }
 
 export function criarPeriodo(preset: Preset, atual?: PeriodoDemo): PeriodoDemo {
   if (preset !== "personalizado") return { preset, ancora: HOJE };
-
   const base = intervalo(atual ?? PERIODO_INICIAL);
   const fim = Math.min(base.fim, DIA_HOJE);
-  return {
-    preset,
-    ancora: paraIso(base.inicio),
-    de: paraIso(base.inicio),
-    ate: paraIso(fim),
-  };
+  return { preset, ancora: paraIso(base.inicio), de: paraIso(Math.max(base.inicio, DIA_INICIO)), ate: paraIso(fim) };
 }
 
 export function navegar(periodo: PeriodoDemo, passo: 1 | -1): PeriodoDemo {
@@ -360,12 +336,7 @@ export function navegar(periodo: PeriodoDemo, passo: 1 | -1): PeriodoDemo {
       const de = paraDia(periodo.de ?? periodo.ancora);
       const ate = paraDia(periodo.ate ?? periodo.ancora);
       const salto = (ate - de + 1) * passo;
-      return {
-        ...periodo,
-        ancora: paraIso(de + salto),
-        de: paraIso(de + salto),
-        ate: paraIso(ate + salto),
-      };
+      return { ...periodo, ancora: paraIso(de + salto), de: paraIso(de + salto), ate: paraIso(ate + salto) };
     }
     default:
       return periodo;
@@ -378,24 +349,24 @@ export function ehPeriodoAtual(periodo: PeriodoDemo): boolean {
   return intervalo(periodo).fim >= DIA_HOJE;
 }
 
-export function rotuloComparacao(periodo: PeriodoDemo): string {
-  switch (periodo.preset) {
-    case "dia":
-      return "dia anterior";
-    case "semana":
-      return "semana anterior";
-    case "mes":
-      return "mês anterior";
-    case "ano":
-      return "ano anterior";
-    default:
-      return "período anterior";
-  }
+/** O período começa antes do primeiro dia com dado? A seta de voltar para ali. */
+export function ehPrimeiroPeriodo(periodo: PeriodoDemo): boolean {
+  if (periodo.preset === "geral") return true;
+  return intervalo(periodo).inicio <= DIA_INICIO;
 }
 
-/** Data de um dia no formato curto, para o seletor personalizado. */
-export function isoDoDia(dia: number): string {
-  return paraIso(dia);
+export const DIA_PRIMEIRO = DIA_INICIO;
+
+/** "01 – 25 set. 2026", como o botão de período do painel. */
+export function rotuloIntervaloCurto(periodo: PeriodoDemo): string {
+  if (periodo.preset === "geral") return "Todo o período";
+  const iv = intervalo(periodo);
+  const a = partes(iv.inicio);
+  const b = partes(Math.max(iv.inicio, Math.min(iv.fim, DIA_HOJE)));
+  if (a.ano === b.ano && a.mes === b.mes && a.dia === b.dia) return `${pad(a.dia)} ${MESES_CURTOS[a.mes - 1]}. ${a.ano}`;
+  if (a.ano === b.ano && a.mes === b.mes) return `${pad(a.dia)} – ${pad(b.dia)} ${MESES_CURTOS[a.mes - 1]}. ${a.ano}`;
+  if (a.ano === b.ano) return `${pad(a.dia)} ${MESES_CURTOS[a.mes - 1]}. – ${pad(b.dia)} ${MESES_CURTOS[b.mes - 1]}. ${a.ano}`;
+  return `${dataCurta(iv.inicio)} – ${dataCurta(Math.min(iv.fim, DIA_HOJE))}`;
 }
 
 /* -------------------------------------------------------------------------
@@ -420,883 +391,875 @@ export function ruido(chave: string): number {
 }
 
 /* -------------------------------------------------------------------------
-   Ferramentas por pessoa
-
-   O tempo de cada categoria se reparte entre as ferramentas da equipe, e nem
-   todo mundo usa todas: quem nunca abre o Instagram não aparece na fatia dele.
+   Pessoas, equipes e aplicativos
    ------------------------------------------------------------------------- */
 
-const BASES = ["PRODUCTIVE", "NEUTRAL", "UNPRODUCTIVE", "SEM"] as const;
-type BaseCategoria = (typeof BASES)[number];
-
-/** Minutos por categoria de origem: produtivo, neutro, improdutivo, sem. */
-type Cat4 = [number, number, number, number];
-
-const TIPO_BASE: Record<string, TipoCategoria | null> = Object.fromEntries(
-  APPS.map((app) => [app.alvo, app.tipo]),
-);
-
-const PROBABILIDADE_USO: Record<BaseCategoria, number> = {
-  PRODUCTIVE: 0.95,
-  NEUTRAL: 0.85,
-  UNPRODUCTIVE: 0.62,
-  SEM: 0.58,
-};
-
-type PesosPessoa = Record<BaseCategoria, [string, number][]>;
-
-function pesosDaPessoa(pessoa: PerfilPessoa): PesosPessoa {
-  const daEquipe = PESOS[pessoa.equipeId];
-  const resultado = {} as PesosPessoa;
-
-  for (const base of BASES) {
-    const entradas = Object.entries(daEquipe[base]);
-    // A primeira ferramenta da lista é a da rotina da equipe: essa todo mundo
-    // usa. As demais entram conforme o perfil da pessoa.
-    const usadas = entradas.filter(
-      ([alvo], indice) =>
-        indice === 0 || ruido(`${pessoa.id}|uso|${alvo}`) < PROBABILIDADE_USO[base],
-    );
-    const soma = usadas.reduce((total, [, peso]) => total + peso, 0) || 1;
-    resultado[base] = usadas.map(([alvo, peso]) => [alvo, peso / soma]);
-  }
-
-  return resultado;
-}
-
-const PESOS_PESSOA: Record<string, PesosPessoa> = Object.fromEntries(
-  PESSOAS.map((pessoa) => [pessoa.id, pesosDaPessoa(pessoa)]),
-);
-
-export const PESSOAS_POR_ID: Record<string, PerfilPessoa> = Object.fromEntries(
-  PESSOAS.map((pessoa) => [pessoa.id, pessoa]),
-);
-
+export const PESSOAS_POR_ID: Record<string, PerfilPessoa> = Object.fromEntries(PESSOAS.map((p) => [p.id, p]));
 export const EQUIPES_POR_ID = Object.fromEntries(EQUIPES.map((e) => [e.id, e]));
+const INDICE_APP: Record<string, number> = Object.fromEntries(APPS.map((a, i) => [a.alvo, i]));
+
+export function escalaDe(pessoa: PerfilPessoa): Escala {
+  return EQUIPES_POR_ID[pessoa.equipeId].escala;
+}
 
 export function tipoDoApp(alvo: string, classificacoes: Classificacoes): TipoCategoria | null {
-  return classificacoes[alvo] ?? TIPO_BASE[alvo] ?? null;
+  if (alvo in classificacoes) return classificacoes[alvo];
+  return APPS[INDICE_APP[alvo]]?.tipo ?? null;
 }
 
-function indiceDoTipo(tipo: TipoCategoria | null): number {
-  if (tipo === "PRODUCTIVE") return 0;
-  if (tipo === "NEUTRAL") return 1;
-  if (tipo === "UNPRODUCTIVE") return 2;
-  return 3;
-}
+const BASES: BaseCategoria[] = ["PRODUCTIVE", "NEUTRAL", "UNPRODUCTIVE", "SEM"];
+const PROBABILIDADE_USO: Record<BaseCategoria, number> = { PRODUCTIVE: 0.95, NEUTRAL: 0.85, UNPRODUCTIVE: 0.62, SEM: 0.7 };
 
 /**
- * Matriz que converte minutos por categoria de ORIGEM em minutos por
- * categoria EFETIVA — a de origem é fixa, a efetiva muda quando o visitante
- * classifica um aplicativo na rosca.
+ * Ferramentas de cada pessoa, por categoria de origem. Nem todo mundo usa
+ * tudo: quem nunca abre o Instagram não aparece na fatia dele.
  */
-function matrizes(classificacoes: Classificacoes): Record<string, number[][]> {
-  const resultado: Record<string, number[][]> = {};
-
-  for (const pessoa of PESSOAS) {
-    const matriz = [
-      [0, 0, 0, 0],
-      [0, 0, 0, 0],
-      [0, 0, 0, 0],
-      [0, 0, 0, 0],
-    ];
-
-    BASES.forEach((base, linha) => {
-      for (const [alvo, peso] of PESOS_PESSOA[pessoa.id][base]) {
-        matriz[linha][indiceDoTipo(tipoDoApp(alvo, classificacoes))] += peso;
-      }
-    });
-
-    resultado[pessoa.id] = matriz;
-  }
-
-  return resultado;
-}
-
-function efetivar(base: Cat4, matriz: number[][]): Cat4 {
-  const saida: Cat4 = [0, 0, 0, 0];
-  for (let origem = 0; origem < 4; origem += 1) {
-    if (base[origem] === 0) continue;
-    for (let destino = 0; destino < 4; destino += 1) {
-      saida[destino] += base[origem] * matriz[origem][destino];
+const FERRAMENTAS: Record<string, Record<BaseCategoria, [number, number][]>> = Object.fromEntries(
+  PESSOAS.map((pessoa) => {
+    const daEquipe = PESOS[pessoa.equipeId];
+    const porBase = {} as Record<BaseCategoria, [number, number][]>;
+    for (const base of BASES) {
+      const entradas = Object.entries(daEquipe[base]).filter(
+        ([alvo], i) => i === 0 || ruido(`${pessoa.id}|uso|${alvo}`) < PROBABILIDADE_USO[base],
+      );
+      const soma = entradas.reduce((s, [, peso]) => s + peso, 0) || 1;
+      porBase[base] = entradas.map(([alvo, peso]) => [INDICE_APP[alvo], peso / soma]);
     }
+    return [pessoa.id, porBase];
+  }),
+);
+
+function escolher<T>(itens: [T, number][], sorteio: number): T {
+  let acumulado = 0;
+  for (const [item, peso] of itens) {
+    acumulado += peso;
+    if (sorteio < acumulado) return item;
   }
-  return saida;
+  return itens[itens.length - 1][0];
 }
 
 /* -------------------------------------------------------------------------
-   Simulação de um dia de uma pessoa
+   O dia de uma pessoa, minuto a minuto
    ------------------------------------------------------------------------- */
 
-export type DiaPessoa = {
-  dia: number;
-  ativo: number;
-  ocioso: number;
-  bloqueado: number;
-  base: Cat4;
-  extra: number;
-  extraBase: Cat4;
-  teclas: number;
-  cliques: number;
-  rolagens: number;
-  entrada: number;
-  saida: number;
-};
+export type EstadoTrecho = "ATIVO" | "OCIOSO" | "BLOQUEADO";
 
-/** Reparte um total inteiro em quatro partes, sem perder nem inventar minuto. */
-function repartir(total: number, fracoes: number[]): Cat4 {
-  const soma = fracoes.reduce((s, f) => s + f, 0) || 1;
-  const brutos = fracoes.map((f) => (total * f) / soma);
-  const inteiros = brutos.map((b) => Math.floor(b));
-  let resto = total - inteiros.reduce((s, v) => s + v, 0);
+/** Um trecho contínuo do dia. `app` é o índice em APPS (−1 fora de ATIVO). */
+export type Trecho = { de: number; ate: number; estado: EstadoTrecho; app: number };
 
-  const ordem = brutos
-    .map((bruto, indice) => ({ indice, sobra: bruto - Math.floor(bruto) }))
-    .sort((a, b) => b.sobra - a.sobra);
+const cacheTrechos = new Map<string, Trecho[]>();
 
-  for (const { indice } of ordem) {
-    if (resto <= 0) break;
-    inteiros[indice] += 1;
-    resto -= 1;
-  }
-
-  return [inteiros[0], inteiros[1], inteiros[2], inteiros[3]];
-}
-
-const cacheDias = new Map<string, DiaPessoa | null>();
-
-export function simularDia(pessoa: PerfilPessoa, dia: number): DiaPessoa | null {
+export function trechosDoDia(pessoa: PerfilPessoa, dia: number): Trecho[] {
   const chave = `${pessoa.id}|${dia}`;
-  const guardado = cacheDias.get(chave);
-  if (guardado !== undefined) return guardado;
-
-  const calculado = calcularDia(pessoa, dia, chave);
-  cacheDias.set(chave, calculado);
-  return calculado;
+  let trechos = cacheTrechos.get(chave);
+  if (!trechos) {
+    trechos = gerarDia(pessoa, dia);
+    cacheTrechos.set(chave, trechos);
+  }
+  return trechos;
 }
 
-function calcularDia(pessoa: PerfilPessoa, dia: number, chave: string): DiaPessoa | null {
-  if (dia < DIA_INICIO || dia > DIA_HOJE) return null;
-  if (pessoa.paradaDesde && dia >= paraDia(pessoa.paradaDesde)) return null;
+function gerarDia(pessoa: PerfilPessoa, dia: number): Trecho[] {
+  if (dia < DIA_INICIO || dia > DIA_HOJE) return [];
+  if (pessoa.desde && dia < paraDia(pessoa.desde)) return [];
+  if (pessoa.paradaDesde && dia >= paraDia(pessoa.paradaDesde)) return [];
 
   const { semana, mes, dia: diaDoMes } = partes(dia);
-  if (semana === 0 || DIAS_FERIADO.has(dia)) return null;
+  const r = (medida: string) => ruido(`${pessoa.id}|${dia}|${medida}`);
+  const escala = escalaDe(pessoa);
 
-  const r = (medida: string) => ruido(`${chave}|${medida}`);
-
-  let fator = 1;
-  let entrada = pessoa.entrada + Math.round((r("entrada") - 0.5) * 24);
+  let entrada: number;
+  let saida: number;
+  let almoco: [number, number] | null;
 
   if (semana === 6) {
-    // Sábado é exceção de fechamento: só o último do mês, e só para quem
-    // costuma pegar sábado. Espalhado, cada sábado entraria como "dia com
-    // registro" no divisor da média por pessoa/dia — e três pessoas
-    // trabalhando derrubariam o número da equipe inteira.
-    if (!pessoa.sabado || diaDoMes < 22) return null;
-    fator = 0.42;
+    // Sábado é exceção de fechamento, só o último do mês e só para quem
+    // costuma pegar. Não há escala: tudo cai fora dela.
+    if (!pessoa.sabado || diaDoMes < 22) return [];
     entrada = 9 * 60 + Math.round(r("entrada") * 40);
-  } else if (dia !== DIA_HOJE && r("falta") < 0.03) {
-    return null;
+    saida = entrada + 150 + Math.round(r("saida") * 70);
+    almoco = null;
+  } else if (semana === 0 || DIAS_FERIADO.has(dia)) {
+    return [];
+  } else {
+    if (dia !== DIA_HOJE && r("falta") < 0.025) return [];
+    entrada = escala.inicio + pessoa.chegada + Math.round((r("entrada") - 0.5) * 24);
+    // Quem tem hábito de ficar depois varia mais: tem dia que sai na hora.
+    const extra = pessoa.saida > 20 ? pessoa.saida * (0.3 + r("saida") * 1.3) : pessoa.saida + (r("saida") - 0.5) * 20;
+    saida = escala.fim + Math.round(extra);
+    // Dia com consulta, reunião fora ou saída antecipada: o expediente tem
+    // buraco sem dado, que é o que faz a cobertura real ficar abaixo de 100%.
+    if (r("chegou-tarde") < 0.09) entrada += 50 + Math.round(r("quanto-tarde") * 110);
+    if (r("saiu-cedo") < 0.06) saida = Math.min(saida, escala.fim - 40 - Math.round(r("quanto-cedo") * 120));
+    const ini = escala.intervaloInicio + Math.round((r("almoco") - 0.4) * 14);
+    almoco = [ini, ini + 56 + Math.round(r("almoco-dur") * 14)];
   }
+
+  const limite = dia === DIA_HOJE ? (pessoa.hojeAte ?? AGORA_MINUTOS) : 24 * 60;
+  saida = Math.min(saida, limite);
+  if (saida - entrada < 20) return [];
 
   // A operação melhora devagar ao longo do ano — é o que faz o painel mostrar
   // ganho contra o mês anterior, como numa empresa que passou a se medir.
-  const progresso = clamp((mes - 1) / 7, 0, 1);
-  fator *= (0.88 + progresso * 0.12) * (1 + (r("volume") - 0.5) * 0.18);
+  const progresso = clamp((mes - 1) / 8, 0, 1);
+  const pesoBase: [BaseCategoria, number][] = [
+    ["PRODUCTIVE", pessoa.produtivo * (0.86 + progresso * 0.14) * (0.92 + r("produtivo") * 0.16)],
+    ["NEUTRAL", pessoa.neutro * (0.9 + r("neutro") * 0.2)],
+    ["UNPRODUCTIVE", pessoa.improdutivo * (1.15 - progresso * 0.25) * (0.75 + r("improdutivo") * 0.5)],
+    ["SEM", pessoa.sem],
+  ];
+  const somaBase = pesoBase.reduce((s, [, p]) => s + p, 0);
+  const bases: [BaseCategoria, number][] = pesoBase.map(([b, p]) => [b, p / somaBase]);
+  const ociosoDia = pessoa.ocioso * (0.8 + r("ocioso") * 0.4);
+  const ferramentas = FERRAMENTAS[pessoa.id];
 
-  let ativo = Math.round(pessoa.media * fator);
-  let ocioso = Math.round(ativo * pessoa.ocioso * (0.8 + r("ocioso") * 0.4));
-  let bloqueado = semana === 6 ? 0 : 38 + Math.round(r("almoco") * 26);
-
-  const permanencia = Math.round((ativo + ocioso + bloqueado) * 1.05);
-  // Quem tem hábito de hora extra estica o dia depois da janela de expediente.
-  const prolongamento = Math.round(ativo * pessoa.extra * (0.5 + r("extra")));
-  let saida = entrada + permanencia;
-  if (prolongamento > 0) saida = Math.max(saida, EMPRESA.janelaFim + prolongamento);
-
-  // Hoje o dia ainda não terminou: o painel mostra o que já chegou.
-  if (dia === DIA_HOJE) {
-    const limite = pessoa.hojeAte ?? AGORA_MINUTOS;
-    if (saida > limite) {
-      const fracao = clamp((limite - entrada) / Math.max(1, saida - entrada), 0, 1);
-      if (fracao <= 0.02) return null;
-      ativo = Math.round(ativo * fracao);
-      ocioso = Math.round(ocioso * fracao);
-      bloqueado = limite > 13 * 60 ? bloqueado : Math.round(bloqueado * fracao);
-      saida = limite;
-    }
-  }
-
-  const densidade = ativo / Math.max(1, saida - entrada);
-  const forat = Math.max(0, EMPRESA.janelaInicio - entrada) + Math.max(0, saida - EMPRESA.janelaFim);
-  const extra = Math.min(ativo, Math.round(densidade * forat));
-
-  const produtivo = clamp(
-    pessoa.produtivo - 0.02 + progresso * 0.03 + (r("produtivo") - 0.5) * 0.06,
-    0.2,
-    0.9,
-  );
-  const neutro = clamp(pessoa.neutro + (r("neutro") - 0.5) * 0.04, 0.05, 0.4);
-  const improdutivo = clamp(
-    pessoa.improdutivo * (0.75 + r("improdutivo") * 0.5) * (1.12 - progresso * 0.2),
-    0.005,
-    0.4,
-  );
-  const semCategoria = Math.max(0.02, 1 - produtivo - neutro - improdutivo);
-
-  const base = repartir(ativo, [produtivo, neutro, improdutivo, semCategoria]);
-  // Fora do expediente rende menos: cai o produtivo, sobe o improdutivo.
-  const extraBase = repartir(extra, [produtivo * 0.86, neutro, improdutivo * 1.6, semCategoria]);
-  for (let i = 0; i < 4; i += 1) extraBase[i] = Math.min(extraBase[i], base[i]);
-
-  const teclas = Math.round(ativo * pessoa.teclas * (0.85 + r("teclas") * 0.3));
-  const cliques = Math.round(ativo * pessoa.cliques * (0.85 + r("cliques") * 0.3));
-
-  return {
-    dia,
-    ativo,
-    ocioso,
-    bloqueado,
-    base,
-    extra,
-    extraBase,
-    teclas,
-    cliques,
-    rolagens: Math.round(cliques * (0.5 + r("rolagens") * 0.3)),
-    entrada,
-    saida,
-  };
-}
-
-/** Hora a hora do dia, com a queda do almoço. Serve ao recorte "Dia". */
-function porHora(dp: DiaPessoa, pessoaId: string) {
-  const pesos: number[] = new Array(24).fill(0);
-
-  for (let hora = 0; hora < 24; hora += 1) {
-    const inicio = Math.max(dp.entrada, hora * 60);
-    const fim = Math.min(dp.saida, hora * 60 + 60);
-    if (fim <= inicio) continue;
-    pesos[hora] = (fim - inicio) * (hora === 12 ? 0.3 : 1);
-  }
-
-  const soma = pesos.reduce((s, p) => s + p, 0) || 1;
-
-  return pesos
-    .map((peso, hora) => {
-      const fracao = peso / soma;
-      if (fracao === 0) return null;
-
-      // O rendimento oscila: melhor de manhã, cai depois do almoço.
-      const ritmo =
-        1 +
-        0.07 * Math.cos((hora - 10) / 2.2) +
-        (ruido(`${pessoaId}|${dp.dia}|hora${hora}`) - 0.5) * 0.06;
-
-      const produtivo = Math.max(0, dp.base[0] * fracao * ritmo);
-      const sobra = dp.base[0] * fracao - produtivo;
-
-      const base: Cat4 = [
-        produtivo,
-        dp.base[1] * fracao,
-        Math.max(0, dp.base[2] * fracao + sobra),
-        dp.base[3] * fracao,
-      ];
-
-      return { hora, ativo: dp.ativo * fracao, ocioso: dp.ocioso * fracao, base };
-    })
-    .filter((h): h is { hora: number; ativo: number; ocioso: number; base: Cat4 } => h !== null);
-}
-
-/* -------------------------------------------------------------------------
-   Varredura: uma passada pelos dias, guardando tudo por pessoa
-   ------------------------------------------------------------------------- */
-
-type Balde = { chave: number; ativo: number; ocioso: number; efetivo: Cat4 };
-
-type AcumuladoPessoa = {
-  ativo: number;
-  ocioso: number;
-  bloqueado: number;
-  base: Cat4;
-  efetivo: Cat4;
-  extra: number;
-  extraEfetivo: Cat4;
-  teclas: number;
-  cliques: number;
-  rolagens: number;
-  dias: Set<number>;
-  diasComExtra: number;
-  baldes: Map<number, Balde>;
-};
-
-export type Varredura = {
-  periodo: PeriodoDemo;
-  intervalo: Intervalo;
-  classificacoes: Classificacoes;
-  atual: Map<string, AcumuladoPessoa>;
-  anterior: Map<string, AcumuladoPessoa>;
-};
-
-function novoAcumulado(): AcumuladoPessoa {
-  return {
-    ativo: 0,
-    ocioso: 0,
-    bloqueado: 0,
-    base: [0, 0, 0, 0],
-    efetivo: [0, 0, 0, 0],
-    extra: 0,
-    extraEfetivo: [0, 0, 0, 0],
-    teclas: 0,
-    cliques: 0,
-    rolagens: 0,
-    dias: new Set<number>(),
-    diasComExtra: 0,
-    baldes: new Map<number, Balde>(),
-  };
-}
-
-function chaveDoBalde(dia: number, bucket: BucketSerie): number {
-  const p = partes(dia);
-  switch (bucket) {
-    case "day":
-      return dia;
-    case "week":
-      return dia - ((p.semana + 6) % 7);
-    case "month":
-      return p.ano * 12 + (p.mes - 1);
-    case "hour":
-      return dia * 24;
-  }
-}
-
-function somarBalde(
-  baldes: Map<number, Balde>,
-  chave: number,
-  ativo: number,
-  ocioso: number,
-  efetivo: Cat4,
-) {
-  const atual = baldes.get(chave) ?? { chave, ativo: 0, ocioso: 0, efetivo: [0, 0, 0, 0] as Cat4 };
-  atual.ativo += ativo;
-  atual.ocioso += ocioso;
-  for (let i = 0; i < 4; i += 1) atual.efetivo[i] += efetivo[i];
-  baldes.set(chave, atual);
-}
-
-function varrerIntervalo(
-  iv: Intervalo,
-  matriz: Record<string, number[][]>,
-  comSerie: boolean,
-): Map<string, AcumuladoPessoa> {
-  const porPessoa = new Map<string, AcumuladoPessoa>();
-  const inicio = Math.max(iv.inicio, DIA_INICIO);
-  const fim = Math.min(iv.fim, DIA_HOJE);
-
-  for (let dia = inicio; dia <= fim; dia += 1) {
-    for (const pessoa of PESSOAS) {
-      const dp = simularDia(pessoa, dia);
-      if (!dp) continue;
-
-      const m = matriz[pessoa.id];
-      const efetivo = efetivar(dp.base, m);
-
-      let acumulado = porPessoa.get(pessoa.id);
-      if (!acumulado) {
-        acumulado = novoAcumulado();
-        porPessoa.set(pessoa.id, acumulado);
-      }
-
-      acumulado.ativo += dp.ativo;
-      acumulado.ocioso += dp.ocioso;
-      acumulado.bloqueado += dp.bloqueado;
-      acumulado.teclas += dp.teclas;
-      acumulado.cliques += dp.cliques;
-      acumulado.rolagens += dp.rolagens;
-      acumulado.extra += dp.extra;
-      if (dp.extra >= 5) acumulado.diasComExtra += 1;
-      acumulado.dias.add(dia);
-
-      const extraEfetivo = efetivar(dp.extraBase, m);
-      for (let i = 0; i < 4; i += 1) {
-        acumulado.base[i] += dp.base[i];
-        acumulado.efetivo[i] += efetivo[i];
-        acumulado.extraEfetivo[i] += extraEfetivo[i];
-      }
-
-      if (!comSerie) continue;
-
-      if (iv.bucket === "hour") {
-        for (const faixa of porHora(dp, pessoa.id)) {
-          somarBalde(
-            acumulado.baldes,
-            dia * 24 + faixa.hora,
-            faixa.ativo,
-            faixa.ocioso,
-            efetivar(faixa.base, m),
-          );
-        }
+  const trechos: Trecho[] = [];
+  const preencher = (de: number, ate: number) => {
+    let t = de;
+    let n = 0;
+    while (t < ate) {
+      const rr = (m: string) => ruido(`${pessoa.id}|${dia}|${t}|${n}|${m}`);
+      const sorteio = rr("estado");
+      let estado: EstadoTrecho = "ATIVO";
+      let duracao: number;
+      if (sorteio < ociosoDia) {
+        estado = "OCIOSO";
+        duracao = 3 + Math.floor(rr("dur") * 13);
+      } else if (sorteio < ociosoDia + 0.035) {
+        estado = "BLOQUEADO";
+        duracao = 4 + Math.floor(rr("dur") * 12);
       } else {
-        somarBalde(acumulado.baldes, chaveDoBalde(dia, iv.bucket), dp.ativo, dp.ocioso, efetivo);
+        duracao = 3 + Math.floor(rr("dur") * 30);
       }
+      const fim = Math.min(ate, t + duracao);
+      const app =
+        estado === "ATIVO" ? escolher(ferramentas[escolher(bases, rr("base"))], rr("app")) : -1;
+      const anterior = trechos[trechos.length - 1];
+      if (anterior && anterior.ate === t && anterior.estado === estado && anterior.app === app) anterior.ate = fim;
+      else trechos.push({ de: t, ate: fim, estado, app });
+      t = fim;
+      n += 1;
     }
+  };
+
+  if (almoco && almoco[0] < saida) {
+    preencher(entrada, almoco[0]);
+    // No almoço a tela fica bloqueada: é o que a estação de fato registra.
+    const fimAlmoco = Math.min(almoco[1], saida);
+    trechos.push({ de: almoco[0], ate: fimAlmoco, estado: "BLOQUEADO", app: -1 });
+    if (fimAlmoco < saida) preencher(fimAlmoco, saida);
+  } else {
+    preencher(entrada, saida);
   }
 
-  return porPessoa;
-}
-
-/** Uma varredura serve a todas as telas: o escopo é aplicado depois, somando. */
-export function varrer(periodo: PeriodoDemo, classificacoes: Classificacoes): Varredura {
-  const matriz = matrizes(classificacoes);
-  const iv = intervalo(periodo);
-
-  const anterior =
-    periodo.preset === "geral"
-      ? new Map<string, AcumuladoPessoa>()
-      : varrerIntervalo(intervalo(navegar(periodo, -1)), matriz, false);
-
-  return {
-    periodo,
-    intervalo: iv,
-    classificacoes,
-    atual: varrerIntervalo(iv, matriz, true),
-    anterior,
-  };
+  return trechos;
 }
 
 /* -------------------------------------------------------------------------
-   Leitura: do acumulado para o que cada tela mostra
+   Resumo de um dia de uma pessoa (independe da classificação)
    ------------------------------------------------------------------------- */
+
+type ResumoDia = {
+  expediente: number;
+  registrados: number;
+  ociosos: number;
+  bloqueado: number;
+  /** Minutos ativos por aplicativo dentro do expediente e fora da escala. */
+  dentro: Float64Array;
+  fora: Float64Array;
+  primeiro: number | null;
+  ultimo: number | null;
+};
+
+/** Minutos de [a, b) que caem dentro do expediente (escala sem intervalo, até o corte). */
+function minutosNoExpediente(a: number, b: number, escala: Escala, corte: number): number {
+  const parte = (x: number, y: number) => Math.max(0, Math.min(b, y, corte) - Math.max(a, x));
+  return parte(escala.inicio, escala.intervaloInicio) + parte(escala.intervaloFim, escala.fim);
+}
+
+const cacheResumo = new Map<string, ResumoDia>();
+
+function resumoDoDia(pessoa: PerfilPessoa, dia: number, corte: number | null): ResumoDia {
+  const corteEfetivo = corte ?? (dia === DIA_HOJE ? AGORA_MINUTOS : 24 * 60);
+  const chave = `${pessoa.id}|${dia}|${corteEfetivo}`;
+  const guardado = cacheResumo.get(chave);
+  if (guardado) return guardado;
+
+  const escala = escalaDe(pessoa);
+  const trabalha = temExpediente(dia) && dia >= DIA_INICIO && dia <= DIA_HOJE && !(pessoa.desde && dia < paraDia(pessoa.desde));
+  const expediente = trabalha ? minutosNoExpediente(0, 24 * 60, escala, corteEfetivo) : 0;
+
+  const resumo: ResumoDia = {
+    expediente,
+    registrados: 0,
+    ociosos: 0,
+    bloqueado: 0,
+    dentro: new Float64Array(APPS.length),
+    fora: new Float64Array(APPS.length),
+    primeiro: null,
+    ultimo: null,
+  };
+
+  for (const t of trechosDoDia(pessoa, dia)) {
+    if (t.de >= corteEfetivo) break;
+    const ate = Math.min(t.ate, corteEfetivo);
+    resumo.primeiro = resumo.primeiro ?? t.de;
+    resumo.ultimo = ate;
+    const dentro = trabalha ? minutosNoExpediente(t.de, ate, escala, corteEfetivo) : 0;
+    resumo.registrados += dentro;
+    if (t.estado === "OCIOSO") resumo.ociosos += dentro;
+    else if (t.estado === "BLOQUEADO") resumo.bloqueado += dentro;
+    else {
+      resumo.dentro[t.app] += dentro;
+      // Fora da escala: antes do início ou depois do fim (o intervalo não conta).
+      const foraDaEscala = trabalha
+        ? Math.max(0, Math.min(ate, escala.inicio) - t.de) + Math.max(0, ate - Math.max(t.de, escala.fim))
+        : ate - t.de;
+      resumo.fora[t.app] += foraDaEscala;
+    }
+  }
+
+  cacheResumo.set(chave, resumo);
+  return resumo;
+}
+
+/* -------------------------------------------------------------------------
+   Agregação por pessoa
+   ------------------------------------------------------------------------- */
+
+export const MINUTOS_VAZIOS: Minutos = {
+  expediente: 0,
+  registrados: 0,
+  ativos: 0,
+  produtivos: 0,
+  neutros: 0,
+  improdutivos: 0,
+  semClassificar: 0,
+  ociosos: 0,
+  bloqueado: 0,
+  semDados: 0,
+  ativosFora: 0,
+};
+
+function somarMinutos(lista: Minutos[]): Minutos {
+  const total = { ...MINUTOS_VAZIOS };
+  for (const m of lista) for (const k of Object.keys(total) as (keyof Minutos)[]) total[k] += m[k];
+  return total;
+}
+
+function tiposEfetivos(classificacoes: Classificacoes): (TipoCategoria | null)[] {
+  return APPS.map((a) => tipoDoApp(a.alvo, classificacoes));
+}
 
 function pessoasDoEscopo(escopo: EscopoDemo): PerfilPessoa[] {
-  return PESSOAS.filter((pessoa) => {
-    if (escopo.equipeId && pessoa.equipeId !== escopo.equipeId) return false;
-    if (escopo.colaboradorId && pessoa.id !== escopo.colaboradorId) return false;
-    if (escopo.dispositivoId && pessoa.maquina !== escopo.dispositivoId) return false;
-    return true;
-  });
+  return PESSOAS.filter(
+    (p) => (!escopo.equipeId || p.equipeId === escopo.equipeId) && (!escopo.colaboradorId || p.id === escopo.colaboradorId),
+  );
 }
 
-function indiceDe(efetivo: Cat4): number | null {
-  const classificado = efetivo[0] + efetivo[1] + efetivo[2];
-  if (classificado <= 0) return null;
-  return (efetivo[0] / classificado) * 100;
+function linhaDaPessoa(pessoa: PerfilPessoa, janela: Janela, tipos: (TipoCategoria | null)[]): LinhaProdutividade {
+  const m = { ...MINUTOS_VAZIOS };
+  let diasComRegistro = 0;
+  let diasComExpediente = 0;
+  let somaPrimeiro = 0;
+  let somaUltimo = 0;
+  let ultimoRegistro: LinhaProdutividade["ultimoRegistro"] = null;
+
+  const fim = Math.min(janela.fim, DIA_HOJE);
+  for (let dia = Math.max(janela.inicio, DIA_INICIO); dia <= fim; dia += 1) {
+    const r = resumoDoDia(pessoa, dia, dia === janela.fim ? janela.corte : null);
+    m.expediente += r.expediente;
+    m.registrados += r.registrados;
+    m.ociosos += r.ociosos;
+    m.bloqueado += r.bloqueado;
+    for (let i = 0; i < APPS.length; i += 1) {
+      const dentro = r.dentro[i];
+      if (dentro > 0) {
+        const tipo = tipos[i];
+        if (tipo === "PRODUCTIVE") m.produtivos += dentro;
+        else if (tipo === "NEUTRAL") m.neutros += dentro;
+        else if (tipo === "UNPRODUCTIVE") m.improdutivos += dentro;
+        else m.semClassificar += dentro;
+      }
+      m.ativosFora += r.fora[i];
+    }
+    if (r.expediente > 0) diasComExpediente += 1;
+    if (r.primeiro !== null && r.ultimo !== null) {
+      diasComRegistro += 1;
+      somaPrimeiro += r.primeiro;
+      somaUltimo += r.ultimo;
+      ultimoRegistro = { dia, minuto: r.ultimo };
+    }
+  }
+
+  m.ativos = m.produtivos + m.neutros + m.improdutivos + m.semClassificar;
+  m.semDados = Math.max(0, m.expediente - m.registrados);
+
+  return {
+    colaboradorId: pessoa.id,
+    colaborador: pessoa.nome,
+    cargo: pessoa.cargo,
+    equipeId: pessoa.equipeId,
+    equipe: EQUIPES_POR_ID[pessoa.equipeId].nome,
+    minutos: m,
+    indice: m.expediente > 0 ? (m.produtivos / m.expediente) * 100 : null,
+    cobertura: m.expediente > 0 ? (Math.min(m.registrados, m.expediente) / m.expediente) * 100 : null,
+    diasComRegistro,
+    diasComExpediente,
+    primeiroMedio: diasComRegistro > 0 ? somaPrimeiro / diasComRegistro : null,
+    ultimoMedio: diasComRegistro > 0 ? somaUltimo / diasComRegistro : null,
+    ultimoRegistro,
+  };
 }
 
-const KPIS_VAZIOS: KpisDemo = {
-  minutosRegistrados: 0,
-  minutosAtivos: 0,
-  minutosOciosos: 0,
-  minutosBloqueado: 0,
-  minutosProdutivos: 0,
-  minutosNeutros: 0,
-  minutosImprodutivos: 0,
-  minutosSemClassificar: 0,
-  teclas: 0,
-  cliques: 0,
-  rolagens: 0,
-  indice: null,
-  colaboradores: 0,
-  dispositivos: 0,
-  diasComRegistro: 0,
-  topAplicacao: null,
-  jornadaEsperada: 0,
+const media = (valores: (number | null)[]) => {
+  const v = valores.filter((x): x is number => x !== null);
+  return v.length === 0 ? null : v.reduce((s, x) => s + x, 0) / v.length;
 };
 
-function somarKpis(
-  porPessoa: Map<string, AcumuladoPessoa>,
-  pessoas: PerfilPessoa[],
-  topAplicacao: string | null,
-): KpisDemo {
-  const kpis: KpisDemo = { ...KPIS_VAZIOS, topAplicacao };
-  const dias = new Set<number>();
-
-  for (const pessoa of pessoas) {
-    const acumulado = porPessoa.get(pessoa.id);
-    if (!acumulado || acumulado.ativo === 0) continue;
-
-    kpis.minutosAtivos += acumulado.ativo;
-    kpis.minutosOciosos += acumulado.ocioso;
-    kpis.minutosBloqueado += acumulado.bloqueado;
-    kpis.minutosProdutivos += acumulado.efetivo[0];
-    kpis.minutosNeutros += acumulado.efetivo[1];
-    kpis.minutosImprodutivos += acumulado.efetivo[2];
-    kpis.minutosSemClassificar += acumulado.efetivo[3];
-    kpis.teclas += acumulado.teclas;
-    kpis.cliques += acumulado.cliques;
-    kpis.rolagens += acumulado.rolagens;
-    kpis.colaboradores += 1;
-    kpis.dispositivos += 1;
-    kpis.jornadaEsperada += acumulado.dias.size * EMPRESA.jornadaMinutos;
-    for (const dia of acumulado.dias) dias.add(dia);
-  }
-
-  kpis.minutosRegistrados = kpis.minutosAtivos + kpis.minutosOciosos + kpis.minutosBloqueado;
-  kpis.diasComRegistro = dias.size;
-  kpis.indice = indiceDe([
-    kpis.minutosProdutivos,
-    kpis.minutosNeutros,
-    kpis.minutosImprodutivos,
-    kpis.minutosSemClassificar,
-  ]);
-
-  return kpis;
-}
-
-function montarEscala(
-  porPessoa: Map<string, AcumuladoPessoa>,
-  pessoas: PerfilPessoa[],
-): EscalaDemo {
-  let ativo = 0;
-  let extra = 0;
-  const dentro: Cat4 = [0, 0, 0, 0];
-  const fora: Cat4 = [0, 0, 0, 0];
-  let pessoasComExtra = 0;
-
-  for (const pessoa of pessoas) {
-    const acumulado = porPessoa.get(pessoa.id);
-    if (!acumulado) continue;
-
-    ativo += acumulado.ativo;
-    extra += acumulado.extra;
-    if (acumulado.extra >= 30) pessoasComExtra += 1;
-
-    for (let i = 0; i < 4; i += 1) {
-      dentro[i] += acumulado.efetivo[i] - acumulado.extraEfetivo[i];
-      fora[i] += acumulado.extraEfetivo[i];
-    }
-  }
-
+/** Média simples por pessoa para o índice; somas para horas e cobertura. */
+export function agregar(linhas: LinhaProdutividade[]): Resumo {
+  const base = linhas.filter((l) => l.minutos.expediente > 0);
+  const minutos = somarMinutos(linhas.map((l) => l.minutos));
   return {
-    temJanela: true,
-    minutosAtivosEscala: ativo - extra,
-    indiceEscala: indiceDe(dentro),
-    minutosAtivosExtra: extra,
-    indiceExtra: indiceDe(fora),
-    pessoasComExtra,
+    pessoas: base.length,
+    pessoasComRegistro: linhas.filter((l) => l.diasComRegistro > 0).length,
+    indiceMedio: media(base.map((l) => l.indice)),
+    cobertura: minutos.expediente > 0 ? (Math.min(minutos.registrados, minutos.expediente) / minutos.expediente) * 100 : null,
+    minutos,
   };
 }
 
-function montarSerie(iv: Intervalo, porPessoa: Map<string, AcumuladoPessoa>, pessoas: PerfilPessoa[]): PontoSerie[] {
-  const juntos = new Map<number, Balde>();
+/** Variação em p.p. — ou NULL sem base: sem expediente ou cobertura baixa em um dos lados. */
+export function compararIndice(atual: Resumo, anterior: Resumo | null): number | null {
+  if (!anterior || atual.indiceMedio === null || anterior.indiceMedio === null) return null;
+  const minima = REGRAS.coberturaMinimaComparacao;
+  if ((atual.cobertura ?? 0) < minima || (anterior.cobertura ?? 0) < minima) return null;
+  return Number((atual.indiceMedio - anterior.indiceMedio).toFixed(1));
+}
+
+/* -------------------------------------------------------------------------
+   Janelas: atual e comparativo alinhado
+   ------------------------------------------------------------------------- */
+
+function janelaAtual(periodo: PeriodoDemo): Janela {
+  const iv = intervalo(periodo);
+  const fim = Math.min(iv.fim, DIA_HOJE);
+  return { inicio: iv.inicio, fim, corte: fim === DIA_HOJE ? AGORA_MINUTOS : null };
+}
+
+function janelaComparativo(periodo: PeriodoDemo): (Janela & { rotulo: string }) | null {
+  if (periodo.preset === "geral") return null;
+  const atual = janelaAtual(periodo);
+  if (atual.fim < atual.inicio) return null;
+
+  if (periodo.preset === "dia") {
+    let anterior = atual.inicio - 1;
+    while (anterior >= DIA_INICIO && !temExpediente(anterior)) anterior -= 1;
+    if (anterior < DIA_INICIO) return null;
+    const p = partes(anterior);
+    return { inicio: anterior, fim: anterior, corte: atual.corte, rotulo: `vs ${pad(p.dia)}/${pad(p.mes)}` };
+  }
+
+  const decorrido = atual.fim - atual.inicio;
+  const prev =
+    periodo.preset === "personalizado"
+      ? { inicio: atual.inicio - (intervalo(periodo).fim - atual.inicio + 1), fim: atual.inicio - 1 }
+      : intervalo(navegar(periodo, -1));
+  const fimAlinhado = prev.inicio + decorrido;
+  const rotulos: Record<string, string> = {
+    semana: "vs semana anterior",
+    mes: "vs mês anterior",
+    ano: "vs ano anterior",
+    personalizado: "vs período anterior",
+  };
+  return {
+    inicio: prev.inicio,
+    // Nunca passa do fim real do período anterior (mês curto x mês longo).
+    fim: Math.min(prev.fim, fimAlinhado),
+    corte: fimAlinhado <= prev.fim ? atual.corte : null,
+    rotulo: rotulos[periodo.preset],
+  };
+}
+
+/* -------------------------------------------------------------------------
+   Equipes
+   ------------------------------------------------------------------------- */
+
+function agruparPorEquipe(linhas: LinhaProdutividade[]) {
+  return EQUIPES.map((e) => ({ equipe: e, resumo: agregar(linhas.filter((l) => l.equipeId === e.id)) }))
+    .filter((g) => g.resumo.pessoas > 0)
+    .sort((a, b) => (b.resumo.indiceMedio ?? -1) - (a.resumo.indiceMedio ?? -1));
+}
+
+function compararEquipes(atual: LinhaProdutividade[], anterior: LinhaProdutividade[] | null): LinhaEquipe[] {
+  const antes = new Map((anterior ? agruparPorEquipe(anterior) : []).map((g) => [g.equipe.id, g.resumo]));
+  return agruparPorEquipe(atual).map((g) => ({
+    equipeId: g.equipe.id,
+    equipe: g.equipe.nome,
+    pessoas: g.resumo.pessoas,
+    indice: g.resumo.indiceMedio,
+    cobertura: g.resumo.cobertura,
+    minutosAtivos: g.resumo.minutos.ativos,
+    minutosForaEscala: g.resumo.minutos.ativosFora,
+    variacao: anterior ? compararIndice(g.resumo, antes.get(g.equipe.id) ?? null) : null,
+    minutos: g.resumo.minutos,
+  }));
+}
+
+/** Pessoas com a variação individual validada (mesma regra das equipes). */
+export function variacaoDaPessoa(recorte: Recorte, colaboradorId: string): number | null {
+  const atual = recorte.linhas.find((l) => l.colaboradorId === colaboradorId);
+  const antes = recorte.anteriores?.find((l) => l.colaboradorId === colaboradorId);
+  if (!atual || !antes) return null;
+  return compararIndice(agregar([atual]), agregar([antes]));
+}
+
+function foraDaEscala(linhas: LinhaProdutividade[]) {
+  const relevantes = linhas.filter((l) => l.minutos.ativosFora >= REGRAS.minutosForaEscalaRelevante);
+  return { minutos: relevantes.reduce((s, l) => s + l.minutos.ativosFora, 0), pessoas: relevantes.length };
+}
+
+/* -------------------------------------------------------------------------
+   Evolução do índice e atividade ao longo do período
+   ------------------------------------------------------------------------- */
+
+type BaldeEvolucao = "day" | "week" | "month";
+
+function truncar(dia: number, balde: BaldeEvolucao): number {
+  const p = partes(dia);
+  if (balde === "month") return diaDe(p.ano, p.mes, 1);
+  if (balde === "week") return dia - ((p.semana + 6) % 7);
+  return dia;
+}
+
+function distancia(de: number, ate: number, balde: BaldeEvolucao): number {
+  if (balde === "month") {
+    const a = partes(de);
+    const b = partes(ate);
+    return (b.ano - a.ano) * 12 + (b.mes - a.mes);
+  }
+  return balde === "week" ? Math.round((ate - de) / 7) : ate - de;
+}
+
+function avancar(dia: number, n: number, balde: BaldeEvolucao): number {
+  if (balde === "month") {
+    const p = partes(dia);
+    return diaDe(p.ano, p.mes + n, 1);
+  }
+  return dia + n * (balde === "week" ? 7 : 1);
+}
+
+function rotulosDoBalde(dia: number, balde: BaldeEvolucao): { curto: string; completo: string } {
+  const p = partes(dia);
+  if (balde === "month") {
+    return { curto: `${MESES_CURTOS[p.mes - 1]}/${String(p.ano).slice(2)}`, completo: `${MESES[p.mes - 1]} de ${p.ano}` };
+  }
+  if (balde === "week") return { curto: `${pad(p.dia)}/${pad(p.mes)}`, completo: `semana de ${pad(p.dia)}/${pad(p.mes)}/${p.ano}` };
+  return { curto: `${pad(p.dia)} ${MESES_CURTOS[p.mes - 1]}.`, completo: `${DIAS_SEMANA[p.semana]}, ${pad(p.dia)}/${pad(p.mes)}/${p.ano}` };
+}
+
+/** Índice de cada balde, média por pessoa — fora da linha se a cobertura for baixa. */
+function serieIndice(
+  pessoas: PerfilPessoa[],
+  janela: Janela,
+  balde: BaldeEvolucao,
+  tipos: (TipoCategoria | null)[],
+): Map<number, number | null> {
+  const porBalde = new Map<number, number | null>();
+  for (let inicio = truncar(janela.inicio, balde); inicio <= janela.fim; inicio = avancar(inicio, 1, balde)) {
+    const fim = Math.min(janela.fim, avancar(inicio, 1, balde) - 1);
+    const sub: Janela = { inicio: Math.max(inicio, janela.inicio), fim, corte: fim === janela.fim ? janela.corte : null };
+    const resumo = agregar(pessoas.map((p) => linhaDaPessoa(p, sub, tipos)));
+    const valido = (resumo.cobertura ?? 0) >= REGRAS.coberturaMinimaPontoEvolucao;
+    porBalde.set(inicio, valido ? resumo.indiceMedio : null);
+  }
+  return porBalde;
+}
+
+function montarEvolucao(periodo: PeriodoDemo, pessoas: PerfilPessoa[], tipos: (TipoCategoria | null)[]) {
+  const atual = janelaAtual(periodo);
+  let janela: Janela;
+  let anterior: Janela | null;
+  let balde: BaldeEvolucao;
+  let descricao: string;
+
+  if (periodo.preset === "dia") {
+    // Um dia sozinho não tem evolução: mostra os 14 dias até ele.
+    janela = { inicio: atual.inicio - 13, fim: atual.fim, corte: atual.corte };
+    anterior = { inicio: atual.inicio - 27, fim: atual.inicio - 14, corte: null };
+    balde = "day";
+    descricao = "Últimos 14 dias";
+  } else if (periodo.preset === "geral") {
+    const p = partes(DIA_HOJE);
+    janela = { inicio: Math.max(DIA_INICIO, diaDe(p.ano, p.mes - 11, 1)), fim: atual.fim, corte: atual.corte };
+    anterior = null;
+    balde = "month";
+    descricao = "Últimos 12 meses";
+  } else {
+    const iv = intervalo(periodo);
+    const dias = iv.fim - iv.inicio + 1;
+    balde = periodo.preset === "ano" ? "month" : dias <= 62 ? "day" : dias <= 400 ? "week" : "month";
+    janela = atual;
+    const prev =
+      periodo.preset === "personalizado"
+        ? { inicio: iv.inicio - dias, fim: iv.inicio - 1 }
+        : intervalo(navegar(periodo, -1));
+    anterior = { inicio: prev.inicio, fim: prev.fim, corte: null };
+    descricao = balde === "day" ? "Dia a dia" : balde === "week" ? "Semana a semana" : "Mês a mês";
+  }
+
+  const inicioAtual = truncar(janela.inicio, balde);
+  const limite = distancia(inicioAtual, truncar(janela.fim, balde), balde);
+  const valoresAtual = serieIndice(pessoas, janela, balde, tipos);
+  const valoresAnterior = anterior ? serieIndice(pessoas, anterior, balde, tipos) : null;
+  const inicioAnterior = anterior ? truncar(anterior.inicio, balde) : 0;
+
+  const pontos: PontoEvolucao[] = [];
+  for (let n = 0; n <= limite; n += 1) {
+    const dia = avancar(inicioAtual, n, balde);
+    const r = rotulosDoBalde(dia, balde);
+    pontos.push({
+      chave: String(dia),
+      rotulo: r.curto,
+      rotuloCompleto: r.completo,
+      atual: valoresAtual.get(dia) ?? null,
+      anterior: valoresAnterior?.get(avancar(inicioAnterior, n, balde)) ?? null,
+    });
+  }
+
+  return { pontos, descricao, temAnterior: !!anterior };
+}
+
+/** Horas por categoria em cada balde do período: hora a hora no dia, dia a dia no mês… */
+function montarAtividade(periodo: PeriodoDemo, pessoas: PerfilPessoa[], tipos: (TipoCategoria | null)[]) {
+  const iv = intervalo(periodo);
+  const atual = janelaAtual(periodo);
+  const bucket = iv.bucket;
+  const pontos: PontoAtividade[] = [];
+
+  const somar = (alvo: PontoAtividade, app: number, minutos: number) => {
+    const tipo = tipos[app];
+    if (tipo === "PRODUCTIVE") alvo.produtivo += minutos;
+    else if (tipo === "NEUTRAL") alvo.neutro += minutos;
+    else if (tipo === "UNPRODUCTIVE") alvo.improdutivo += minutos;
+    else alvo.sem += minutos;
+  };
+
+  if (bucket === "hour") {
+    const dia = atual.inicio;
+    for (let hora = 7; hora <= 20; hora += 1) {
+      pontos.push({
+        chave: String(hora),
+        rotulo: `${pad(hora)}h`,
+        rotuloCompleto: `${pad(hora)}h às ${pad(hora + 1)}h`,
+        produtivo: 0, neutro: 0, improdutivo: 0, sem: 0, ocioso: 0,
+      });
+    }
+    for (const pessoa of pessoas) {
+      for (const t of trechosDoDia(pessoa, dia)) {
+        for (let hora = 7; hora <= 20; hora += 1) {
+          const sobra = Math.max(0, Math.min(t.ate, hora * 60 + 60) - Math.max(t.de, hora * 60));
+          if (sobra <= 0) continue;
+          const ponto = pontos[hora - 7];
+          if (t.estado === "OCIOSO") ponto.ocioso += sobra;
+          else if (t.estado === "ATIVO") somar(ponto, t.app, sobra);
+        }
+      }
+    }
+    return { pontos, bucket };
+  }
+
+  const balde = bucket as BaldeEvolucao;
+  for (let inicio = truncar(atual.inicio, balde); inicio <= atual.fim; inicio = avancar(inicio, 1, balde)) {
+    const r = rotulosDoBalde(inicio, balde);
+    const ponto: PontoAtividade = {
+      chave: String(inicio), rotulo: r.curto, rotuloCompleto: r.completo,
+      produtivo: 0, neutro: 0, improdutivo: 0, sem: 0, ocioso: 0,
+    };
+    const fim = Math.min(atual.fim, avancar(inicio, 1, balde) - 1);
+    for (let dia = Math.max(inicio, DIA_INICIO); dia <= fim; dia += 1) {
+      for (const pessoa of pessoas) {
+        const resumo = resumoDoDia(pessoa, dia, null);
+        ponto.ocioso += resumo.ociosos;
+        for (let i = 0; i < APPS.length; i += 1) somar(ponto, i, resumo.dentro[i] + resumo.fora[i]);
+      }
+    }
+    pontos.push(ponto);
+  }
+  return { pontos, bucket };
+}
+
+/* -------------------------------------------------------------------------
+   Aplicativos e sites
+   ------------------------------------------------------------------------- */
+
+function montarApps(janela: Janela, pessoas: PerfilPessoa[], tipos: (TipoCategoria | null)[]): LinhaApp[] {
+  const minutos = new Float64Array(APPS.length);
+  const quem = APPS.map(() => new Set<string>());
+  const dias = APPS.map(() => new Set<number>());
 
   for (const pessoa of pessoas) {
-    const acumulado = porPessoa.get(pessoa.id);
-    if (!acumulado) continue;
-    for (const balde of acumulado.baldes.values()) {
-      somarBalde(juntos, balde.chave, balde.ativo, balde.ocioso, balde.efetivo);
+    for (let dia = Math.max(janela.inicio, DIA_INICIO); dia <= janela.fim; dia += 1) {
+      const r = resumoDoDia(pessoa, dia, dia === janela.fim ? janela.corte : null);
+      for (let i = 0; i < APPS.length; i += 1) {
+        const total = r.dentro[i] + r.fora[i];
+        if (total <= 0) continue;
+        minutos[i] += total;
+        quem[i].add(pessoa.id);
+        dias[i].add(dia);
+      }
     }
   }
 
-  if (juntos.size === 0) return [];
+  return APPS.map((app, i) => ({
+    alvo: app.alvo,
+    site: app.site,
+    tipo: tipos[i],
+    minutos: Math.round(minutos[i]),
+    pessoas: quem[i].size,
+    dias: dias[i].size,
+  }))
+    .filter((l) => l.minutos > 0)
+    .sort((a, b) => b.minutos - a.minutos);
+}
 
-  const chaves: number[] = [];
-  const fim = Math.min(iv.fim, DIA_HOJE);
+/* -------------------------------------------------------------------------
+   Pontos de atenção (newsecfocus `lib/visao-geral.ts`)
+   ------------------------------------------------------------------------- */
 
-  if (iv.bucket === "hour") {
-    const existentes = [...juntos.keys()];
-    for (let dia = iv.inicio; dia <= fim; dia += 1) {
-      const daqui = existentes.filter((c) => Math.floor(c / 24) === dia);
-      if (daqui.length === 0) continue;
-      const primeira = Math.min(7, ...daqui.map((c) => c % 24));
-      const ultima = Math.max(...daqui.map((c) => c % 24));
-      for (let hora = primeira; hora <= ultima; hora += 1) chaves.push(dia * 24 + hora);
-    }
-  } else {
-    const vistas = new Set<number>();
-    for (let dia = Math.max(iv.inicio, DIA_INICIO); dia <= fim; dia += 1) {
-      const chave = chaveDoBalde(dia, iv.bucket);
-      if (vistas.has(chave)) continue;
-      vistas.add(chave);
-      chaves.push(chave);
-    }
+const plural = (n: number, um: string, varios: string) => (n === 1 ? um : varios);
+
+function montarPontos(
+  apps: LinhaApp[],
+  pessoas: PerfilPessoa[],
+  linhas: LinhaProdutividade[],
+  equipes: LinhaEquipe[],
+): PontoAtencao[] {
+  const pontos: PontoAtencao[] = [];
+
+  const semCategoria = apps.filter((a) => a.tipo === null);
+  if (semCategoria.length > 0) {
+    const minutos = linhas.reduce((s, l) => s + l.minutos.semClassificar, 0);
+    pontos.push({
+      natureza: "dados",
+      titulo: `${semCategoria.length} ${plural(semCategoria.length, "aplicativo sem classificação", "aplicativos sem classificação")}`,
+      detalhe: `${formatarHorasTexto(minutos)} fora do índice no período`,
+      acao: { rotulo: "Revisar categorias", tela: "aplicativos" },
+    });
   }
 
-  return chaves.map((chave) => {
-    const balde = juntos.get(chave);
-    const efetivo = balde?.efetivo ?? ([0, 0, 0, 0] as Cat4);
-    const rotulos = rotulosDoBalde(chave, iv.bucket);
+  const pendentes = pessoas.filter((p) => p.pendente);
+  if (pendentes.length > 0) {
+    pontos.push({
+      natureza: "dados",
+      titulo: `${pendentes.length} ${plural(pendentes.length, "pessoa com cadastro pendente", "pessoas com cadastro pendente")}`,
+      detalhe: "Cadastro ainda não revisado por um administrador",
+      acao: { rotulo: "Ver pessoas", tela: "pessoas" },
+    });
+  }
 
+  const fora = foraDaEscala(linhas);
+  if (fora.pessoas > 0) {
+    const nomes =
+      fora.pessoas <= 3
+        ? linhas
+            .filter((l) => l.minutos.ativosFora >= REGRAS.minutosForaEscalaRelevante)
+            .sort((a, b) => b.minutos.ativosFora - a.minutos.ativosFora)
+            .map((l) => `${l.colaborador} · ${formatarHorasTexto(l.minutos.ativosFora)}`)
+            .join(" · ")
+        : null;
+    pontos.push({
+      natureza: "observacao",
+      titulo: `${fora.pessoas} ${plural(fora.pessoas, "pessoa com atividade fora da escala", "pessoas com atividade fora da escala")}`,
+      detalhe: nomes ?? `${formatarHorasTexto(fora.minutos)} somadas · estimativa, não é marcação de ponto`,
+      acao: { rotulo: "Ver jornada", tela: "jornada" },
+    });
+  }
+
+  const maiorMudanca = equipes
+    .filter((e) => e.variacao !== null && Math.abs(e.variacao) >= REGRAS.variacaoRelevantePp)
+    .sort((a, b) => Math.abs(b.variacao!) - Math.abs(a.variacao!))[0];
+  if (maiorMudanca) {
+    const v = maiorMudanca.variacao!;
+    pontos.push({
+      natureza: "observacao",
+      titulo: `${maiorMudanca.equipe}: ${v > 0 ? "+" : "−"}${Math.abs(v).toFixed(0)} p.p. no índice`,
+      detalhe: "Comparado ao período anterior, com cobertura suficiente nos dois",
+      acao: { rotulo: "Explorar equipe", tela: "equipe", equipeId: maiorMudanca.equipeId },
+    });
+  }
+
+  return pontos.slice(0, REGRAS.maxPontosAtencao);
+}
+
+function formatarHorasTexto(minutos: number): string {
+  const total = Math.max(0, Math.round(minutos));
+  const h = Math.floor(total / 60);
+  const m = total % 60;
+  if (h === 0) return `${m}m`;
+  if (m === 0) return `${h}h`;
+  return `${h}h ${pad(m)}m`;
+}
+
+/* -------------------------------------------------------------------------
+   O recorte que as telas leem
+   ------------------------------------------------------------------------- */
+
+export function montarRecorte(periodo: PeriodoDemo, escopo: EscopoDemo, classificacoes: Classificacoes): Recorte {
+  const tipos = tiposEfetivos(classificacoes);
+  const pessoas = pessoasDoEscopo(escopo);
+  const atual = janelaAtual(periodo);
+  const comparativo = janelaComparativo(periodo);
+
+  const linhas = pessoas.map((p) => linhaDaPessoa(p, atual, tipos));
+  const anteriores = comparativo ? pessoas.map((p) => linhaDaPessoa(p, comparativo, tipos)) : null;
+  const resumo = agregar(linhas);
+  const resumoAnterior = anteriores ? agregar(anteriores) : null;
+  const equipes = compararEquipes(linhas, anteriores);
+  const apps = montarApps(atual, pessoas, tipos);
+
+  return {
+    intervalo: intervalo(periodo),
+    rotuloCurto: rotuloIntervaloCurto(periodo),
+    rotuloComparacao: comparativo?.rotulo ?? null,
+    linhas,
+    anteriores,
+    resumo,
+    resumoAnterior,
+    variacao: compararIndice(resumo, resumoAnterior),
+    fora: foraDaEscala(linhas),
+    equipes,
+    evolucao: montarEvolucao(periodo, pessoas, tipos),
+    atividade: montarAtividade(periodo, pessoas, tipos),
+    apps,
+    pontos: montarPontos(apps, pessoas, linhas, equipes),
+  };
+}
+
+/* -------------------------------------------------------------------------
+   Leituras de um dia (linha do tempo, sessões, jornada) e do ritmo
+   ------------------------------------------------------------------------- */
+
+export type EstadoLinha = "PRODUTIVO" | "NEUTRO" | "IMPRODUTIVO" | "SEM" | "OCIOSO" | "BLOQUEADO";
+
+export type SegmentoLinha = { de: number; ate: number; estado: EstadoLinha; alvo: string | null };
+
+function estadoDoTrecho(t: Trecho, tipos: (TipoCategoria | null)[]): EstadoLinha {
+  if (t.estado === "OCIOSO") return "OCIOSO";
+  if (t.estado === "BLOQUEADO") return "BLOQUEADO";
+  const tipo = tipos[t.app];
+  return tipo === "PRODUCTIVE" ? "PRODUTIVO" : tipo === "NEUTRAL" ? "NEUTRO" : tipo === "UNPRODUCTIVE" ? "IMPRODUTIVO" : "SEM";
+}
+
+/** O dia de uma pessoa, já com a categoria efetiva de cada trecho. */
+export function linhaDoTempo(pessoaId: string, dia: number, classificacoes: Classificacoes): SegmentoLinha[] {
+  const pessoa = PESSOAS_POR_ID[pessoaId];
+  if (!pessoa) return [];
+  const tipos = tiposEfetivos(classificacoes);
+  return trechosDoDia(pessoa, dia).map((t) => ({
+    de: t.de,
+    ate: t.ate,
+    estado: estadoDoTrecho(t, tipos),
+    alvo: t.app >= 0 ? APPS[t.app].alvo : null,
+  }));
+}
+
+/** Uma linha por dia do período para o histórico da pessoa. */
+export function historicoDaPessoa(pessoaId: string, periodo: PeriodoDemo, classificacoes: Classificacoes) {
+  const pessoa = PESSOAS_POR_ID[pessoaId];
+  if (!pessoa) return [];
+  const tipos = tiposEfetivos(classificacoes);
+  const atual = janelaAtual(periodo);
+  const linhas: { dia: number; trabalha: boolean; linha: LinhaProdutividade }[] = [];
+  for (let dia = Math.max(atual.inicio, DIA_INICIO); dia <= atual.fim; dia += 1) {
+    const linha = linhaDaPessoa(pessoa, { inicio: dia, fim: dia, corte: dia === atual.fim ? atual.corte : null }, tipos);
+    if (linha.minutos.expediente === 0 && linha.diasComRegistro === 0) continue;
+    linhas.push({ dia, trabalha: temExpediente(dia), linha });
+  }
+  return linhas.reverse();
+}
+
+/** Blocos de 15 min com registro de cada pessoa num dia (Comparativo de jornada). */
+export function jornadaDoDia(dia: number, escopo: EscopoDemo) {
+  return pessoasDoEscopo({ ...escopo, colaboradorId: null }).map((pessoa) => {
+    const blocos = new Map<number, number>();
+    let fora = 0;
+    const escala = escalaDe(pessoa);
+    const trabalha = temExpediente(dia) && !(pessoa.desde && dia < paraDia(pessoa.desde));
+    const trechos = trechosDoDia(pessoa, dia);
+    for (const t of trechos) {
+      for (let b = Math.floor(t.de / 15) * 15; b < t.ate; b += 15) {
+        const sobra = Math.min(t.ate, b + 15) - Math.max(t.de, b);
+        if (sobra > 0) blocos.set(b, (blocos.get(b) ?? 0) + sobra);
+      }
+      if (t.estado === "ATIVO") {
+        fora += trabalha
+          ? Math.max(0, Math.min(t.ate, escala.inicio) - t.de) + Math.max(0, t.ate - Math.max(t.de, escala.fim))
+          : t.ate - t.de;
+      }
+    }
     return {
-      chave: String(chave),
-      rotulo: rotulos.curto,
-      rotuloCompleto: rotulos.completo,
-      ativo: balde?.ativo ?? 0,
-      ocioso: balde?.ocioso ?? 0,
-      produtivo: efetivo[0],
-      neutro: efetivo[1],
-      improdutivo: efetivo[2],
-      indice: balde ? indiceDe(efetivo) : null,
+      colaboradorId: pessoa.id,
+      colaborador: pessoa.nome,
+      trabalha,
+      escala,
+      blocos: [...blocos.entries()].sort((a, b) => a[0] - b[0]),
+      primeiro: trechos[0]?.de ?? null,
+      ultimo: trechos[trechos.length - 1]?.ate ?? null,
+      fora,
     };
   });
 }
 
-function rotulosDoBalde(chave: number, bucket: BucketSerie): { curto: string; completo: string } {
-  if (bucket === "hour") {
-    const dia = Math.floor(chave / 24);
-    const hora = chave % 24;
-    const p = partes(dia);
-    return {
-      curto: `${pad(hora)}h`,
-      completo: `${pad(p.dia)}/${pad(p.mes)}, ${pad(hora)}h às ${pad((hora + 1) % 24)}h`,
-    };
-  }
+/** Ritmo do período: tempo ativo e produtivo por hora e por dia da semana. */
+export function ritmoDoPeriodo(periodo: PeriodoDemo, escopo: EscopoDemo, classificacoes: Classificacoes) {
+  const tipos = tiposEfetivos(classificacoes);
+  const atual = janelaAtual(periodo);
+  const horas = Array.from({ length: 24 }, () => ({ ativo: 0, produtivo: 0 }));
+  const mapa = Array.from({ length: 7 }, () => new Array<number>(24).fill(0));
 
-  if (bucket === "month") {
-    const ano = Math.floor(chave / 12);
-    const mes = chave % 12;
-    return {
-      curto: `${pad(mes + 1)}/${String(ano).slice(2)}`,
-      completo: `${MESES_CURTOS[mes]} de ${ano}`,
-    };
-  }
-
-  const p = partes(chave);
-  const curto = `${pad(p.dia)}/${pad(p.mes)}`;
-
-  if (bucket === "week") {
-    return { curto, completo: `semana de ${curto}/${p.ano}` };
-  }
-
-  return { curto, completo: `${DIAS_SEMANA[p.semana]}, ${curto}/${p.ano}` };
-}
-
-function montarDistribuicao(
-  porPessoa: Map<string, AcumuladoPessoa>,
-  pessoas: PerfilPessoa[],
-  classificacoes: Classificacoes,
-): FatiaDistribuicao[] {
-  const minutos = new Map<string, number>();
-  const quantos = new Map<string, number>();
-
-  for (const pessoa of pessoas) {
-    const acumulado = porPessoa.get(pessoa.id);
-    if (!acumulado) continue;
-
-    BASES.forEach((base, linha) => {
-      const total = acumulado.base[linha];
-      if (total <= 0) return;
-
-      for (const [alvo, peso] of PESOS_PESSOA[pessoa.id][base]) {
-        const parte = total * peso;
-        if (parte < 1) continue;
-        minutos.set(alvo, (minutos.get(alvo) ?? 0) + parte);
-        quantos.set(alvo, (quantos.get(alvo) ?? 0) + 1);
+  for (const pessoa of pessoasDoEscopo(escopo)) {
+    for (let dia = Math.max(atual.inicio, DIA_INICIO); dia <= atual.fim; dia += 1) {
+      const semana = (partes(dia).semana + 6) % 7;
+      for (const t of trechosDoDia(pessoa, dia)) {
+        if (t.estado !== "ATIVO") continue;
+        for (let hora = Math.floor(t.de / 60); hora * 60 < t.ate; hora += 1) {
+          const sobra = Math.min(t.ate, hora * 60 + 60) - Math.max(t.de, hora * 60);
+          if (sobra <= 0) continue;
+          horas[hora].ativo += sobra;
+          if (tipos[t.app] === "PRODUCTIVE") horas[hora].produtivo += sobra;
+          mapa[semana][hora] += sobra;
+        }
       }
-    });
-  }
-
-  return [...minutos.entries()]
-    .sort((a, b) => b[1] - a[1])
-    .map(([nome, total], indice) => {
-      const tipo = tipoDoApp(nome, classificacoes);
-      return {
-        nome,
-        tipo,
-        minutos: Math.round(total),
-        pessoas: quantos.get(nome) ?? 0,
-        cor: tipo ? CORES_TIPO[tipo] : PALETA_SERIES[indice % PALETA_SERIES.length],
-      };
-    });
-}
-
-function montarEquipes(porPessoa: Map<string, AcumuladoPessoa>): LinhaEquipe[] {
-  return EQUIPES.map((equipe) => {
-    const linha: LinhaEquipe = {
-      equipeId: equipe.id,
-      equipe: equipe.nome,
-      cor: equipe.cor,
-      pessoas: 0,
-      minutosAtivos: 0,
-      minutosOciosos: 0,
-      minutosProdutivos: 0,
-      minutosNeutros: 0,
-      minutosImprodutivos: 0,
-      indice: null,
-      aderencia: null,
-    };
-
-    let jornada = 0;
-    const efetivo: Cat4 = [0, 0, 0, 0];
-
-    for (const pessoa of PESSOAS) {
-      if (pessoa.equipeId !== equipe.id) continue;
-      const acumulado = porPessoa.get(pessoa.id);
-      if (!acumulado || acumulado.ativo === 0) continue;
-
-      linha.pessoas += 1;
-      linha.minutosAtivos += acumulado.ativo;
-      linha.minutosOciosos += acumulado.ocioso;
-      jornada += acumulado.dias.size * EMPRESA.jornadaMinutos;
-      for (let i = 0; i < 4; i += 1) efetivo[i] += acumulado.efetivo[i];
     }
-
-    linha.minutosProdutivos = efetivo[0];
-    linha.minutosNeutros = efetivo[1];
-    linha.minutosImprodutivos = efetivo[2];
-    linha.indice = indiceDe(efetivo);
-    linha.aderencia = jornada > 0 ? (linha.minutosAtivos / jornada) * 100 : null;
-
-    return linha;
-  }).filter((linha) => linha.pessoas > 0);
-}
-
-function montarPessoas(
-  porPessoa: Map<string, AcumuladoPessoa>,
-  pessoas: PerfilPessoa[],
-): LinhaPessoa[] {
-  const linhas: LinhaPessoa[] = [];
-
-  for (const pessoa of pessoas) {
-    const acumulado = porPessoa.get(pessoa.id);
-    if (!acumulado || acumulado.ativo === 0) continue;
-
-    const jornada = acumulado.dias.size * EMPRESA.jornadaMinutos;
-
-    linhas.push({
-      colaboradorId: pessoa.id,
-      colaborador: pessoa.nome,
-      cargo: pessoa.cargo,
-      equipeId: pessoa.equipeId,
-      equipe: EQUIPES_POR_ID[pessoa.equipeId].nome,
-      diasComRegistro: acumulado.dias.size,
-      minutosAtivos: acumulado.ativo,
-      minutosOciosos: acumulado.ocioso,
-      minutosProdutivos: acumulado.efetivo[0],
-      minutosNeutros: acumulado.efetivo[1],
-      minutosImprodutivos: acumulado.efetivo[2],
-      teclas: acumulado.teclas,
-      cliques: acumulado.cliques,
-      indice: indiceDe(acumulado.efetivo),
-      aderencia: jornada > 0 ? (acumulado.ativo / jornada) * 100 : null,
-    });
   }
-
-  return linhas;
+  return { horas, mapa };
 }
 
-function montarHorasExtras(
-  porPessoa: Map<string, AcumuladoPessoa>,
-  pessoas: PerfilPessoa[],
-): LinhaHorasExtras[] {
-  const linhas: LinhaHorasExtras[] = [];
-
-  for (const pessoa of pessoas) {
-    const acumulado = porPessoa.get(pessoa.id);
-    if (!acumulado || acumulado.ativo === 0) continue;
-
-    linhas.push({
-      colaboradorId: pessoa.id,
-      colaborador: pessoa.nome,
-      cargo: pessoa.cargo,
-      equipeId: pessoa.equipeId,
-      equipe: EQUIPES_POR_ID[pessoa.equipeId].nome,
-      temJanelaDefinida: true,
-      minutosExtras: acumulado.extra,
-      diasComHoraExtra: acumulado.diasComExtra,
-      minutosAtivosTotais: acumulado.ativo,
-      percentualExtra: acumulado.ativo > 0 ? (acumulado.extra / acumulado.ativo) * 100 : null,
-      janela: EMPRESA.janela,
-    });
-  }
-
-  return linhas;
-}
-
-function variacaoPercentual(atual: number, anterior: number): number | null {
-  if (anterior <= 0) return null;
-  return Number((((atual - anterior) / anterior) * 100).toFixed(1));
-}
-
-export function montarRecorte(varredura: Varredura, escopo: EscopoDemo): Recorte {
-  const pessoas = pessoasDoEscopo(escopo);
-  const distribuicao = montarDistribuicao(varredura.atual, pessoas, varredura.classificacoes);
-
-  const kpis = somarKpis(varredura.atual, pessoas, distribuicao[0]?.nome ?? null);
-  const anterior = somarKpis(varredura.anterior, pessoas, null);
-
-  // Pessoas e horas extras ignoram o recorte de pessoa: as duas telas são
-  // listas, e o filtro que vale nelas é o de equipe.
-  const pessoasDaEquipe = pessoasDoEscopo({ ...escopo, colaboradorId: null, dispositivoId: null });
-
-  return {
-    intervalo: varredura.intervalo,
-    kpis,
-    anterior,
-    variacao: {
-      minutosAtivos: variacaoPercentual(kpis.minutosAtivos, anterior.minutosAtivos),
-      indice:
-        kpis.indice === null || anterior.indice === null
-          ? null
-          : Number((kpis.indice - anterior.indice).toFixed(1)),
-    },
-    escala: montarEscala(varredura.atual, pessoas),
-    serie: montarSerie(varredura.intervalo, varredura.atual, pessoas),
-    distribuicao,
-    equipes: montarEquipes(varredura.atual),
-    pessoas: montarPessoas(varredura.atual, pessoasDaEquipe),
-    horasExtras: montarHorasExtras(varredura.atual, pessoasDaEquipe),
-  };
-}
-
-/** Dia a dia de uma pessoa — a tabela da tela de detalhe. */
-export function diasDaPessoa(varredura: Varredura, pessoaId: string): LinhaDia[] {
-  const pessoa = PESSOAS_POR_ID[pessoaId];
-  if (!pessoa) return [];
-
-  const matriz = matrizes(varredura.classificacoes)[pessoaId];
-  const iv = varredura.intervalo;
-  const linhas: LinhaDia[] = [];
-
-  const hora = (minutos: number) => `${pad(Math.floor(minutos / 60))}:${pad(minutos % 60)}`;
-
-  for (let dia = Math.max(iv.inicio, DIA_INICIO); dia <= Math.min(iv.fim, DIA_HOJE); dia += 1) {
-    const dp = simularDia(pessoa, dia);
-    if (!dp) continue;
-
-    const p = partes(dia);
-    linhas.push({
-      dia: paraIso(dia),
-      data: `${pad(p.dia)}/${pad(p.mes)}/${p.ano}`,
-      minutosAtivos: dp.ativo,
-      minutosOciosos: dp.ocioso,
-      indice: indiceDe(efetivar(dp.base, matriz)),
-      primeiroSinal: hora(dp.entrada),
-      ultimoSinal: hora(dp.saida),
-    });
-  }
-
-  return linhas;
-}
+/* -------------------------------------------------------------------------
+   Resumo do recorte padrão, para as peças soltas da página
+   ------------------------------------------------------------------------- */
 
 /**
- * Resumo do recorte padrão (agosto, empresa inteira), calculado uma vez.
+ * O recorte padrão (mês corrente, empresa inteira), calculado uma vez.
  *
- * Serve às peças da página que mostram um número solto do painel — o cartão
- * de "quanto a equipe trabalha", por exemplo. Antes esse número era digitado
- * à mão na seção, e bastava mexer no motor para a página passar a contradizer
- * a própria demonstração logo abaixo dela.
+ * Serve às peças da página que mostram um número solto do painel. Antes esse
+ * número era digitado à mão na seção, e bastava mexer no motor para a página
+ * passar a contradizer a própria demonstração logo abaixo dela.
  */
 export const RESUMO_PADRAO = (() => {
-  const recorte = montarRecorte(varrer(PERIODO_INICIAL, {}), ESCOPO_VAZIO);
-  const { kpis } = recorte;
-
-  const divisor = kpis.colaboradores * kpis.diasComRegistro;
-  const ativo =
-    kpis.minutosProdutivos +
-    kpis.minutosNeutros +
-    kpis.minutosImprodutivos +
-    kpis.minutosSemClassificar;
-
-  const fatia = (minutos: number) => (ativo > 0 ? (minutos / ativo) * 100 : 0);
-
+  const recorte = montarRecorte(PERIODO_INICIAL, ESCOPO_VAZIO, {});
+  const m = recorte.resumo.minutos;
+  const total = m.expediente || 1;
+  const maisFora = [...recorte.linhas].sort((a, b) => b.minutos.ativosFora - a.minutos.ativosFora)[0];
   return {
-    mediaPessoaDia: divisor > 0 ? kpis.minutosAtivos / divisor : 0,
-    indice: kpis.indice,
-    composicao: [
-      { cor: CORES_TIPO.PRODUCTIVE, parte: fatia(kpis.minutosProdutivos) },
-      { cor: CORES_TIPO.NEUTRAL, parte: fatia(kpis.minutosNeutros) },
-      { cor: CORES_TIPO.UNPRODUCTIVE, parte: fatia(kpis.minutosImprodutivos) },
-      { cor: CORES_TIPO.SEM, parte: fatia(kpis.minutosSemClassificar) },
-    ],
+    indice: recorte.resumo.indiceMedio,
+    expediente: m.expediente,
+    semClassificacao: recorte.apps.filter((a) => a.tipo === null).length,
+    maisFora: { nome: maisFora.colaborador, minutos: maisFora.minutos.ativosFora },
+    composicao: (["produtivos", "neutros", "improdutivos", "semClassificar", "ociosos", "bloqueado", "semDados"] as const).map(
+      (k) => ({ chave: k, cor: CORES_EXPEDIENTE[k], parte: (m[k] / total) * 100 }),
+    ),
   };
 })();

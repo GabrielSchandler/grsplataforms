@@ -73,14 +73,16 @@ const dadosEstruturados = {
       url: `${siteConfig.siteUrl}/focus`,
       inLanguage: "pt-BR",
       description:
-        "Telemetria de produtividade para estações Windows: tempo ativo, uso de aplicativos e sites, horas extras e aderência à jornada, por pessoa, equipe e período.",
+        "Telemetria de produtividade para estações Windows: tempo produtivo sobre o expediente previsto, uso de aplicativos e sites e atividade fora da escala, por pessoa, equipe e período.",
       publisher: { "@id": `${siteConfig.siteUrl}/#organizacao` },
       // Cada item existe no produto. Nada aqui é promessa de próxima versão.
       featureList: [
         "Registro de um minuto por estação, com o aplicativo em primeiro plano e o estado de atividade",
-        "Índice de produtividade por pessoa, equipe e período",
+        "Índice de tempo produtivo sobre o expediente previsto na escala, por pessoa, equipe e período",
+        "Cobertura de dados: quanto do expediente teve registro",
         "Classificação de aplicativos e sites definida pela própria empresa",
-        "Horas extras calculadas a partir da janela de expediente",
+        "Escala de expediente por empresa, equipe e pessoa, com a atividade fora da escala à parte",
+        "Linha do tempo do dia de cada pessoa, minuto a minuto",
         "Linha do tempo das estações: ligou, bloqueou a tela, hibernou e desligou",
         "Aviso quando uma estação para de enviar",
         "Exportação em XLSX e CSV com o mesmo recorte do painel",

@@ -17,23 +17,14 @@ import { ProvedorFocus, useFocus, type LayoutFocus, type TelaId } from "./estado
  * clica na barra lateral, troca o período, filtra por equipe, abre uma pessoa
  * e classifica um aplicativo.
  *
- * A tela ativa fica na URL (`?tela=horas-extras`) para o comercial conseguir
+ * A tela ativa fica na URL (`?tela=jornada`) para o comercial conseguir
  * mandar ao lead o endereço de uma tela específica, em vez de "abre a página e
  * clica na quinta linha do menu". Mesmo padrão da réplica do CRM.
  */
 
 const PARAM = "tela";
 
-const TELAS: TelaId[] = [
-  "visao",
-  "equipes",
-  "pessoas",
-  "aplicativos",
-  "dispositivos",
-  "horas-extras",
-  "registros",
-  "relatorios",
-];
+const TELAS: TelaId[] = ["visao", "equipes", "pessoas", "aplicativos", "jornada", "relatorios", "dispositivos"];
 
 /** Pedido vindo de outra seção da página. O contador força o efeito a repetir. */
 export type PedidoTela = { tela: TelaId; contador: number };

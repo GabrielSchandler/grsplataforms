@@ -387,14 +387,26 @@
    Sora, fundos alternados e botão vermelho.
    ========================================================================== */
 
+/* Tema claro corporativo do painel (set/2026, redesenho de 16/09/2026). A
+   barra lateral azul-marinho é o único bloco escuro; o resto é cartão branco
+   sobre cinza-azulado. Valores copiados de newsecfocus/dashboard/tailwind.config.ts. */
 @theme {
-  --color-foco-fundo: #090d16;
-  --color-foco-suave: #0d121e;
-  --color-foco-cartao: #0f1524;
-  --color-foco-borda: #1e293b;
-  /* `rounded-xl2` do painel (1,25rem). O teto de 8px vale para a moldura da
+  --color-foco-fundo: #f3f5f8;
+  --color-foco-cartao: #ffffff;
+  --color-foco-borda: #e2e7ee;
+  --color-foco-tinta: #12213a;
+  --color-foco-marinho: #13233a;
+  --color-foco-marinho-ativo: #1d3a57;
+  --color-foco-marinho-borda: #243752;
+  --color-foco-marinho-texto: #c3cedb;
+  /* Cor de DADO (tempo produtivo, barras) e cor de AÇÃO (botão, link,
+     selecionado) são diferentes no painel, e a réplica mantém a separação. */
+  --color-foco-marca: #1f9fb2;
+  --color-foco-acao: #1b5e8f;
+  --color-foco-acao-suave: #e9f1f8;
+  /* `rounded-xl2` do painel (0,625rem). O teto de 8px vale para a moldura da
      NewSec, não para a réplica de um produto que usa outro raio. */
-  --radius-foco: 1.25rem;
+  --radius-foco: 0.625rem;
 }
 
 /* Inter e JetBrains Mono, como no painel. As variáveis vêm de
@@ -403,7 +415,8 @@
   font-family: var(--fonte-foco, ui-sans-serif), ui-sans-serif, system-ui, sans-serif;
   font-feature-settings: "cv11", "ss01";
   letter-spacing: normal;
-  color: #e2e8f0;
+  color: #1e293b;
+  color-scheme: light;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -411,52 +424,40 @@
   font-family: var(--fonte-foco-mono, ui-monospace), ui-monospace, monospace;
 }
 
-/* `shadow-glow` do painel: um fio ciano e um halo baixo. */
-.foco-glow {
-  box-shadow:
-    0 0 0 1px rgba(34, 211, 238, 0.08),
-    0 8px 40px -12px rgba(34, 211, 238, 0.25);
+.foco-num {
+  font-variant-numeric: tabular-nums;
 }
 
-/* `vidro` do painel, sem o desfoque de fundo: dentro de uma réplica reduzida,
-   dezenas de backdrop-filter custam caro e quase não aparecem sobre o fundo
-   liso do painel. */
-.foco-vidro {
-  background: linear-gradient(180deg, rgba(15, 21, 36, 0.78), rgba(9, 13, 22, 0.7));
-  border: 1px solid rgba(30, 41, 59, 0.8);
+/* `.vidro` do painel: cartão branco, sombra quase imperceptível. */
+.foco-cartao {
+  background: #ffffff;
+  border: 1px solid #e2e7ee;
+  border-radius: 0.625rem;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
 }
 
-/* Brilho de fundo do painel (`fundo-aurora`), preso à réplica e não à janela. */
-.foco-aurora {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;
+/* "Sem dados" listrado, para não ser lido como mais uma categoria de uso. */
+.foco-sem-dados {
+  background-color: #f1f4f8;
+  background-image: repeating-linear-gradient(
+    135deg,
+    #d5dce5 0,
+    #d5dce5 1.5px,
+    transparent 1.5px,
+    transparent 6px
+  );
 }
 
-.foco-aurora::before,
-.foco-aurora::after {
-  content: "";
-  position: absolute;
-  border-radius: 9999px;
-  filter: blur(120px);
-  opacity: 0.35;
-}
-
-.foco-aurora::before {
-  width: 520px;
-  height: 520px;
-  top: -140px;
-  left: -80px;
-  background: radial-gradient(circle, #22d3ee, transparent 70%);
-}
-
-.foco-aurora::after {
-  width: 620px;
-  height: 620px;
-  bottom: -220px;
-  right: -120px;
-  background: radial-gradient(circle, #a78bfa, transparent 70%);
+/* Registro fora da escala na jornada: a cor do dado, mais clara e listrada. */
+.foco-fora {
+  background-color: rgba(31, 159, 178, 0.4);
+  background-image: repeating-linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.6) 0,
+    rgba(255, 255, 255, 0.6) 2px,
+    transparent 2px,
+    transparent 5px
+  );
 }
 
 @keyframes foco-pulso {
@@ -483,7 +484,7 @@
 /* Rolagem interna da réplica: a janela do painel rola, a página não. */
 .foco-rolagem {
   scrollbar-width: thin;
-  scrollbar-color: #1e293b transparent;
+  scrollbar-color: #cbd5e1 transparent;
   overscroll-behavior: contain;
 }
 

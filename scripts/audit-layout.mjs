@@ -668,7 +668,7 @@ async function main() {
 
         const contadorFocus = paginaFocus
           .locator("#painel span")
-          .filter({ hasText: /^\d+\/10$/ })
+          .filter({ hasText: /^\d+\/\d+$/ })
           .first();
         const antesFocus = Number((await contadorFocus.textContent())?.split("/")[0]);
 

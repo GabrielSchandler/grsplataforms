@@ -1,26 +1,25 @@
 /**
  * O que não depende do período escolhido: quem está fazendo o quê agora, as
- * estações, o diário de bordo e a atividade minuto a minuto.
+ * estações e o último envio de cada uma, o diário de bordo e os registros
+ * minuto a minuto.
  *
- * Tudo sai dos perfis de `dados.ts` e do "agora" fixo (sexta, 28/08/2026,
+ * Tudo sai dos perfis de `dados.ts` e do "agora" fixo (sexta, 25/09/2026,
  * 16h40). Nada aqui lê o relógio: a réplica precisa desenhar igual no build
  * e no navegador.
  */
 
-import { AGORA_MINUTOS, EVENTOS, HOJE, PESSOAS, type EstadoAgora, type EventoEstacao } from "./dados";
-import { EQUIPES_POR_ID, ruido } from "./motor";
+import { AGORA_MINUTOS, APPS, EMPRESA, EVENTOS, PESSOAS, type EstadoAgora, type EventoEstacao } from "./dados";
+import { EQUIPES_POR_ID, escalaDe, ruido, tipoDoApp } from "./motor";
+import type { TipoCategoria } from "./formato";
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
-/** "há 12 min" → 12. Serve para ordenar sem inventar carimbo de tempo. */
-export function minutosDoRotulo(rotulo: string): number {
-  if (rotulo === "agora") return 0;
-  const partes = /^há (\d+) (min|h|d)$/.exec(rotulo);
-  if (!partes) return 0;
-  const valor = Number(partes[1]);
-  if (partes[2] === "min") return valor;
-  if (partes[2] === "h") return valor * 60;
-  return valor * 1440;
+/** "16:39" → minutos atrás; "ontem 17:52" → idem, atravessando a meia-noite. */
+function minutosDesde(rotulo: string): number {
+  const ontem = rotulo.startsWith("ontem ");
+  const [h, m] = rotulo.replace("ontem ", "").split(":").map(Number);
+  const minuto = h * 60 + m;
+  return ontem ? 24 * 60 - minuto + AGORA_MINUTOS : AGORA_MINUTOS - minuto;
 }
 
 /* ----------------------------------------------------------- atividade agora */
@@ -50,44 +49,53 @@ export const TEMPO_REAL: LinhaTempoReal[] = PESSOAS.map((pessoa) => ({
   momento: pessoa.agora.momento,
   status: pessoa.agora.estado,
 })).sort(
-  (a, b) =>
-    ORDEM_STATUS[a.status] - ORDEM_STATUS[b.status] ||
-    minutosDoRotulo(a.momento) - minutosDoRotulo(b.momento) ||
-    a.colaborador.localeCompare(b.colaborador, "pt-BR"),
+  (a, b) => ORDEM_STATUS[a.status] - ORDEM_STATUS[b.status] || a.colaborador.localeCompare(b.colaborador, "pt-BR"),
 );
-
-export const COM_SINAL = TEMPO_REAL.filter((linha) => linha.status !== "offline").length;
 
 /* ---------------------------------------------------------------- estações */
 
-export type DispositivoDemo = {
+export type EstacaoDemo = {
   id: string;
   maquina: string;
-  usuario: string;
-  online: boolean;
-  /** Estação parada é diferente de offline: não dá sinal há mais de um dia. */
-  parada: boolean;
+  usuarioWindows: string;
+  colaboradorId: string;
+  colaborador: string;
+  equipe: string;
   versao: string;
-  sincronizou: string;
-  minutosAtras: number;
+  ultimoEnvio: string;
+  minutosSemEnvio: number;
+  situacao: "RECENTE" | "ATRASADA";
+  /** Só conta como problema se a escala da pessoa prevê expediente agora. */
+  emExpedienteAgora: boolean;
 };
 
-export const DISPOSITIVOS: DispositivoDemo[] = PESSOAS.map((pessoa) => {
-  const minutosAtras = minutosDoRotulo(pessoa.estacao.sincronizou);
+export const ESTACOES: EstacaoDemo[] = PESSOAS.map((pessoa) => {
+  const minutosSemEnvio = minutosDesde(pessoa.estacao.ultimoEnvio);
+  const escala = escalaDe(pessoa);
+  const emExpedienteAgora =
+    AGORA_MINUTOS >= escala.inicio &&
+    AGORA_MINUTOS < escala.fim &&
+    !(AGORA_MINUTOS >= escala.intervaloInicio && AGORA_MINUTOS < escala.intervaloFim);
   return {
     id: pessoa.maquina,
     maquina: pessoa.maquina,
-    usuario: pessoa.usuario,
-    online: pessoa.agora.estado !== "offline",
-    parada: minutosAtras >= 24 * 60,
+    usuarioWindows: pessoa.usuario,
+    colaboradorId: pessoa.id,
+    colaborador: pessoa.nome,
+    equipe: EQUIPES_POR_ID[pessoa.equipeId].nome,
     versao: pessoa.estacao.versao,
-    sincronizou: pessoa.estacao.sincronizou,
-    minutosAtras,
-  };
-}).sort((a, b) => a.minutosAtras - b.minutosAtras);
+    ultimoEnvio: pessoa.estacao.ultimoEnvio,
+    minutosSemEnvio,
+    situacao: minutosSemEnvio >= EMPRESA.limiarAtrasoMinutos ? "ATRASADA" : "RECENTE",
+    emExpedienteAgora,
+  } satisfies EstacaoDemo;
+}).sort((a, b) => b.minutosSemEnvio - a.minutosSemEnvio);
 
-export const ESTACOES_ONLINE = DISPOSITIVOS.filter((d) => d.online).length;
-export const ESTACAO_PARADA = DISPOSITIVOS.find((d) => d.parada) ?? null;
+/** As que pedem atenção: sem envio recente enquanto a escala prevê expediente. */
+export const ATRASADAS = ESTACOES.filter((e) => e.situacao !== "RECENTE" && e.emExpedienteAgora);
+
+/** Último envio de qualquer estação, para a nota do cabeçalho. */
+export const ULTIMO_ENVIO = "16:39";
 
 /* ------------------------------------------------------------ diário de bordo */
 
@@ -107,60 +115,49 @@ export const GRUPOS_EVENTOS: GrupoEventos[] = (() => {
 
 export type RegistroDemo = {
   chave: string;
-  data: string;
   hora: string;
   colaborador: string;
-  equipe: string;
   maquina: string;
-  processo: string;
-  dominio: string | null;
+  alvo: string;
   titulo: string;
   estado: "ATIVO" | "OCIOSO" | "BLOQUEADO";
+  tipo: TipoCategoria | null;
   teclas: number;
   cliques: number;
-  segundosAtivos: number;
 };
 
 /**
- * Cem linhas, que é o tamanho de página do painel. Cada linha é um minuto de
- * uma estação: o detalhe por trás dos gráficos.
+ * Os últimos minutos recebidos: cada linha é um minuto de uma estação, o
+ * detalhe por trás dos gráficos. Só a contagem de teclas e cliques — o agente
+ * nunca guarda quais teclas.
  */
 export const REGISTROS: RegistroDemo[] = (() => {
-  const [, mes, dia] = HOJE.split("-");
-  const data = `${dia}/${mes}`;
   const comSinal = PESSOAS.filter((pessoa) => pessoa.agora.estado !== "offline");
   const linhas: RegistroDemo[] = [];
 
-  for (let recuo = 1; linhas.length < 100 && recuo < 60; recuo += 1) {
+  for (let recuo = 1; linhas.length < 40 && recuo < 30; recuo += 1) {
     const minuto = AGORA_MINUTOS - recuo;
-
     for (const pessoa of comSinal) {
-      if (linhas.length >= 100) break;
-
+      if (linhas.length >= 40) break;
       const r = (medida: string) => ruido(`${pessoa.id}|registro|${minuto}|${medida}`);
-      const paradoAgora =
-        pessoa.agora.estado === "ocioso" && recuo <= minutosDoRotulo(pessoa.agora.momento);
-      const bloqueado = !paradoAgora && r("bloqueio") < 0.035;
-      const estado = bloqueado ? "BLOQUEADO" : paradoAgora ? "OCIOSO" : "ATIVO";
+      const parado = pessoa.agora.estado === "ocioso" && recuo <= Number(/\d+/.exec(pessoa.agora.momento)?.[0] ?? 0);
+      const bloqueado = !parado && r("bloqueio") < 0.03;
+      const estado = bloqueado ? "BLOQUEADO" : parado ? "OCIOSO" : "ATIVO";
       const ativo = estado === "ATIVO";
-
+      const alvo = pessoa.agora.dominio ?? pessoa.agora.processo;
       linhas.push({
         chave: `${pessoa.id}-${minuto}`,
-        data,
         hora: `${pad(Math.floor(minuto / 60))}:${pad(minuto % 60)}`,
         colaborador: pessoa.nome,
-        equipe: EQUIPES_POR_ID[pessoa.equipeId].nome,
         maquina: pessoa.maquina,
-        processo: pessoa.agora.processo,
-        dominio: pessoa.agora.dominio,
+        alvo,
         titulo: pessoa.agora.titulo,
         estado,
+        tipo: APPS.some((a) => a.alvo === alvo) ? tipoDoApp(alvo, {}) : null,
         teclas: ativo ? Math.round(pessoa.teclas * (0.4 + r("teclas") * 1.5)) : 0,
         cliques: ativo ? Math.round(pessoa.cliques * (0.4 + r("cliques") * 1.6)) : 0,
-        segundosAtivos: ativo ? 24 + Math.round(r("segundos") * 36) : 0,
       });
     }
   }
-
   return linhas;
 })();

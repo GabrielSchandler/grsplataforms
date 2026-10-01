@@ -133,7 +133,7 @@ export const focusDemo = {
   eyebrow: "Ambiente demonstrativo",
   title: "O painel que substitui o achismo por dado.",
   intro:
-    "Isto não é um print. É o sistema, com dados fictícios de uma empresa de 18 pessoas em quatro equipes. Clique, filtre, mude o período — é exatamente isto que a sua operação vai mostrar em poucos dias.",
+    "Isto não é um print. É o sistema, com dados fictícios de uma empresa de 19 pessoas em quatro equipes. Clique, filtre, mude o período, classifique um aplicativo — é exatamente isto que a sua operação vai mostrar em poucos dias.",
 };
 
 export const focusRespostas = {
@@ -144,15 +144,15 @@ export const focusRespostas = {
   cartoes: [
     {
       tela: "visao",
-      pergunta: "Quanto a equipe trabalha, de verdade?",
+      pergunta: "Quanto do expediente vira trabalho?",
       resposta:
-        "Troque a sensação pelo número. Veja a média real de horas ativas por pessoa e por dia — comparável entre equipes de tamanhos diferentes, sem que ninguém precise adivinhar.",
+        "Troque a sensação pelo número. O tempo em ferramentas produtivas dividido pelo expediente previsto na escala — e, ao lado, para onde foi o resto: tempo parado, tela bloqueada, máquina sem dado.",
     },
     {
       tela: "equipes",
       pergunta: "Qual equipe rende mais — e em quê?",
       resposta:
-        "Descubra qual time realmente entrega e qual só parece ocupado. Tempo produtivo, neutro e improdutivo, lado a lado, equipe por equipe.",
+        "Equipe por equipe, com o índice médio por pessoa — um time de três se compara com um de dez — e a composição do expediente de cada uma, lado a lado.",
     },
     {
       tela: "aplicativos",
@@ -161,10 +161,10 @@ export const focusRespostas = {
         "Pare de pagar licença para ferramenta que ninguém abre. Veja o que cada equipe realmente usa — e o que virou custo esquecido.",
     },
     {
-      tela: "horas-extras",
-      pergunta: "Quem está passando da jornada?",
+      tela: "jornada",
+      pergunta: "Quem está estendendo o dia?",
       resposta:
-        "Identifique sobrecarga antes que ela vire pedido de demissão — ou o motivo silencioso por trás de uma queda de entrega.",
+        "A escala de cada pessoa ao lado da atividade registrada, dentro e fora dela. Veja sobrecarga antes que vire pedido de demissão — sem transformar o painel em relógio de ponto.",
     },
     {
       tela: "dispositivos",
@@ -175,7 +175,8 @@ export const focusRespostas = {
     {
       tela: "relatorios",
       pergunta: "Preciso levar isso para a diretoria.",
-      resposta: "Números prontos para a reunião de amanhã, não montados às pressas na noite anterior.",
+      resposta:
+        "Quatro relatórios em XLSX ou CSV, com os mesmos filtros e critérios do painel — prontos para a reunião de amanhã, não montados às pressas na noite anterior.",
     },
   ],
 } as const;
@@ -273,7 +274,7 @@ export const focusOferta = {
     "Painel ativo para a sua empresa, com o seu nome",
     "Nosso time acompanha a instalação nas primeiras estações — você não configura nada sozinho",
     "Classificação de produtividade já aplicada, para o índice valer desde o primeiro dia",
-    "Ajuste da jornada esperada, que é o que liga o alerta de hora extra",
+    "Escala de expediente configurada por equipe, que é a régua do índice e do que fica fora da escala",
   ],
   contratacao: {
     titulo: "Contratação",
@@ -313,6 +314,16 @@ export const focusFaq = {
       question: "Minha equipe vai desconfiar disso?",
       answer:
         "É a reação mais comum quando o monitoramento é malfeito. O Focus foi desenhado para reduzir esse risco: a estação avisa que está sendo acompanhada, nenhum conteúdo é lido, e o que chega ao painel é padrão de uso — não uma gravação de cada segundo da pessoa. Como a mudança é comunicada para a equipe continua sendo o fator que mais pesa na aceitação, e essa decisão é sua, não do sistema.",
+    },
+    {
+      question: "Por que o índice de produtividade parece baixo?",
+      answer:
+        "Porque a régua é o expediente inteiro previsto na escala, não só o tempo em que a máquina estava em uso. Tela bloqueada, tempo parado e máquina desligada dentro do expediente contam contra, e o tempo em ferramentas que a empresa classificou como neutras não conta a favor. O número mostra quanto do expediente pago virou trabalho em ferramenta produtiva — não é nota de desempenho.",
+    },
+    {
+      question: "Isso vira controle de ponto?",
+      answer:
+        "Não. O painel mostra a atividade fora da escala para dar contexto ao uso da estação, mas avisa na própria tela que isso não é marcação de ponto nem banco de horas. Primeiro e último registro não confirmam chegada nem saída, e ausência de registro não é falta.",
     },
     {
       question: "O Focus substitui uma conversa de avaliação de desempenho?",
@@ -373,7 +384,7 @@ export const focusFinal = {
 export const focusMeta = {
   title: "NewSec Focus — monitoramento de produtividade da equipe",
   description:
-    "Veja o tempo ativo, o uso de aplicativos e as horas extras da sua equipe por pessoa, equipe e período. Agente para Windows, sem captura de tela e sem registrar o que é digitado. Teste com o seu time.",
+    "Veja quanto do expediente vira trabalho, o uso de aplicativos e a atividade fora da escala, por pessoa, equipe e período. Agente para Windows, sem captura de tela e sem registrar o que é digitado. Teste com o seu time.",
   keywords: [
     "software de monitoramento de funcionários",
     "monitoramento de produtividade",

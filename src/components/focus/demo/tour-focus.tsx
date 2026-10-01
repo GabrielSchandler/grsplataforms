@@ -2,24 +2,24 @@
 
 import { TourGuiado, type EtapaTour } from "@/components/demo/guided-tour";
 import { useAntesDaPintura } from "@/lib/use-antes-da-pintura";
-import {
-  ALTURA_CELULAR,
-  ALTURA_DESKTOP,
-  CascaFocus,
-  LARGURA_CELULAR,
-  LARGURA_DESKTOP,
-} from "./casca";
+import { ALTURA_CELULAR, ALTURA_DESKTOP, CascaFocus, LARGURA_CELULAR, LARGURA_DESKTOP } from "./casca";
 import { ProvedorFocus, useFocus, type LayoutFocus, type TelaId } from "./estado";
 
 /**
  * Roteiro do tour do Focus: o que o gestor passa a enxergar, na ordem em que
- * faz sentido descobrir. Dez etapas, cada uma destacando um ponto da tela.
+ * faz sentido descobrir. Cada etapa destaca um ponto da tela.
+ *
+ * Segue o painel redesenhado em 16/09/2026: a régua do índice é o
+ * EXPEDIENTE, e o tour começa explicando isso — é a diferença que o
+ * comprador precisa entender antes de ver qualquer número, senão ele lê
+ * "36%" como nota baixa em vez de como o quanto do expediente pago virou
+ * trabalho.
  *
  * Quem chega frio não sabe o que procurar num painel cheio de números — por
  * isso o tour vem antes da exploração livre, como na página do CRM.
  */
 
-type EtapaFocus = EtapaTour & { tela: TelaId };
+type EtapaFocus = EtapaTour & { tela: TelaId; pessoaId?: string };
 
 const ETAPAS: EtapaFocus[] = [
   {
@@ -27,81 +27,91 @@ const ETAPAS: EtapaFocus[] = [
     grupo: "Visão geral",
     destaque: "indice",
     chave: "visao",
-    titulo: "O índice de produtividade",
+    titulo: "Quanto do expediente virou trabalho",
     texto:
-      "Tempo produtivo sobre o tempo classificado. Quem decide o que é produtivo em cada aplicativo e site é a sua empresa — o sistema só conta.",
+      "Tempo em ferramentas produtivas dividido pelo expediente previsto na escala. Tela bloqueada, máquina desligada e tempo parado dentro do expediente contam contra — é o número que mostra onde o dia vaza.",
   },
   {
     tela: "visao",
     grupo: "Visão geral",
-    destaque: "media",
+    destaque: "cobertura",
     chave: "visao",
-    titulo: "Quanto a equipe trabalha, em média",
+    titulo: "Quanto do expediente tem dado",
     texto:
-      "Média de tempo ativo por pessoa e por dia. É o número que compara equipes de tamanhos diferentes e meses de durações diferentes — o total do período não julga nada.",
+      "Cobertura não é presença: é quanto do expediente chegou ao painel. Sem ela, uma queda de índice causada por máquina desligada pareceria queda de desempenho.",
   },
   {
     tela: "visao",
     grupo: "Visão geral",
-    destaque: "composicao",
+    destaque: "aviso-dados",
     chave: "visao",
-    titulo: "Onde o tempo foi parar",
+    titulo: "Estação parada, avisada no topo",
     texto:
-      "Produtivo, neutro, improdutivo e o que ainda não tem categoria. O tempo ocioso e o de tela bloqueada aparecem à parte: é o que explica jornada longa com pouca entrega.",
+      "Quando uma estação para de enviar durante o expediente, o painel diz qual é e há quanto tempo — antes que vire uma semana de dados perdidos.",
   },
   {
     tela: "visao",
     grupo: "Visão geral",
-    destaque: "distribuicao",
+    destaque: "uso",
     chave: "visao",
-    titulo: "Cada ferramenta, com a categoria ao lado",
+    titulo: "Para onde foi o expediente",
     texto:
-      "O que ainda não tem categoria pode ser classificado ali mesmo, e o índice passa a considerar na hora. Experimente na exploração livre.",
+      "Produtivo, neutro, improdutivo, sem classificação, ocioso, bloqueado e sem dados, em horas somadas. É o que explica jornada longa com pouca entrega.",
   },
   {
     tela: "visao",
     grupo: "Visão geral",
-    destaque: "comparativo",
+    destaque: "pontos",
     chave: "visao",
-    titulo: "As equipes lado a lado",
+    titulo: "O que olhar primeiro",
     texto:
-      "Tempo ativo por categoria, equipe por equipe. É onde a conversa sobre desempenho deixa de ser impressão e passa a ser leitura.",
+      "Problema de dado vem antes de leitura de atividade, e cada ponto leva direto para onde se resolve: classificar um aplicativo, revisar um cadastro, abrir a jornada.",
   },
   {
     tela: "visao",
     grupo: "Visão geral",
-    destaque: "agora",
+    destaque: "evolucao",
     chave: "visao",
-    titulo: "Quem está fazendo o quê, agora",
+    titulo: "Está melhorando?",
     texto:
-      "Aplicativo em primeiro plano e título da janela já higienizado — e-mails e números longos são removidos ainda na estação, antes de qualquer envio.",
+      "O período atual ao lado do anterior, ponto a ponto. A comparação para no mesmo horário: às 16h40, o mês é comparado com o mês anterior até o mesmo ponto.",
   },
   {
-    tela: "pessoas",
+    tela: "equipes",
+    grupo: "Equipes",
+    destaque: "tabela-equipes",
+    chave: "equipes",
+    titulo: "Equipes comparáveis de verdade",
+    texto:
+      "O índice da equipe é a média de cada pessoa, então um time de três se compara com um de dez. Variação só aparece quando há dado suficiente nos dois períodos.",
+  },
+  {
+    tela: "pessoa",
+    pessoaId: "p04",
     grupo: "Pessoas",
-    destaque: "tabela-pessoas",
-    chave: "pessoas",
-    titulo: "O ranking que mostra o ponto fora da curva",
+    destaque: "linha-do-tempo",
+    chave: "pessoa",
+    titulo: "O dia de uma pessoa, minuto a minuto",
     texto:
-      "Ordenável por tempo ativo, média por dia, aderência e índice. Um clique abre o dia a dia da pessoa, com o expediente de cada data.",
+      "Cada trecho com a cor do que aconteceu, o expediente previsto em tracejado e o intervalo marcado. Dá para ver quem estende o dia sem ninguém perceber.",
   },
   {
-    tela: "horas-extras",
-    grupo: "Horas extras",
-    destaque: "tabela-extras",
-    chave: "horas-extras",
-    titulo: "Hora extra antes de virar problema",
+    tela: "aplicativos",
+    grupo: "Aplicativos",
+    destaque: "lista-apps",
+    chave: "aplicativos",
+    titulo: "Quem decide o que é produtivo é você",
     texto:
-      "Atividade fora da janela de expediente, por pessoa, com faixa de risco. Serve para equilibrar carga — e costuma ser a primeira coisa que o RH pede.",
+      "Cada aplicativo e site, com a categoria que a empresa definiu. O que ainda não tem categoria fica fora do índice até alguém classificar — experimente na exploração livre.",
   },
   {
-    tela: "dispositivos",
-    grupo: "Estações",
-    destaque: "diario",
-    chave: "dispositivos",
-    titulo: "O diário de bordo das estações",
+    tela: "jornada",
+    grupo: "Jornada",
+    destaque: "comparativo-jornada",
+    chave: "jornada",
+    titulo: "Jornada, sem virar ponto",
     texto:
-      "Quando cada máquina ligou, bloqueou a tela, hibernou e desligou. E, no topo do painel, o aviso de quem parou de enviar — o risco silencioso deste tipo de sistema.",
+      "A escala de cada pessoa e os blocos com registro, dentro e fora dela. Serve para equilibrar carga — e a tela avisa que não é marcação de ponto.",
   },
   {
     tela: "relatorios",
@@ -110,28 +120,31 @@ const ETAPAS: EtapaFocus[] = [
     chave: "relatorios",
     titulo: "Para levar à diretoria",
     texto:
-      "Quatro relatórios em XLSX ou CSV, com o mesmo recorte de período e de equipe que está na tela. No Excel em português, abrem sem pedir importação.",
+      "Quatro relatórios em XLSX ou CSV, com o mesmo período, os mesmos filtros e os mesmos critérios da tela. Uma prévia mostra as linhas antes de gerar o arquivo.",
   },
 ];
 
-const GRUPOS = ["Visão geral", "Pessoas", "Horas extras", "Estações", "Relatórios"] as const;
+const GRUPOS = ["Visão geral", "Equipes", "Pessoas", "Aplicativos", "Jornada", "Relatórios"] as const;
 
 /** Cores do próprio Focus: o realce muda de cor junto com o assunto. */
 const CORES: Record<string, string> = {
-  "Visão geral": "#22d3ee",
-  Pessoas: "#a78bfa",
-  "Horas extras": "#fbbf24",
-  "Estações": "#38bdf8",
-  "Relatórios": "#34d399",
+  "Visão geral": "#1f9fb2",
+  Equipes: "#1b5e8f",
+  Pessoas: "#3d5f8f",
+  Aplicativos: "#e0676b",
+  Jornada: "#f2c14e",
+  Relatórios: "#16808f",
 };
 
 /** Mantém a tela da réplica sincronizada com a etapa do tour. */
-function TelaDoPasso({ tela }: { tela: TelaId }) {
-  const { tela: atual, abrirTela } = useFocus();
+function TelaDoPasso({ etapa }: { etapa: EtapaFocus }) {
+  const { tela: atual, pessoaId, abrirTela } = useFocus();
 
   useAntesDaPintura(() => {
-    if (atual !== tela) abrirTela(tela);
-  }, [tela]);
+    if (atual !== etapa.tela || (etapa.pessoaId && pessoaId !== etapa.pessoaId)) {
+      abrirTela(etapa.tela, etapa.pessoaId ? { pessoaId: etapa.pessoaId } : undefined);
+    }
+  }, [etapa.tela, etapa.pessoaId]);
 
   return <CascaFocus />;
 }
@@ -147,10 +160,10 @@ export function TourFocus({ layout }: { layout: LayoutFocus }) {
         cores={CORES}
         largura={celular ? LARGURA_CELULAR : LARGURA_DESKTOP}
         classeTela="overflow-hidden rounded-[12px] border border-foco-borda"
-        escurecimento="rgba(2, 6, 16, 0.82)"
+        escurecimento="rgba(9, 17, 31, 0.72)"
         renderTela={(indice) => (
           <div style={{ height: celular ? ALTURA_CELULAR : ALTURA_DESKTOP }}>
-            <TelaDoPasso tela={ETAPAS[indice].tela} />
+            <TelaDoPasso etapa={ETAPAS[indice]} />
           </div>
         )}
       />
