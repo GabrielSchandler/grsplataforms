@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
+import { chatFinal, chatMensagens } from "@/content/chat";
 import { finalCta } from "@/content/site";
 import { focusFinal, focusMensagens } from "@/content/focus";
 import { siteConfig, whatsappLink, type ProdutoId } from "@/lib/site-config";
@@ -17,7 +18,8 @@ const fields = [
 
 /**
  * Cada produto pergunta o tamanho da operação com a unidade que importa nele:
- * o CRM cobra por usuário, o Focus por estação monitorada.
+ * o CRM cobra por usuário, o Focus por estação monitorada, e no Chat o que
+ * dimensiona a conversa é quantas pessoas atendem.
  */
 const porProduto = {
   crm: {
@@ -37,6 +39,15 @@ const porProduto = {
     sufixo: "computadores",
     consentimento: focusFinal.consent,
     enviar: focusFinal.submit,
+  },
+  chat: {
+    cabecalho: chatMensagens.formulario,
+    rotuloTamanho: "Quantas pessoas atendem pelo WhatsApp",
+    campoTamanho: "Atendentes",
+    opcoes: ["1 a 3", "4 a 10", "11 a 25", "26 a 50", "Mais de 50"],
+    sufixo: "atendentes",
+    consentimento: chatFinal.consent,
+    enviar: chatFinal.submit,
   },
 } as const;
 

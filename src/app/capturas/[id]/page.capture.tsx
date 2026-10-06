@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
+import { ConversaHero } from "@/components/chat/secoes";
 import { PainelComercial } from "@/components/demo/screens-comercial";
-import { demoScreens } from "@/components/demo/registry";
+import { screenMap } from "@/components/demo/screen-map";
 import { PreviaPainel } from "@/components/focus/topo";
 import { LogoMark } from "@/components/site/logo";
 import { hero } from "@/content/site";
@@ -19,9 +20,12 @@ export const dynamicParams = false;
 
 export function generateStaticParams() {
   return [
-    ...demoScreens.map((screen) => ({ id: screen.id })),
+    // Todas as telas da réplica, e não só as abas da home: qualquer uma pode
+    // virar imagem de página ou peça de divulgação.
+    ...Object.keys(screenMap).map((id) => ({ id })),
     { id: "og" },
     { id: "og-focus" },
+    { id: "og-chat" },
   ];
 }
 
@@ -109,6 +113,43 @@ function OpenGraphFocusCard() {
   );
 }
 
+/** A do Chat: a conversa atendida pela IA e assumida pela equipe. */
+function OpenGraphChatCard() {
+  return (
+    <div
+      id="alvo"
+      className="relative flex h-[630px] w-[1200px] flex-col justify-between overflow-hidden bg-ink-950 p-16"
+    >
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+        <div className="absolute right-12 top-12 w-[420px]">
+          <ConversaHero />
+        </div>
+        <div className="absolute inset-0 bg-gradient-to-r from-ink-950 via-ink-950/55 to-transparent" />
+      </div>
+
+      <div className="relative flex items-center gap-3 text-white">
+        <LogoMark className="h-12 w-auto" />
+        <span className="text-3xl font-extrabold uppercase tracking-[0.02em]">NewSec</span>
+        <span className="rounded bg-violet-500/15 px-3 py-1 text-xl font-semibold text-violet-300">
+          Chat
+        </span>
+      </div>
+
+      <div className="relative max-w-[620px]">
+        <h1 className="font-display text-[54px] leading-[1.05] font-semibold text-white">
+          WhatsApp com IA, equipe e campanhas.
+        </h1>
+        <p className="mt-6 text-2xl text-fog-400">A IA responde na hora e para quando alguém assume.</p>
+      </div>
+
+      <div className="relative flex items-center gap-3">
+        <span aria-hidden="true" className="h-px w-10 bg-brand-500" />
+        <span className="text-lg text-fog-500">newsec.com.br/chat</span>
+      </div>
+    </div>
+  );
+}
+
 export default async function CapturePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
@@ -120,7 +161,11 @@ export default async function CapturePage({ params }: { params: Promise<{ id: st
     return <OpenGraphFocusCard />;
   }
 
-  const screen = demoScreens.find((item) => item.id === id);
+  if (id === "og-chat") {
+    return <OpenGraphChatCard />;
+  }
+
+  const screen = screenMap[id];
 
   if (!screen) {
     notFound();

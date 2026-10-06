@@ -191,6 +191,7 @@ async function main() {
     for (const [rota, arquivo] of [
       ["og", "og.png"],
       ["og-focus", "og-focus.png"],
+      ["og-chat", "og-chat.png"],
     ]) {
       await page.goto(`${BASE}/capturas/${rota}/`, { waitUntil: "load", timeout: 30000 });
       await page.waitForSelector("#alvo", { timeout: 15000 });

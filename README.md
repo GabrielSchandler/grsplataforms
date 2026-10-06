@@ -6,6 +6,7 @@ Site de venda dos produtos NewSec. Não exibe preço em nenhuma página.
 | --- | --- | --- |
 | **NewSec CRM** | `/` e as cinco páginas de área | Agendar demonstração |
 | **NewSec Focus** | `/focus` | Pedir o teste com a própria equipe |
+| **NewSec Chat** | `/chat` | Pedir o teste da central de atendimento |
 
 Até 09/2026 marca e produto eram a mesma palavra: "NewSec" queria dizer o CRM.
 Com o Focus, a marca passou a ser a casa e cada produto ganhou nome próprio —
@@ -177,6 +178,36 @@ As colunas de Documentos, Usuários, Backups e Logs foram lidas das tabelas do
 próprio CRM, não inventadas. A esteira jurídica mostrada é um exemplo montado
 para o site: o processo real de qualquer empresa é configurado dentro do
 sistema, e não foi publicado aqui.
+
+### O visual da réplica do CRM (outubro de 2026)
+
+A réplica segue o shell novo do produto: barra lateral azul-marinho, índigo
+como cor de ação, indicadores com filete colorido, listas com painel lateral e
+tema claro ou escuro — o botão de tema do cabeçalho da réplica funciona.
+
+- As cores são tokens `ns-*`, declarados em `globals.css` no escopo `.crm-app`.
+  Trocar `data-tema` troca a réplica inteira sem tocar em componente.
+- `chrome.tsx` é a casca e é de cliente (guarda o tema e o clique do menu). As
+  primitivas (`Stat`, `Panel`, `Pill`, `Detalhe`…) ficam em `kit.tsx`, que não
+  é: tela renderizada no build não pode passar um ícone como propriedade a um
+  componente de cliente.
+- O Portal do cliente e os dois documentos gerados não usam esses tokens: no
+  produto eles também ficam fora do shell.
+- O menu traz **Atendimento WhatsApp** e **Chat interno** em todas as áreas. A
+  tela de atendimento é clicável (abas Meus, Outros e IA) e também aparece na
+  seção `#atendimento` da home.
+
+## A réplica do NewSec Chat
+
+A página `/chat` traz a central funcionando, em `src/components/chat/demo/`:
+Atendimento, Supervisão, Assistente IA e uma campanha. O gesto central do
+produto funciona de verdade — clicar em **Assumir e pausar IA** tira a conversa
+da aba IA e a põe em Meu atendimento. As cores são as do Chat (`chat-*` em
+`globals.css`) e a fonte é a do sistema, como no produto.
+
+O texto fica em `src/content/chat.ts`, com um cabeçalho listando o que a página
+**não** diz: API oficial do WhatsApp, campanha sem risco de bloqueio, desempenho
+por atendente, volume e nome de fornecedor.
 
 ## A réplica do NewSec Focus
 

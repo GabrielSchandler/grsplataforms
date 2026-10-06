@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { Logo } from "@/components/site/logo";
 import { hero, nav, trial } from "@/content/site";
+import { chatMensagens, chatNav } from "@/content/chat";
 import { focusMensagens, focusNav } from "@/content/focus";
 import {
   CONTACT_ANCHOR,
@@ -17,14 +18,21 @@ import {
 } from "@/lib/site-config";
 
 /**
- * Cabeçalho do site, agora com dois produtos.
+ * Cabeçalho do site, com os três produtos.
  *
- * O seletor "CRM · Focus" fica ao lado do logo, com os dois nomes à vista.
- * Com apenas dois produtos, esconder o Focus dentro de um menu suspenso seria
- * esconder justamente o que se quer mostrar — e dois links não custam
- * JavaScript nenhum. O resto do menu muda conforme o produto da página: nas
- * páginas do CRM, as cinco áreas; no Focus, as seções da própria página.
+ * O seletor "CRM · Focus · Chat" fica ao lado do logo, com os nomes à vista.
+ * Com poucos produtos, escondê-los dentro de um menu suspenso seria esconder
+ * justamente o que se quer mostrar — e três links não custam JavaScript
+ * nenhum. O resto do menu muda conforme o produto da página: nas páginas do
+ * CRM, as cinco áreas; no Focus e no Chat, as seções da própria página.
  */
+
+/** O que muda no cabeçalho de cada produto: menu, chamada e mensagem. */
+const porProduto = {
+  crm: { links: nav.links, cta: nav.cta, mensagem: hero.whatsappMessage },
+  focus: { links: focusNav.links, cta: focusNav.cta, mensagem: focusMensagens.teste },
+  chat: { links: chatNav.links, cta: chatNav.cta, mensagem: chatMensagens.teste },
+} as const;
 
 /** Destaca o item do menu conforme a seção que está na tela. */
 function useSecaoAtiva(ids: string[]) {
@@ -101,15 +109,17 @@ export function Header({ produto = "crm" }: { produto?: ProdutoId }) {
   const pathname = usePathname();
 
   const ehFocus = produto === "focus";
-  const links = ehFocus ? focusNav.links : nav.links;
+  // Focus e Chat são páginas únicas: o menu aponta para seções, não para rotas.
+  const paginaUnica = produto !== "crm";
+  const { links } = porProduto[produto];
 
   // `trailingSlash` deixa o caminho como "/comercial/"; a comparação ignora
   // a barra final para o item certo ficar marcado.
   const atual = pathname?.replace(/\/$/, "") || "/";
 
   const ancoras = useMemo(
-    () => (ehFocus ? links.map((link) => link.href.replace("#", "")) : []),
-    [ehFocus, links],
+    () => (paginaUnica ? links.map((link) => link.href.replace("#", "")) : []),
+    [paginaUnica, links],
   );
   const secaoAtiva = useSecaoAtiva(ancoras);
 
@@ -127,11 +137,11 @@ export function Header({ produto = "crm" }: { produto?: ProdutoId }) {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const ctaHref = ehFocus
-    ? whatsappLink(focusMensagens.teste)
-    : primaryCtaHref(hero.whatsappMessage);
-  const ctaRotulo = ehFocus ? focusNav.cta : nav.cta;
-  const inicio = ehFocus ? "/focus" : "/";
+  const ctaHref = paginaUnica
+    ? whatsappLink(porProduto[produto].mensagem)
+    : primaryCtaHref(porProduto[produto].mensagem);
+  const ctaRotulo = porProduto[produto].cta;
+  const inicio = produtos.find((item) => item.id === produto)?.href ?? "/";
 
   return (
     <header
@@ -141,7 +151,7 @@ export function Header({ produto = "crm" }: { produto?: ProdutoId }) {
           : "border-b border-transparent"
       }`}
     >
-      <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-5 px-5 py-4 sm:px-8">
+      <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-5 py-4 sm:px-8">
         <div className="flex items-center gap-3">
           <Link href={inicio} aria-label={`${siteConfig.brandName} — página inicial`}>
             <Logo />
@@ -149,16 +159,16 @@ export function Header({ produto = "crm" }: { produto?: ProdutoId }) {
           <SeletorProduto atual={produto} className="hidden lg:flex" />
         </div>
 
-        <nav aria-label="Seções do site" className="hidden items-center gap-6 lg:flex">
+        <nav aria-label="Seções do site" className="hidden items-center gap-4 lg:flex xl:gap-5">
           {links.map((link) => {
-            const ativo = ehFocus ? link.href === `#${secaoAtiva}` : link.href === atual;
+            const ativo = paginaUnica ? link.href === `#${secaoAtiva}` : link.href === atual;
 
             return (
               <Link
                 key={link.href}
                 href={link.href}
                 aria-current={ativo ? "page" : undefined}
-                className={`relative text-sm font-medium transition-colors ${
+                className={`relative whitespace-nowrap text-[13px] font-medium transition-colors xl:text-sm ${
                   ativo ? "text-white" : "text-fog-300 hover:text-white"
                 }`}
               >
@@ -193,7 +203,7 @@ export function Header({ produto = "crm" }: { produto?: ProdutoId }) {
               : {})}
             aria-hidden={!pastHero}
             tabIndex={pastHero ? 0 : -1}
-            className={`hidden rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-semibold text-white transition duration-300 hover:bg-brand-600 sm:inline-flex ${
+            className={`hidden whitespace-nowrap rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-semibold text-white transition duration-300 hover:bg-brand-600 sm:inline-flex ${
               pastHero
                 ? "pointer-events-auto translate-y-0 opacity-100"
                 : "pointer-events-none -translate-y-1 opacity-0"
@@ -263,6 +273,14 @@ export function Header({ produto = "crm" }: { produto?: ProdutoId }) {
                   className="block rounded-lg border border-ink-700 px-3 py-2.5 text-center text-sm font-semibold text-white"
                 >
                   Entrar no painel
+                </a>
+              ) : produto === "chat" ? (
+                <a
+                  href={whatsappLink(chatMensagens.especialista)}
+                  onClick={() => setOpen(false)}
+                  className="block rounded-lg border border-ink-700 px-3 py-2.5 text-center text-sm font-semibold text-white"
+                >
+                  Falar com um especialista
                 </a>
               ) : (
                 <a

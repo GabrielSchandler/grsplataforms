@@ -52,6 +52,13 @@ export const produtos = [
     href: "/focus",
     descricao: "Produtividade da equipe nas estações Windows, por pessoa e por equipe.",
   },
+  {
+    id: "chat",
+    nome: "NewSec Chat",
+    curto: "Chat",
+    href: "/chat",
+    descricao: "Atendimento por WhatsApp com IA, equipe e campanhas na mesma central.",
+  },
 ] as const;
 
 export type ProdutoId = (typeof produtos)[number]["id"];

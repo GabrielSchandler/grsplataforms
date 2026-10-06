@@ -379,6 +379,116 @@
 }
 
 /* ==========================================================================
+   NewSec CRM
+   --------------------------------------------------------------------------
+   Tokens da réplica do CRM, copiados do shell do produto (`.ns-shell`): barra
+   lateral azul-marinho, índigo como cor de ação e tema claro ou escuro. Os
+   utilitários `*-ns-*` leem variáveis que só existem dentro de `.crm-app`,
+   então trocar `data-tema` troca a réplica inteira sem tocar em componente.
+   ========================================================================== */
+
+@theme inline {
+  --color-ns-bg: var(--ns-bg);
+  --color-ns-surface: var(--ns-surface);
+  --color-ns-alt: var(--ns-surface-alt);
+  --color-ns-text: var(--ns-text);
+  --color-ns-muted: var(--ns-text-secondary);
+  --color-ns-border: var(--ns-border);
+  --color-ns-primary: var(--ns-primary);
+  --color-ns-danger: var(--ns-danger);
+  --color-ns-warning: var(--ns-warning);
+  --color-ns-success: var(--ns-success);
+  --color-ns-ia: var(--ns-ia);
+}
+
+/* A barra lateral é a mesma nos dois temas. */
+@theme {
+  --color-ns-lateral: #10172f;
+  --color-ns-lateral-borda: #26314a;
+  --color-ns-lateral-texto: #c8d1e3;
+  --color-ns-lateral-fraco: #a9b6d0;
+}
+
+.crm-app {
+  --ns-bg: #f4f6fb;
+  --ns-surface: #ffffff;
+  --ns-surface-alt: #eef1f8;
+  --ns-text: #11182e;
+  --ns-text-secondary: #69738a;
+  --ns-border: #dde2ec;
+  --ns-primary: #5267f5;
+  --ns-danger: #e24f63;
+  --ns-warning: #e7a11f;
+  --ns-success: #12a976;
+  --ns-ia: #7c3aed;
+  color: var(--ns-text);
+  color-scheme: light;
+  letter-spacing: normal;
+}
+
+.crm-app[data-tema="escuro"] {
+  --ns-bg: #0b1020;
+  --ns-surface: #12192b;
+  --ns-surface-alt: #182238;
+  --ns-text: #f3f6ff;
+  --ns-text-secondary: #97a3b8;
+  --ns-border: #26314a;
+  --ns-primary: #7385ff;
+  --ns-danger: #ff7082;
+  --ns-warning: #f4b940;
+  --ns-success: #3dd6a0;
+  --ns-ia: #c4b5fd;
+  color-scheme: dark;
+}
+
+/* ==========================================================================
+   NewSec Chat
+   --------------------------------------------------------------------------
+   Tokens da réplica do Chat, copiados de newsecchat/tailwind.config.ts: barra
+   lateral escura, área de trabalho clara, verde-petróleo como cor de ação e
+   roxo para tudo que é da IA.
+   ========================================================================== */
+
+@theme {
+  --color-chat-tinta-950: #102438;
+  --color-chat-tinta-900: #15283b;
+  --color-chat-tinta-850: #172e3d;
+  --color-chat-tinta-700: #344c63;
+  --color-chat-bruma-600: #58697c;
+  --color-chat-bruma-300: #cbd8e4;
+  --color-chat-bruma-200: #dce5ec;
+  --color-chat-bruma-100: #edf3f7;
+  --color-chat-bruma-50: #f8fafc;
+  --color-chat-tela: #f4f7fa;
+  --color-chat-produto-50: #e6f6fb;
+  --color-chat-produto-500: #00a7cd;
+  --color-chat-produto-700: #0087a5;
+  --color-chat-produto-800: #006f8a;
+  --color-chat-ia-50: #f0eaff;
+  --color-chat-ia-600: #6d4aff;
+  --color-chat-ia-700: #5734d6;
+  --color-chat-sucesso-100: #e3f8ed;
+  --color-chat-sucesso-700: #116947;
+  --color-chat-alerta-100: #fff2dc;
+  --color-chat-alerta-700: #a95009;
+}
+
+/* O Chat usa a fonte do sistema, não Sora. */
+.chat-app {
+  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  letter-spacing: normal;
+  color: #15283b;
+  color-scheme: light;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Mensagem que acabou de chegar na conversa demonstrativa. */
+  .chat-entra {
+    animation: hero-rise 320ms var(--ease-out-quint) both;
+  }
+}
+
+/* ==========================================================================
    NewSec Focus
    --------------------------------------------------------------------------
    Tokens da réplica do painel e efeitos da página /focus. As cores são as do

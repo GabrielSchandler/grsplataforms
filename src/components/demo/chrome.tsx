@@ -1,10 +1,11 @@
 "use client";
 
-import { createContext, useContext } from "react";
+import { createContext, useContext, useSyncExternalStore } from "react";
 import {
   BarChart3,
   Building2,
   Calculator,
+  ChevronDown,
   ClipboardList,
   FileSignature,
   FileText,
@@ -14,6 +15,10 @@ import {
   LayoutDashboard,
   LogOut,
   Mail,
+  MessageCircle,
+  MessagesSquare,
+  Moon,
+  Sun,
   Users,
   WalletCards,
   type LucideIcon,
@@ -21,12 +26,15 @@ import {
 import { demoCompany } from "./data";
 
 /**
- * Reprodução da casca do sistema. As classes seguem o que existe no produto
- * (barra lateral branca de 288px, item ativo em teal-50, ação em teal-700)
- * para que a tela demonstrativa não pareça outra coisa.
+ * Reprodução da casca do sistema, no visual de outubro de 2026: barra lateral
+ * azul-marinho com o item ativo em índigo, cabeçalho com título, descrição e
+ * o botão de tema, e superfícies que acompanham o tema claro ou escuro. As
+ * cores vêm dos tokens `ns-*` (ver globals.css), os mesmos do produto.
  */
 
 const icons: Record<string, LucideIcon> = {
+  chat: MessagesSquare,
+  internalChat: MessageCircle,
   dashboard: LayoutDashboard,
   clients: Users,
   preSales: Handshake,
@@ -38,7 +46,6 @@ const icons: Record<string, LucideIcon> = {
   backups: ClipboardList,
   logs: ClipboardList,
   email: Mail,
-  integrations: Mail,
   leads: ClipboardList,
   legal: FileText,
   finance: WalletCards,
@@ -49,6 +56,12 @@ export type NavItem = { label: string; icon: keyof typeof icons };
 
 export type Workspace = "Comercial" | "Jurídico" | "Financeiro" | "Academy" | "Gestão";
 
+/** Atendimento e chat interno aparecem em qualquer área, no topo do menu. */
+const chats: NavItem[] = [
+  { label: "Atendimento WhatsApp", icon: "chat" },
+  { label: "Chat interno", icon: "internalChat" },
+];
+
 /**
  * Navegação por área, espelhando o filtro por workspace do sistema.
  *
@@ -58,32 +71,57 @@ export type Workspace = "Comercial" | "Jurídico" | "Financeiro" | "Academy" | "
  */
 export const workspaceNav: Record<Workspace, NavItem[]> = {
   Comercial: [
+    ...chats,
     { label: "Painel comercial", icon: "dashboard" },
-    { label: "Distribuição de leads", icon: "leads" },
     { label: "Clientes", icon: "clients" },
     { label: "Pré-vendas", icon: "preSales" },
     { label: "Simulações", icon: "calculations" },
     { label: "Documentos", icon: "documents" },
+    { label: "Academy", icon: "academy" },
+    { label: "Distribuição de leads", icon: "leads" },
   ],
   "Jurídico": [
-    { label: "Esteira", icon: "legal" },
+    ...chats,
     { label: "Clientes", icon: "clients" },
     { label: "Pré-vendas", icon: "preSales" },
     { label: "Documentos", icon: "documents" },
+    { label: "Academy", icon: "academy" },
+    { label: "Esteira", icon: "legal" },
   ],
   Financeiro: [
-    { label: "Lançamentos", icon: "finance" },
+    ...chats,
+    { label: "Financeiro", icon: "finance" },
     { label: "Consultas", icon: "finance" },
   ],
-  Academy: [{ label: "Academy", icon: "academy" }],
+  Academy: [...chats, { label: "Academy", icon: "academy" }],
   "Gestão": [
-    { label: "Painel comercial", icon: "dashboard" },
+    ...chats,
+    { label: "Gestão", icon: "dashboard" },
     { label: "Usuários", icon: "users" },
     { label: "Empresa", icon: "company" },
     { label: "Backups", icon: "backups" },
     { label: "Logs", icon: "logs" },
   ],
 };
+
+/**
+ * Abas da Gestão, como no produto: grupos em cima, páginas do grupo embaixo.
+ * `nav` é o item da barra lateral que abre aquela página na réplica. O grupo
+ * Operação (aprovações, contratos e templates) fica de fora pelo mesmo motivo
+ * do menu: não tem tela construída aqui.
+ */
+const gestaoGrupos = [
+  { label: "Visão geral", paginas: [{ label: "Visão geral", nav: "Gestão" }] },
+  { label: "Equipe", paginas: [{ label: "Equipe", nav: "Usuários" }] },
+  { label: "Configurações", paginas: [{ label: "Empresa", nav: "Empresa" }] },
+  {
+    label: "Segurança",
+    paginas: [
+      { label: "Auditoria", nav: "Logs" },
+      { label: "Backups", nav: "Backups" },
+    ],
+  },
+];
 
 /**
  * Quando a réplica está dentro de um demo navegável, o contexto assume a área
@@ -98,14 +136,37 @@ type DemoNav = {
 
 export const DemoNavContext = createContext<DemoNav>({});
 
-export function DemoBadge() {
-  return (
-    <span className="inline-flex items-center gap-1.5 rounded border border-slate-300 bg-white/80 px-2 py-1 text-[11px] font-medium tracking-wide text-slate-500">
-      <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-slate-400" />
-      Ambiente demonstrativo
-    </span>
+/* ---------- tema claro / escuro ----------
+   O produto guarda a escolha no navegador. Aqui ela vive só na memória da
+   página e começa sempre no claro, igual ao HTML que saiu do build. */
+
+type Tema = "claro" | "escuro";
+
+let temaAtual: Tema = "claro";
+const ouvintesTema = new Set<() => void>();
+
+function assinarTema(aviso: () => void) {
+  ouvintesTema.add(aviso);
+  return () => {
+    ouvintesTema.delete(aviso);
+  };
+}
+
+function alternarTema() {
+  temaAtual = temaAtual === "claro" ? "escuro" : "claro";
+  for (const aviso of ouvintesTema) aviso();
+}
+
+export function useTemaCrm(): Tema {
+  return useSyncExternalStore(
+    assinarTema,
+    () => temaAtual,
+    () => "claro",
   );
 }
+
+const foco =
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ns-primary focus-visible:ring-offset-0";
 
 type ScreenProps = {
   workspace: Workspace;
@@ -113,12 +174,23 @@ type ScreenProps = {
   title: string;
   subtitle?: string;
   actions?: React.ReactNode;
+  /** Atendimento e chat ocupam a área inteira, sem cabeçalho nem margem. */
+  semMoldura?: boolean;
   children: React.ReactNode;
 };
 
 /** Casca completa: barra lateral + cabeçalho + área de conteúdo. */
-export function Screen({ workspace, active, title, subtitle, actions, children }: ScreenProps) {
+export function Screen({
+  workspace,
+  active,
+  title,
+  subtitle,
+  actions,
+  semMoldura = false,
+  children,
+}: ScreenProps) {
   const nav = useContext(DemoNavContext);
+  const tema = useTemaCrm();
   const areaAtual = nav.workspace ?? workspace;
   const itemAtivo = nav.active ?? active;
   const items = workspaceNav[areaAtual];
@@ -126,48 +198,55 @@ export function Screen({ workspace, active, title, subtitle, actions, children }
   return (
     // data-demo marca a réplica do produto: ela reproduz o estilo do sistema
     // real, então a auditoria de contraste do site não se aplica aqui.
-    <div data-demo="true" className="flex min-h-[620px] w-full bg-[#f7f8fa] text-slate-950">
-      <aside className="flex w-64 shrink-0 flex-col border-r border-slate-200 bg-white px-3 py-4">
-        <div className="flex items-center gap-3 px-2">
-          <div className="flex h-12 w-12 items-center justify-center rounded-md bg-slate-100 text-sm font-bold uppercase tracking-wide text-slate-700">
-            {demoCompany.initials}
+    <div
+      data-demo="true"
+      data-tema={tema}
+      className="crm-app flex min-h-[620px] w-full bg-ns-bg text-ns-text"
+    >
+      <aside className="flex w-[226px] shrink-0 flex-col border-r border-ns-lateral-borda bg-ns-lateral px-3 py-5 text-ns-lateral-texto">
+        <div className="border-b border-ns-lateral-borda px-2 pb-4">
+          <div className="flex items-center gap-2">
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-white text-[10px] font-bold uppercase tracking-wide text-slate-800">
+              {demoCompany.initials}
+            </span>
+            <span className="text-[23px] font-semibold leading-none text-white">newsec</span>
           </div>
-          <div className="min-w-0">
-            <p className="text-[11px] font-semibold uppercase tracking-wide text-teal-700">
-              {areaAtual}
-            </p>
-            <p className="mt-0.5 truncate text-base font-semibold text-slate-950">
-              {demoCompany.tradeName}
-            </p>
-          </div>
+          <p className="mt-2.5 text-[9px] font-semibold uppercase tracking-[0.08em] text-ns-lateral-fraco">
+            CRM • {areaAtual}
+          </p>
         </div>
 
-        <div className="mt-6 px-2">
-          <span className="inline-flex w-full items-center gap-2.5 rounded-lg bg-teal-700 px-3 py-2.5 text-sm font-semibold text-white">
-            <House aria-hidden="true" className="h-4 w-4" />
-            Tela inicial
+        <div className="mt-4 flex items-center justify-between rounded-lg bg-white/5 px-3 py-2.5 text-white">
+          <span>
+            <span className="block text-[9px] text-ns-lateral-fraco">Workspace</span>
+            <span className="mt-0.5 block text-[13px] font-semibold">{areaAtual}</span>
           </span>
+          <ChevronDown aria-hidden="true" className="h-3.5 w-3.5" />
         </div>
 
-        <nav className="mt-4 flex flex-1 flex-col gap-1">
+        <span className="mt-3 inline-flex items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] font-semibold text-white">
+          <House aria-hidden="true" className="h-4 w-4 shrink-0" />
+          Tela inicial
+        </span>
+
+        <nav className="mt-2 flex flex-1 flex-col gap-0.5">
           {items.map((item) => {
             const Icon = icons[item.icon];
             const isActive = item.label === itemAtivo;
-            const classe = `inline-flex items-center gap-2.5 rounded-lg px-3 py-2 text-left text-[13px] font-medium transition-colors ${
-              isActive ? "bg-teal-50 text-teal-900" : "text-slate-700"
+            const classe = `inline-flex items-center gap-2.5 rounded-lg px-3 py-2 text-left text-[12.5px] font-medium transition-colors ${
+              isActive ? "bg-[#5267f5] text-white" : "text-ns-lateral-texto"
             }`;
-            const icone = (
-              <Icon
-                aria-hidden="true"
-                className={`h-4 w-4 shrink-0 ${isActive ? "text-teal-800" : "text-teal-700"}`}
-              />
+            const conteudo = (
+              <>
+                <Icon aria-hidden="true" className="h-4 w-4 shrink-0" />
+                <span className="min-w-0 truncate">{item.label}</span>
+              </>
             );
 
             if (!nav.onSelect) {
               return (
                 <span key={item.label} className={classe}>
-                  {icone}
-                  {item.label}
+                  {conteudo}
                 </span>
               );
             }
@@ -178,150 +257,119 @@ export function Screen({ workspace, active, title, subtitle, actions, children }
                 type="button"
                 onClick={() => nav.onSelect?.(item.label)}
                 aria-current={isActive ? "page" : undefined}
-                className={`${classe} cursor-pointer hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-600`}
+                className={`${classe} cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7385ff] ${
+                  isActive ? "" : "hover:bg-white/5 hover:text-white"
+                }`}
               >
-                {icone}
-                {item.label}
+                {conteudo}
               </button>
             );
           })}
         </nav>
 
-        <p className="px-3 pb-2 text-[11px] text-slate-400">Versão 1.0.0</p>
-        <span className="inline-flex items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] font-medium text-slate-600">
+        <p className="px-3 pb-2 text-[11px] text-[#8f9bb3]">
+          {demoCompany.tradeName} · Versão 0.1.0
+        </p>
+        <span className="inline-flex items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] font-medium">
           <LogOut aria-hidden="true" className="h-4 w-4" />
           Sair
         </span>
       </aside>
 
       <main className="flex min-w-0 flex-1 flex-col">
-        <header className="flex items-center justify-between gap-4 border-b border-slate-200 bg-white px-6 py-4">
-          <div className="min-w-0">
-            <h3 className="truncate text-lg font-semibold text-slate-950">{title}</h3>
-            {subtitle ? <p className="mt-0.5 text-[13px] text-slate-500">{subtitle}</p> : null}
-          </div>
-          <div className="flex shrink-0 items-center gap-3">
-            {actions}
-            <DemoBadge />
-          </div>
-        </header>
+        {semMoldura ? (
+          children
+        ) : (
+          <>
+            <header className="flex items-center justify-between gap-4 border-b border-ns-border bg-ns-surface px-6 py-3">
+              <div className="min-w-0">
+                <h3 className="truncate text-[19px] font-semibold text-ns-text">{title}</h3>
+                {subtitle ? (
+                  <p className="mt-0.5 truncate text-[12px] text-ns-muted">{subtitle}</p>
+                ) : null}
+              </div>
+              <div className="flex shrink-0 items-center gap-2.5">
+                {actions}
+                <BotaoTema />
+              </div>
+            </header>
 
-        <div className="flex-1 p-6">{children}</div>
+            {areaAtual === "Gestão" ? <AbasGestao ativo={itemAtivo} /> : null}
+
+            <div className="flex-1 p-5">{children}</div>
+          </>
+        )}
       </main>
     </div>
   );
 }
 
-/* ---------- primitivas reutilizadas pelas telas ---------- */
+/** O botão de tema do cabeçalho: lua no claro, sol no escuro, como no produto. */
+export function BotaoTema() {
+  const tema = useTemaCrm();
+  const Icone = tema === "claro" ? Moon : Sun;
 
-export function Panel({
-  title,
-  hint,
-  children,
-  className = "",
-  ...rest
-}: {
-  title?: string;
-  hint?: string;
-  children: React.ReactNode;
-  className?: string;
-} & React.HTMLAttributes<HTMLElement>) {
   return (
-    <section {...rest} className={`rounded-lg border border-slate-200 bg-white ${className}`}>
-      {title ? (
-        <div className="flex items-baseline justify-between gap-3 border-b border-slate-100 px-4 py-3">
-          <h4 className="text-[13px] font-semibold text-slate-950">{title}</h4>
-          {hint ? <span className="text-[11px] text-slate-500">{hint}</span> : null}
+    <button
+      type="button"
+      onClick={alternarTema}
+      aria-label={tema === "claro" ? "Usar tema escuro" : "Usar tema claro"}
+      title={tema === "claro" ? "Tema escuro" : "Tema claro"}
+      className={`inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border border-ns-border bg-ns-alt text-ns-muted transition-colors hover:text-ns-text ${foco}`}
+    >
+      <Icone aria-hidden="true" className="h-4 w-4" />
+    </button>
+  );
+}
+
+function AbasGestao({ ativo }: { ativo: string }) {
+  const nav = useContext(DemoNavContext);
+  const grupoAtual =
+    gestaoGrupos.find((grupo) => grupo.paginas.some((pagina) => pagina.nav === ativo)) ??
+    gestaoGrupos[0];
+
+  function aba(rotulo: string, destino: string, ativa: boolean, classe: string) {
+    const cor = ativa
+      ? "border-ns-primary text-ns-primary"
+      : "border-transparent text-ns-muted";
+
+    if (!nav.onSelect) {
+      return (
+        <span key={rotulo} className={`shrink-0 border-b-2 ${classe} ${cor}`}>
+          {rotulo}
+        </span>
+      );
+    }
+
+    return (
+      <button
+        key={rotulo}
+        type="button"
+        onClick={() => nav.onSelect?.(destino)}
+        aria-current={ativa ? "page" : undefined}
+        className={`shrink-0 cursor-pointer border-b-2 ${classe} ${cor} ${foco} ${
+          ativa ? "" : "hover:text-ns-text"
+        }`}
+      >
+        {rotulo}
+      </button>
+    );
+  }
+
+  return (
+    <div className="bg-ns-bg px-5">
+      <div className="flex gap-1 border-b border-ns-border">
+        {gestaoGrupos.map((grupo) =>
+          aba(grupo.label, grupo.paginas[0].nav, grupo === grupoAtual, "px-3.5 py-3 text-[13px] font-medium"),
+        )}
+      </div>
+      {grupoAtual.paginas.length > 1 ? (
+        <div className="flex gap-1 border-b border-ns-border">
+          {grupoAtual.paginas.map((pagina) =>
+            aba(pagina.label, pagina.nav, pagina.nav === ativo, "px-3.5 py-2.5 text-[11px] font-semibold"),
+          )}
         </div>
       ) : null}
-      <div className="p-4">{children}</div>
-    </section>
-  );
-}
-
-const toneText = {
-  positive: "text-teal-700",
-  negative: "text-brand-500",
-  neutral: "text-slate-950",
-} as const;
-
-export function Stat({
-  label,
-  value,
-  hint,
-  tone = "neutral",
-}: {
-  label: string;
-  value: string;
-  hint?: string;
-  tone?: keyof typeof toneText;
-}) {
-  return (
-    <div className="rounded-lg border border-slate-200 bg-white px-4 py-3">
-      <p className="text-[11px] font-medium uppercase tracking-wide text-slate-500">{label}</p>
-      <p className={`mt-1.5 text-xl font-semibold ${toneText[tone]}`}>{value}</p>
-      {hint ? <p className="mt-0.5 text-[11px] text-slate-500">{hint}</p> : null}
     </div>
-  );
-}
-
-export function Bar({ value, tone = "teal" }: { value: number; tone?: "teal" | "slate" }) {
-  return (
-    <div className="h-1.5 w-full overflow-hidden rounded bg-slate-100">
-      <div
-        className={`h-full rounded ${tone === "teal" ? "bg-teal-700" : "bg-slate-400"}`}
-        style={{ width: `${Math.min(100, Math.max(0, value))}%` }}
-      />
-    </div>
-  );
-}
-
-export function Avatar({ initials }: { initials: string }) {
-  return (
-    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-slate-100 text-[10px] font-semibold text-slate-600">
-      {initials}
-    </span>
-  );
-}
-
-const pillTone = {
-  teal: "border-teal-200 bg-teal-50 text-teal-800",
-  slate: "border-slate-200 bg-slate-50 text-slate-600",
-  amber: "border-amber-200 bg-amber-50 text-amber-800",
-} as const;
-
-export function Pill({
-  children,
-  tone = "slate",
-}: {
-  children: React.ReactNode;
-  tone?: keyof typeof pillTone;
-}) {
-  return (
-    <span
-      className={`inline-flex items-center rounded border px-1.5 py-0.5 text-[11px] font-medium ${pillTone[tone]}`}
-    >
-      {children}
-    </span>
-  );
-}
-
-export function Button({
-  children,
-  variant = "primary",
-}: {
-  children: React.ReactNode;
-  variant?: "primary" | "ghost";
-}) {
-  return (
-    <span
-      className={`inline-flex items-center gap-2 rounded-lg px-3 py-2 text-[13px] font-semibold ${
-        variant === "primary"
-          ? "bg-teal-700 text-white"
-          : "border border-slate-200 bg-white text-slate-700"
-      }`}
-    >
-      {children}
-    </span>
   );
 }

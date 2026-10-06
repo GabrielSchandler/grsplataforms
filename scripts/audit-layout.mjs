@@ -38,6 +38,7 @@ const expectedSections = [
   "topo",
   "demonstrativo",
   "jornada",
+  "atendimento",
   "areas",
   "seguranca",
   "implantacao",
@@ -56,6 +57,20 @@ const focusSections = [
   "respostas",
   "celular",
   "coleta",
+  "implantacao",
+  "teste",
+  "perguntas",
+  "demonstracao",
+];
+
+/** Seções da página do Chat, na ordem de leitura. */
+const chatSections = [
+  "topo",
+  "problema",
+  "central",
+  "telas",
+  "ia",
+  "campanhas",
   "implantacao",
   "teste",
   "perguntas",
@@ -503,7 +518,7 @@ async function main() {
 
       const contador = paginaTour
         .locator("#demonstrativo span")
-        .filter({ hasText: /^\d+\/14$/ })
+        .filter({ hasText: /^\d+\/\d+$/ })
         .first();
       const antes = Number((await contador.textContent())?.split("/")[0]);
       // Marcador próprio: `h3` sozinho pega também o bloco do teste grátis,
@@ -542,7 +557,7 @@ async function main() {
           { param: "1", esperado: 1 },
           { param: "6", esperado: 6 },
           { param: "10", esperado: 10 },
-          { param: "14", esperado: 14 },
+          { param: "15", esperado: 15 },
           { param: "0", esperado: 1 },
           { param: "99", esperado: 1 },
           { param: "abc", esperado: 1 },
@@ -565,10 +580,10 @@ async function main() {
 
           const texto = await page
             .locator("#demonstrativo span")
-            .filter({ hasText: /^\d+\/14$/ })
+            .filter({ hasText: /^\d+\/\d+$/ })
             .first()
             .textContent();
-          const etapa = Number((texto ?? "0/14").split("/")[0]);
+          const etapa = Number((texto ?? "0/0").split("/")[0]);
 
           check(
             etapa === caso.esperado,
@@ -684,6 +699,50 @@ async function main() {
         );
 
         await semMovimentoFocus.close();
+      }
+
+      /* ---------- página do Chat ---------- */
+
+      await page.goto(`${BASE}/chat/`, { waitUntil: "load", timeout: 30000 });
+      await prepararPagina(page);
+
+      const rotuloChat = `${viewport.name} /chat`;
+      await checarOverflow(page, rotuloChat);
+      await checarImagens(page, rotuloChat);
+      await checarContraste(page, rotuloChat);
+      await registrarAltura(page, "/chat", viewport);
+
+      const chat = await page.evaluate(
+        (ids) => ({
+          h1: document.querySelectorAll("h1").length,
+          temFaq: Boolean(document.querySelector("#perguntas details")),
+          temCta: Boolean(document.querySelector("#demonstracao")),
+          faltando: ids.filter((id) => !document.getElementById(id)),
+          temReplica: Boolean(document.querySelector("#central [data-demo]")),
+        }),
+        chatSections,
+      );
+
+      check(chat.h1 === 1, `${rotuloChat}: deveria ter exatamente 1 h1, tem ${chat.h1}`);
+      check(chat.temFaq, `${rotuloChat}: sem FAQ proprio`);
+      check(chat.temCta, `${rotuloChat}: sem secao de chamada final`);
+      check(chat.temReplica, `${rotuloChat}: a replica da central nao foi montada`);
+      check(chat.faltando.length === 0, `${rotuloChat}: secoes ausentes — ${chat.faltando.join(", ")}`);
+
+      /* ---------- Chat: assumir a conversa tira ela da IA ---------- */
+
+      if (viewport.width === 1440) {
+        const abaIa = page.locator("#central").getByRole("tab", { name: /^IA/ });
+        const antesChat = Number((await abaIa.locator("strong").textContent()) ?? "0");
+
+        await page.locator("#central").getByRole("button", { name: "Assumir e pausar IA" }).click();
+        await page.waitForTimeout(400);
+
+        const depoisChat = Number((await abaIa.locator("strong").textContent()) ?? "0");
+        check(
+          depoisChat === antesChat - 1,
+          `${rotuloChat}: assumir nao tirou a conversa da aba IA (${antesChat} -> ${depoisChat})`,
+        );
       }
 
       /* ---------- política de privacidade ---------- */

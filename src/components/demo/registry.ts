@@ -1,4 +1,5 @@
 import type { ComponentType } from "react";
+import { AtendimentoWhatsApp } from "./screens-atendimento";
 import {
   DistribuicaoLeads,
   PainelComercial,
@@ -31,6 +32,13 @@ export const demoScreens: DemoScreen[] = [
     component: PainelComercial,
   },
   {
+    id: "atendimento",
+    label: "Atendimento com IA",
+    caption:
+      "WhatsApp dentro do CRM: a IA atende o contato novo e passa para a equipe com os dados. Clique nas abas e nas conversas.",
+    component: AtendimentoWhatsApp,
+  },
+  {
     id: "distribuicao-leads",
     label: "Distribuição de leads",
     caption: "Importação incremental da planilha e repasse manual ou equilibrado.",
@@ -39,19 +47,19 @@ export const demoScreens: DemoScreen[] = [
   {
     id: "pipeline",
     label: "Pipeline",
-    caption: "Pré-vendas em Kanban, com valor por etapa e responsável em cada card.",
+    caption: "Pré-vendas em quadro, com o valor do contrato e o responsável em cada card.",
     component: Pipeline,
   },
   {
     id: "cliente",
     label: "Tela do cliente",
-    caption: "Um cadastro dividido em abas, com linha do tempo alimentada automaticamente.",
+    caption: "Cliente 360: um cadastro dividido em abas, com linha do tempo alimentada automaticamente.",
     component: TelaCliente,
   },
   {
     id: "simulacao",
     label: "Simulação",
-    caption: "Redução ajustável, quitação opcional e os arquivos gerados ao salvar.",
+    caption: "Economia estimada, nova parcela e comparativo, com os arquivos gerados ao salvar.",
     component: Simulacao,
   },
   {
@@ -70,7 +78,7 @@ export const demoScreens: DemoScreen[] = [
   {
     id: "esteira-juridica",
     label: "Esteira jurídica",
-    caption: "Etapas criadas pela própria empresa, com documentos esperados por coluna.",
+    caption: "Etapas criadas pela própria empresa, com responsável e tempo na etapa em cada card.",
     component: EsteiraJuridica,
   },
   {
@@ -82,13 +90,13 @@ export const demoScreens: DemoScreen[] = [
   {
     id: "financeiro",
     label: "Financeiro",
-    caption: "Entradas, saídas, chargebacks e importação de planilha por período.",
+    caption: "Saldo do mês, a receber, a pagar e fluxo de caixa, com cada lançamento aberto ao lado.",
     component: Financeiro,
   },
   {
     id: "academy",
     label: "Academy",
-    caption: "Trilhas de treinamento e progresso de cada pessoa da equipe.",
+    caption: "Catálogo de cursos com capítulos, duração e o seu progresso em cada um.",
     component: AcademyScreen,
   },
   {

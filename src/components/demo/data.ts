@@ -194,11 +194,27 @@ export const simulation = {
   ],
   reduction: 18,
   payoff: true,
+  savedAt: "12/08/2026, 14:32",
+  /** Parcela atual e nova parcela, em reais, para o comparativo em barras. */
+  installments: { current: 3184.6, corrected: 2611.37 },
+  /**
+   * Resumo da análise. Confere: 3.184,60 × 0,82 = 2.611,37; os totais são a
+   * parcela × 312 restantes; a economia é a diferença entre os dois.
+   */
+  summary: [
+    ["Valor financiado", "R$ 320.000,00"],
+    ["Quantidade de parcelas", "360"],
+    ["Parcelas restantes", "312"],
+    ["Parcela atual", "R$ 3.184,60"],
+    ["Nova parcela", "R$ 2.611,37"],
+    ["Total atual", "R$ 993.595,20"],
+    ["Total corrigido", "R$ 814.747,44"],
+    ["Economia estimada", "R$ 178.847,76"],
+  ] as const,
   results: [
-    { label: "Parcela simulada", value: "R$ 2.611,37", tone: "positive" as const },
-    { label: "Diferença mensal", value: "R$ 573,23", tone: "positive" as const },
-    { label: "Parcelas restantes", value: "312" },
-    { label: "Diferença acumulada", value: "R$ 178.847,76", tone: "positive" as const },
+    { label: "Economia estimada", value: "R$ 178.847,76", accent: "success" as const },
+    { label: "Nova parcela", value: "R$ 2.611,37", accent: "primary" as const },
+    { label: "Redução escolhida", value: "18%", accent: "warning" as const },
   ],
   outputs: ["Relatório em PDF", "Imagem-resumo"],
 };
@@ -214,8 +230,8 @@ export const legalPipeline = {
       color: "#0f766e",
       expected: "Contrato, procuração, RG/CPF",
       cards: [
-        { client: "Jorge Menegatti", protocol: "2026-04790", owner: "Dra. Helena Prates", days: 2 },
-        { client: "Tereza Aquino", protocol: "2026-04801", owner: "Dra. Helena Prates", days: 1 },
+        { client: "Jorge Menegatti", type: "Veículo", protocol: "2026-04790", owner: "Dra. Helena Prates", days: 2 },
+        { client: "Tereza Aquino", type: "Imóvel", protocol: "2026-04801", owner: "Dra. Helena Prates", days: 1 },
       ],
     },
     {
@@ -223,9 +239,9 @@ export const legalPipeline = {
       color: "#1d4ed8",
       expected: "Laudo técnico",
       cards: [
-        { client: "Ademir Fontoura", protocol: "2026-04688", owner: "Dr. Caio Sobral", days: 6 },
-        { client: "Neusa Villar", protocol: "2026-04702", owner: "Dr. Caio Sobral", days: 4 },
-        { client: "Sueli Barcelos", protocol: "2026-04715", owner: "Dra. Helena Prates", days: 3 },
+        { client: "Ademir Fontoura", type: "Veículo", protocol: "2026-04688", owner: "Dr. Caio Sobral", days: 6 },
+        { client: "Neusa Villar", type: "Empréstimo", protocol: "2026-04702", owner: "Dr. Caio Sobral", days: 4 },
+        { client: "Sueli Barcelos", type: "Imóvel", protocol: "2026-04715", owner: "Dra. Helena Prates", days: 3 },
       ],
     },
     {
@@ -233,7 +249,7 @@ export const legalPipeline = {
       color: "#b45309",
       expected: "Comprovante de envio",
       cards: [
-        { client: "Wilson Prata", protocol: "2026-04559", owner: "Dr. Caio Sobral", days: 9 },
+        { client: "Wilson Prata", type: "Veículo", protocol: "2026-04559", owner: "Dr. Caio Sobral", days: 9 },
       ],
     },
     {
@@ -241,8 +257,8 @@ export const legalPipeline = {
       color: "#7e22ce",
       expected: "Número do processo",
       cards: [
-        { client: "Fábio Tanaka", protocol: "2026-04402", owner: "Dra. Helena Prates", days: 21 },
-        { client: "Regina Salles", protocol: "2026-04418", owner: "Dr. Caio Sobral", days: 18 },
+        { client: "Fábio Tanaka", type: "Veículo", protocol: "2026-04402", owner: "Dra. Helena Prates", days: 21 },
+        { client: "Regina Salles", type: "Empréstimo", protocol: "2026-04418", owner: "Dr. Caio Sobral", days: 18 },
       ],
     },
     {
@@ -250,7 +266,7 @@ export const legalPipeline = {
       color: "#0f766e",
       expected: "Movimentações do processo",
       cards: [
-        { client: "Otávio Bittencourt", protocol: "2026-04120", owner: "Dra. Helena Prates", days: 64 },
+        { client: "Otávio Bittencourt", type: "Imóvel", protocol: "2026-04120", owner: "Dra. Helena Prates", days: 64 },
       ],
     },
   ],
@@ -329,22 +345,48 @@ export const clientPortal = {
   ],
 };
 
+/**
+ * Visão geral do financeiro. Os números fecham entre si e com as outras telas:
+ * saldo do mês = entradas − saídas de agosto; julho + agosto do fluxo de caixa
+ * somam o período de Consultas; as premiações previstas são a comissão apurada
+ * do painel comercial.
+ */
 export const finance = {
-  period: "01/08/2026 a 12/08/2026",
+  period: "Agosto de 2026 · até 12/08",
   stats: [
-    { label: "Entradas", value: "R$ 142.880", tone: "positive" as const },
-    { label: "Saídas", value: "R$ 48.310", tone: "negative" as const },
-    { label: "Saldo do período", value: "R$ 94.570", tone: "neutral" as const },
-    { label: "Chargebacks", value: "R$ 3.400", tone: "negative" as const },
+    { label: "Saldo do mês", value: "R$ 94.570", accent: "primary" as const, hint: "Entradas − saídas pagas" },
+    { label: "A receber", value: "R$ 38.200", accent: "success" as const, hint: "Em aberto no período" },
+    { label: "A pagar", value: "R$ 12.940", accent: "danger" as const, hint: "Em aberto no período" },
+    { label: "Premiações previstas", value: "R$ 9.480", accent: "warning" as const, hint: "Das vendas pendentes" },
+  ],
+  /** Entradas e saídas pagas por mês, em milhares de reais. */
+  cashFlow: [
+    { month: "Mar", in: 118.4, out: 52.1 },
+    { month: "Abr", in: 131.25, out: 49.8 },
+    { month: "Mai", in: 126.9, out: 55.3 },
+    { month: "Jun", in: 149.6, out: 51.7 },
+    { month: "Jul", in: 175.36, out: 58.56 },
+    { month: "Ago", in: 142.88, out: 48.31 },
   ],
   entries: [
-    { date: "12/08", description: "Honorários — Tereza Aquino", category: "Venda", method: "Pix", value: "R$ 12.600", kind: "in" as const },
-    { date: "12/08", description: "Comissão — Marina Vasques", category: "Saída", method: "Transferência", value: "R$ 3.780", kind: "out" as const },
-    { date: "11/08", description: "Honorários — Jorge Menegatti", category: "Venda", method: "Boleto", value: "R$ 8.700", kind: "in" as const },
-    { date: "11/08", description: "Chargeback — Neusa Villar", category: "Chargeback", method: "Cartão", value: "R$ 3.400", kind: "out" as const },
-    { date: "09/08", description: "Honorários — Ademir Fontoura", category: "Venda", method: "Cartão", value: "R$ 12.400", kind: "in" as const },
-    { date: "08/08", description: "Assinatura de ferramentas", category: "Custo fixo", method: "Cartão", value: "R$ 1.240", kind: "out" as const },
+    { date: "12/08", description: "Honorários — Tereza Aquino", category: "Venda", method: "Pix", status: "Pago / recebido", value: "R$ 12.600", kind: "in" as const },
+    { date: "12/08", description: "Comissão — Marina Vasques", category: "Comissão", method: "Transferência", status: "Pago / recebido", value: "R$ 3.780", kind: "out" as const },
+    { date: "11/08", description: "Honorários — Jorge Menegatti", category: "Venda", method: "Boleto", status: "Pago / recebido", value: "R$ 8.700", kind: "in" as const },
+    { date: "11/08", description: "Chargeback — Neusa Villar", category: "Chargeback", method: "Cartão", status: "Pago / recebido", value: "R$ 3.400", kind: "out" as const },
+    { date: "15/08", description: "Honorários — Ademir Fontoura", category: "Venda", method: "Cartão", status: "Pendente", value: "R$ 12.400", kind: "in" as const },
+    { date: "08/08", description: "Assinatura de ferramentas", category: "Custo fixo", method: "Cartão", status: "Pago / recebido", value: "R$ 1.240", kind: "out" as const },
   ],
+  /** O lançamento aberto no painel lateral: o primeiro da lista. */
+  selected: [
+    ["Vencimento", "12/08/2026"],
+    ["Tipo", "Receita"],
+    ["Categoria", "Venda"],
+    ["Cliente / origem", "Tereza Aquino"],
+    ["Registrado por", "Ana Prado"],
+    ["Valor previsto", "R$ 12.600,00"],
+    ["Valor pago", "R$ 12.600,00"],
+    ["Forma de pagamento", "Pix"],
+  ] as const,
 };
 
 /**
@@ -356,21 +398,39 @@ export const finance = {
  */
 export const academy = {
   passingScore: 85,
+  /** Catálogo inteiro: 8 + 7 capítulos, 465 + 395 minutos. */
+  totals: { chapters: 15, minutes: 860 },
   tracks: [
     {
       name: "Formação Comercial",
+      category: "Venda consultiva",
       description:
         "Venda consultiva: qualificação, simulação, objeções e fechamento.",
       audience: "Consultores, supervisores e gestores que acompanham vendas.",
-      progress: 86,
+      chapters: 8,
+      done: 7,
+      minutes: 465,
+      progress: 88,
     },
     {
       name: "Operação do CRM",
+      category: "Uso profissional da plataforma",
       description:
         "Uso profissional da plataforma: clientes, pré-vendas, simulações, documentos e jurídico.",
       audience: "Usuários comerciais, jurídicos, financeiros e administradores em onboarding.",
-      progress: 62,
+      chapters: 7,
+      done: 4,
+      minutes: 395,
+      progress: 57,
     },
+  ],
+  /** Primeiros capítulos da Formação Comercial, como aparecem no painel lateral. */
+  chapterList: [
+    { title: "Mentalidade comercial", minutes: 45 },
+    { title: "Qualificação: produto, documentos e prioridade", minutes: 55 },
+    { title: "Diagnóstico consultivo e roteiro de perguntas", minutes: 65 },
+    { title: "Simulação e apresentação da proposta", minutes: 60 },
+    { title: "Comunicação comercial: ligação, WhatsApp e follow-up", minutes: 60 },
   ],
   team: [
     {
@@ -394,6 +454,12 @@ export const academy = {
  */
 export const documentos = {
   filters: ["Todos os tipos", "Contrato", "Recibo", "Procuração", "Notificação"],
+  stats: [
+    { label: "Documentos carregados", value: "148", accent: "primary" as const },
+    { label: "Templates utilizados", value: "6", accent: "success" as const },
+    { label: "PDFs pendentes / erros", value: "3", accent: "danger" as const },
+    { label: "Clientes vinculados", value: "61", accent: "success" as const },
+  ],
   rows: [
     {
       title: "Contrato de prestação de serviços",
@@ -495,6 +561,286 @@ export const consultas = {
     { label: "Custo fixo", value: "R$ 24.360", share: 8 },
     { label: "Chargeback", value: "R$ 8.410", share: 3 },
   ],
+};
+
+/**
+ * Visão geral da Gestão. Tudo aqui confere com as outras telas: 18 usuários
+ * (17 ativos), um inativo, e as aprovações pendentes são a soma das duas
+ * linhas de "Requer sua atenção".
+ */
+export const gestao = {
+  stats: [
+    { label: "Aprovações pendentes", value: "4", accent: "danger" as const, hint: "Acompanhamentos e documentos" },
+    { label: "Usuários online", value: "11", accent: "primary" as const, hint: "17 usuários ativos" },
+    { label: "Simulações criadas hoje", value: "9", accent: "success" as const, hint: "Ontem: 12 · -25%" },
+    { label: "Pré-vendas criadas hoje", value: "6", accent: "warning" as const, hint: "Ontem: 5 · +20%" },
+  ],
+  attention: [
+    { label: "Acompanhamentos para revisão", value: "3" },
+    { label: "Documentos para aprovação", value: "1" },
+    { label: "Usuários inativos", value: "1" },
+  ],
+  areas: [
+    { label: "Comercial", people: 12, active: 92 },
+    { label: "Jurídico", people: 4, active: 100 },
+    { label: "Gestão", people: 2, active: 100 },
+  ],
+  operation: [
+    { label: "Clientes cadastrados", value: "1.284" },
+    { label: "Pré-vendas em andamento", value: "9" },
+  ],
+  lastBackup: "12/08/2026, 00:10 · Concluído",
+  activity: [
+    { action: "Simulação criada", who: "Diego Antunes · SIM-2026-00318", when: "12/08/2026, 14:32" },
+    { action: "Documento enviado", who: "Diego Antunes · contrato-financiamento.pdf", when: "12/08/2026, 11:07" },
+    { action: "Leads importados", who: "Sistema · 24 novos", when: "12/08/2026, 09:12" },
+    { action: "Etapa da pré-venda alterada", who: "Marina Vasques · PV-2211", when: "11/08/2026, 16:48" },
+  ],
+};
+
+/**
+ * Atendimento por WhatsApp dentro do CRM.
+ *
+ * As três abas respondem "de quem é a conversa": as minhas, as de outro
+ * consultor e as que ainda estão com a IA, que faz o primeiro atendimento do
+ * contato novo e passa para a equipe com os dados que coletou. A conversa da
+ * Helena mostra o caminho inteiro: IA → nota de transferência → consultora.
+ */
+export type MensagemDemo = {
+  de: "cliente" | "ia" | "equipe" | "nota" | "sistema";
+  autor?: string;
+  hora?: string;
+  texto: string;
+};
+
+export type ConversaDemo = {
+  id: string;
+  nome: string;
+  telefone: string;
+  previa: string;
+  quando: string;
+  naoLidas?: number;
+  selo?: "Contato novo" | "IA";
+  estado: "IA" | "Em atendimento" | "Aguardando atendente" | "Aguardando cliente";
+  responsavel: string;
+  mensagens: MensagemDemo[];
+};
+
+const conversaHelena: MensagemDemo[] = [
+  { de: "cliente", hora: "14:18", texto: "Oi, vi o anúncio de vocês e queria entender como funciona." },
+  {
+    de: "ia",
+    autor: "Ana (IA)",
+    hora: "14:18",
+    texto: "Olá! Aqui é a Ana, da SuaEmpresa. Para adiantar o seu atendimento: qual é o tipo de contrato?",
+  },
+  { de: "cliente", hora: "14:20", texto: "Financiamento de veículo. São 48 parcelas de R$ 1.120 e estou em dia." },
+  {
+    de: "ia",
+    autor: "Ana (IA)",
+    hora: "14:20",
+    texto: "Obrigada, Helena. Vou chamar um especialista da nossa equipe, que continua com você por aqui mesmo, neste WhatsApp.",
+  },
+  {
+    de: "nota",
+    texto:
+      "Ana (IA) passou a conversa para a equipe — Comercial.\nMotivo: dados principais coletados.\n• Nome: Helena\n• Tipo de contrato: Veículo\n• Valor da parcela: R$ 1.120\n• Parcelas: 48 no total\n• Situação de pagamento: em dia\nResumo: quer entender como funciona a análise do contrato do veículo.",
+  },
+  { de: "sistema", texto: "Conversa transferida para Marina Vasques · 14:24" },
+  { de: "equipe", autor: "Marina", hora: "14:26", texto: "Oi, Helena! Já vi tudo aqui. Vou te explicar os próximos passos." },
+  { de: "cliente", hora: "14:32", texto: "Pode me explicar quais documentos preciso enviar?" },
+];
+
+export const atendimento = {
+  canal: "WhatsApp Comercial",
+  abas: [
+    { id: "meus", rotulo: "Meus", total: 6 },
+    { id: "outros", rotulo: "Outros", total: 14 },
+    { id: "ia", rotulo: "IA", total: 3 },
+  ] as const,
+  filtros: [
+    { rotulo: "Todas", total: 6 },
+    { rotulo: "Não lidas", total: 1 },
+    { rotulo: "Aguardando resposta", total: 2 },
+  ],
+  conversas: {
+    meus: [
+      {
+        id: "helena",
+        nome: "Helena Marcondes",
+        telefone: "(11) 90000-0142",
+        previa: "Pode me explicar quais documentos preciso enviar?",
+        quando: "14:32",
+        naoLidas: 1,
+        selo: "Contato novo",
+        estado: "Em atendimento",
+        responsavel: "Marina Vasques",
+        mensagens: conversaHelena,
+      },
+      {
+        id: "fabio",
+        nome: "Fábio Tanaka",
+        telefone: "(11) 90000-0256",
+        previa: "Vou enviar o contrato hoje à tarde.",
+        quando: "13:10",
+        estado: "Em atendimento",
+        responsavel: "Marina Vasques",
+        mensagens: [
+          { de: "equipe", autor: "Marina", hora: "12:58", texto: "Fábio, segue a simulação em PDF e a imagem-resumo." },
+          { de: "cliente", hora: "13:10", texto: "Vou enviar o contrato hoje à tarde." },
+        ],
+      },
+      {
+        id: "ademir",
+        nome: "Ademir Fontoura",
+        telefone: "(11) 90000-0633",
+        previa: "Marina: Combinado, te aviso assim que sair.",
+        quando: "11:47",
+        estado: "Aguardando cliente",
+        responsavel: "Marina Vasques",
+        mensagens: [
+          { de: "cliente", hora: "11:40", texto: "Tem novidade da proposta?" },
+          { de: "equipe", autor: "Marina", hora: "11:47", texto: "Combinado, te aviso assim que sair." },
+        ],
+      },
+      {
+        id: "tereza",
+        nome: "Tereza Aquino",
+        telefone: "(11) 90000-0871",
+        previa: "Obrigada, fico no aguardo.",
+        quando: "Ontem",
+        estado: "Em atendimento",
+        responsavel: "Marina Vasques",
+        mensagens: [
+          { de: "equipe", autor: "Marina", hora: "16:02", texto: "Tereza, o contrato foi gerado e segue em anexo." },
+          { de: "cliente", hora: "16:10", texto: "Obrigada, fico no aguardo." },
+        ],
+      },
+    ],
+    outros: [
+      {
+        id: "wilson",
+        nome: "Wilson Prata",
+        telefone: "(51) 90000-0684",
+        previa: "Rafael: Te ligo às 15h para fechar os detalhes.",
+        quando: "13:52",
+        estado: "Em atendimento",
+        responsavel: "Rafael Otoni",
+        mensagens: [
+          { de: "cliente", hora: "13:44", texto: "Consegue me ligar hoje?" },
+          { de: "equipe", autor: "Rafael", hora: "13:52", texto: "Te ligo às 15h para fechar os detalhes." },
+        ],
+      },
+      {
+        id: "neusa",
+        nome: "Neusa Villar",
+        telefone: "(11) 90000-0417",
+        previa: "Já mandei o comprovante.",
+        quando: "12:31",
+        naoLidas: 2,
+        estado: "Em atendimento",
+        responsavel: "Camila Prado",
+        mensagens: [
+          { de: "equipe", autor: "Camila", hora: "12:10", texto: "Neusa, falta só o comprovante de residência." },
+          { de: "cliente", hora: "12:31", texto: "Já mandei o comprovante." },
+        ],
+      },
+      {
+        id: "sueli",
+        nome: "Sueli Barcelos",
+        telefone: "(41) 90000-0903",
+        previa: "Preciso falar com alguém do jurídico.",
+        quando: "10:05",
+        estado: "Aguardando atendente",
+        responsavel: "Sem responsável",
+        mensagens: [
+          { de: "cliente", hora: "10:05", texto: "Preciso falar com alguém do jurídico." },
+          { de: "sistema", texto: "Na fila da equipe · gerente avisado às 10:20" },
+        ],
+      },
+    ],
+    ia: [
+      {
+        id: "otavio",
+        nome: "Otávio Bittencourt",
+        telefone: "(21) 90000-0398",
+        previa: "Ana (IA): Está em dia com as parcelas?",
+        quando: "14:41",
+        selo: "IA",
+        estado: "IA",
+        responsavel: "Sem responsável",
+        mensagens: [
+          { de: "cliente", hora: "14:39", texto: "Boa tarde, queria saber se vocês analisam contrato de imóvel." },
+          {
+            de: "ia",
+            autor: "Ana (IA)",
+            hora: "14:39",
+            texto: "Boa tarde! Aqui é a Ana, da SuaEmpresa. Analisamos, sim. Como posso te chamar?",
+          },
+          { de: "cliente", hora: "14:40", texto: "Otávio. A parcela é de R$ 3.180." },
+          { de: "ia", autor: "Ana (IA)", hora: "14:41", texto: "Obrigada, Otávio. Está em dia com as parcelas?" },
+        ],
+      },
+      {
+        id: "regina",
+        nome: "Regina Salles",
+        telefone: "(31) 90000-0771",
+        previa: "Quero falar com um atendente.",
+        quando: "14:36",
+        selo: "IA",
+        estado: "IA",
+        responsavel: "Sem responsável",
+        mensagens: [
+          { de: "cliente", hora: "14:36", texto: "Quero falar com um atendente." },
+          {
+            de: "ia",
+            autor: "Ana (IA)",
+            hora: "14:36",
+            texto: "Claro, Regina. Vou chamar um especialista da nossa equipe, que continua com você por aqui mesmo.",
+          },
+        ],
+      },
+      {
+        id: "novo",
+        nome: "(11) 90000-0519",
+        telefone: "(11) 90000-0519",
+        previa: "Oi, boa tarde.",
+        quando: "14:30",
+        selo: "IA",
+        estado: "IA",
+        responsavel: "Sem responsável",
+        mensagens: [
+          { de: "cliente", hora: "14:30", texto: "Oi, boa tarde." },
+          {
+            de: "ia",
+            autor: "Ana (IA)",
+            hora: "14:30",
+            texto: "Boa tarde! Aqui é a Ana, da SuaEmpresa. Como posso te chamar?",
+          },
+        ],
+      },
+    ],
+  } satisfies Record<string, ConversaDemo[]>,
+};
+
+/** Chat interno: conversa entre funcionários, em grupo ou um a um. */
+export const chatInterno = {
+  conversas: [
+    { nome: "Comercial", grupo: true, previa: "Camila: Planilha de leads atualizada.", quando: "14:12", naoLidas: 2 },
+    { nome: "Jurídico", grupo: true, previa: "Dr. Caio: Notificação do Wilson enviada.", quando: "13:40" },
+    { nome: "Rafael Otoni", grupo: false, previa: "Você: Fechado, obrigado!", quando: "11:58" },
+    { nome: "Dra. Helena Prates", grupo: false, previa: "Consegue me passar o contrato da Tereza?", quando: "Ontem" },
+  ],
+  aberta: {
+    nome: "Comercial",
+    participantes: 5,
+    mensagens: [
+      { autor: "Rafael Otoni", hora: "13:58", texto: "Alguém consegue cobrir o plantão das 17h?" },
+      { autor: "Você", hora: "14:01", texto: "Eu cubro.", citando: "Alguém consegue cobrir o plantão das 17h?" },
+      { autor: "Diego Antunes", hora: "14:07", texto: "Subi a simulação da Cleusa, já está no cadastro dela." },
+      { autor: "Camila Prado", hora: "14:12", texto: "Planilha de leads atualizada.", arquivo: "leads-agosto.xlsx" },
+    ],
+  },
 };
 
 /**

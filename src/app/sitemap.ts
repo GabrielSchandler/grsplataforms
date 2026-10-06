@@ -18,6 +18,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.9,
     },
+    {
+      url: `${siteConfig.siteUrl}/chat/`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
     ...areas.map((area) => ({
       url: `${siteConfig.siteUrl}/${area.slug}/`,
       lastModified: new Date(),

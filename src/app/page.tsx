@@ -1,4 +1,5 @@
 import { ScrollProgress } from "@/components/motion/motion";
+import { Atendimento } from "@/components/sections/atendimento";
 import { Faq, FinalCta } from "@/components/sections/fim";
 import { JourneyScroll } from "@/components/sections/journey-scroll";
 import { Implementation, SecurityTeaser } from "@/components/sections/operacao";
@@ -20,7 +21,7 @@ const structuredData = {
       name: siteConfig.vendorName,
       url: siteConfig.siteUrl,
       description:
-        "Desenvolvedora do NewSec CRM, sistema de operação para empresas de serviços, e do NewSec Focus, telemetria de produtividade para estações Windows.",
+        "Desenvolvedora do NewSec CRM, sistema de operação para empresas de serviços, do NewSec Focus, telemetria de produtividade para estações Windows, e do NewSec Chat, central de atendimento por WhatsApp com IA.",
       ...(siteConfig.email ? { email: siteConfig.email } : {}),
       /* Razão social, CNPJ e endereço saíram daqui junto com o rodapé: em
          dados estruturados eles são ainda mais fáceis de ler em massa do
@@ -41,6 +42,8 @@ const structuredData = {
       publisher: { "@id": `${siteConfig.siteUrl}/#organizacao` },
       featureList: [
         "Isolamento lógico dos dados, aplicado no banco de dados",
+        "Atendimento por WhatsApp dentro do sistema, com IA no primeiro contato e passagem para a equipe",
+        "Chat interno entre os funcionários",
         "Distribuição de leads com importação incremental de planilhas",
         "Pipeline comercial em Kanban",
         "Simulações de veículo, imóvel e empréstimo com relatório em PDF e imagem-resumo gerados automaticamente",
@@ -122,6 +125,7 @@ export default function Home() {
         <DemoSection />
         <Problems />
         <JourneyScroll />
+        <Atendimento />
         <AreasIndex />
         <SecurityTeaser />
         <Implementation />

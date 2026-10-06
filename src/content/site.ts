@@ -213,6 +213,63 @@ export const journey = {
   ],
 };
 
+/**
+ * Atendimento por WhatsApp dentro do CRM, com a IA no primeiro contato.
+ *
+ * É assunto da home, e não de uma área, porque o menu "Atendimento WhatsApp"
+ * aparece em todas elas. Cada frase corresponde a comportamento que existe no
+ * sistema. O que NÃO se afirma: que a empresa edita sozinha o roteiro da IA
+ * (isso é do NewSec Chat, e a seção termina apontando para ele) e qualquer
+ * coisa sobre campanha ou disparo, que o CRM não faz.
+ */
+export const atendimento = {
+  eyebrow: "Atendimento por WhatsApp",
+  title: "A conversa com o cliente acontece dentro do CRM. E a IA atende primeiro.",
+  intro:
+    "O WhatsApp da empresa fica no mesmo sistema do cadastro, da pré-venda e do jurídico. O contato novo é recebido pela IA, que colhe as primeiras informações e passa a conversa para a equipe com tudo anotado.",
+  items: [
+    {
+      title: "A IA faz o primeiro atendimento",
+      description:
+        "O contato novo cai na aba IA. Ela responde, faz uma pergunta por vez, entende áudio e, com o essencial em mãos, chama a equipe.",
+    },
+    {
+      title: "A equipe recebe com a ficha pronta",
+      description:
+        "Na passagem fica uma nota interna com os dados coletados, o motivo e um resumo. O consultor assume sabendo do que se trata.",
+    },
+    {
+      title: "Quem assume cala a IA",
+      description:
+        "Assim que alguém da equipe assume ou recebe a conversa, a IA para de responder. Se ela não conseguir responder, a conversa vai para a equipe em vez de ficar sem resposta.",
+    },
+    {
+      title: "Cada conversa tem dono",
+      description:
+        "As abas separam as suas conversas, as dos outros e as que estão com a IA. Só o responsável responde, e a transferência é feita pelo gerente.",
+    },
+    {
+      title: "Do cadastro para a conversa",
+      description:
+        "O telefone do cliente ou da pré-venda abre a conversa dele no atendimento, e a conversa fica vinculada ao cadastro.",
+    },
+    {
+      title: "Chat interno da equipe",
+      description:
+        "Conversas e grupos entre os funcionários, com arquivo, áudio e resposta citando a mensagem, sem sair do sistema.",
+    },
+  ],
+  demoNote:
+    "Esta é a tela de atendimento, com dados fictícios. Clique nas abas Meus, Outros e IA e abra as conversas.",
+  chat: {
+    title: "Quer a IA configurada pela sua equipe, supervisão das filas e campanhas?",
+    description:
+      "O NewSec Chat é a central de atendimento completa, e funciona com ou sem o CRM.",
+    cta: "Conhecer o NewSec Chat",
+    href: "/chat",
+  },
+};
+
 export const areasIndex = {
   eyebrow: "As cinco áreas",
   title: "O site tem a mesma divisão que o sistema.",
@@ -374,12 +431,12 @@ export const finalCta = {
 };
 
 /**
- * Rodapé da marca, não de um produto: desde que o Focus existe, o rodapé é o
- * único lugar do site em que os dois aparecem lado a lado em todas as páginas.
+ * Rodapé da marca, não de um produto: é o único lugar do site em que os três
+ * aparecem lado a lado em todas as páginas.
  */
 export const footer = {
   description:
-    "Software para empresas de serviços: o CRM que conecta comercial, jurídico e financeiro, e o Focus, que mostra como a equipe usa o tempo nas estações Windows.",
+    "Software para empresas de serviços: o CRM que conecta comercial, jurídico e financeiro; o Focus, que mostra como a equipe usa o tempo nas estações Windows; e o Chat, a central de atendimento por WhatsApp com IA.",
   columns: [
     {
       title: "NewSec CRM",
@@ -389,6 +446,7 @@ export const footer = {
           label: area.navLabel,
           href: `/${area.slug}`,
         })),
+        { label: "Atendimento com IA", href: "/#atendimento" },
         { label: "Perguntas frequentes", href: "/#perguntas" },
       ],
     },
@@ -400,6 +458,16 @@ export const footer = {
         { label: "O que é coletado", href: "/focus#coleta" },
         { label: "Implantação", href: "/focus#implantacao" },
         { label: "Perguntas frequentes", href: "/focus#perguntas" },
+      ],
+    },
+    {
+      title: "NewSec Chat",
+      links: [
+        { label: "Visão geral", href: "/chat" },
+        { label: "A central", href: "/chat#central" },
+        { label: "A IA", href: "/chat#ia" },
+        { label: "Campanhas", href: "/chat#campanhas" },
+        { label: "Perguntas frequentes", href: "/chat#perguntas" },
       ],
     },
   ],

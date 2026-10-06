@@ -1,5 +1,6 @@
 import type { ComponentType } from "react";
 import type { Workspace } from "./chrome";
+import { AtendimentoWhatsApp, ChatInterno } from "./screens-atendimento";
 import {
   DistribuicaoLeads,
   PainelComercial,
@@ -8,7 +9,14 @@ import {
   TelaCliente,
 } from "./screens-comercial";
 import { ImagemResumo, RelatorioPdf } from "./screens-documentos";
-import { Backups, Consultas, Documentos, Logs, Usuarios } from "./screens-gestao";
+import {
+  Backups,
+  Consultas,
+  Documentos,
+  GestaoVisaoGeral,
+  Logs,
+  Usuarios,
+} from "./screens-gestao";
 import {
   AcademyScreen,
   ConfiguracaoEmpresa,
@@ -32,6 +40,8 @@ export type ScreenEntry = {
 };
 
 export const screenMap: Record<string, ScreenEntry> = {
+  atendimento: { component: AtendimentoWhatsApp, workspace: "Comercial", nav: "Atendimento WhatsApp" },
+  "chat-interno": { component: ChatInterno, workspace: "Comercial", nav: "Chat interno" },
   "painel-comercial": { component: PainelComercial, workspace: "Comercial", nav: "Painel comercial" },
   "distribuicao-leads": {
     component: DistribuicaoLeads,
@@ -46,9 +56,10 @@ export const screenMap: Record<string, ScreenEntry> = {
   "imagem-resumo": { component: ImagemResumo, workspace: "Comercial" },
   "esteira-juridica": { component: EsteiraJuridica, workspace: "Jurídico", nav: "Esteira" },
   "portal-cliente": { component: PortalCliente, workspace: "Jurídico" },
-  financeiro: { component: Financeiro, workspace: "Financeiro", nav: "Lançamentos" },
+  financeiro: { component: Financeiro, workspace: "Financeiro", nav: "Financeiro" },
   consultas: { component: Consultas, workspace: "Financeiro", nav: "Consultas" },
   academy: { component: AcademyScreen, workspace: "Academy", nav: "Academy" },
+  gestao: { component: GestaoVisaoGeral, workspace: "Gestão", nav: "Gestão" },
   empresa: { component: ConfiguracaoEmpresa, workspace: "Gestão", nav: "Empresa" },
   usuarios: { component: Usuarios, workspace: "Gestão", nav: "Usuários" },
   backups: { component: Backups, workspace: "Gestão", nav: "Backups" },

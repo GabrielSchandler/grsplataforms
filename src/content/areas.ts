@@ -55,7 +55,7 @@ export const areas: readonly Area[] = [
       inicial: "Painel comercial",
       titulo: "Use a área comercial aqui mesmo.",
       legenda:
-        "Navegue pelo comercial: painel, distribuição de leads, clientes, pré-vendas, simulações e documentos.",
+        "Navegue pelo comercial: atendimento por WhatsApp, painel, clientes, pré-vendas, simulações, documentos e distribuição de leads.",
     },
     cardTitle: "Comercial",
     cardDescription:
@@ -182,7 +182,7 @@ export const areas: readonly Area[] = [
       inicial: "Esteira",
       titulo: "Use a área jurídica aqui mesmo.",
       legenda:
-        "Navegue pela área jurídica: esteira, cliente, pré-vendas e documentos.",
+        "Navegue pela área jurídica: esteira, atendimento, clientes, pré-vendas e documentos.",
     },
     cardTitle: "Jurídico",
     cardDescription:
@@ -259,9 +259,9 @@ export const areas: readonly Area[] = [
     navLabel: "Financeiro",
     demo: {
       workspace: "Financeiro",
-      inicial: "Lançamentos",
+      inicial: "Financeiro",
       titulo: "Use o financeiro aqui mesmo.",
-      legenda: "Navegue pelo financeiro: lançamentos do período e consultas por intervalo.",
+      legenda: "Navegue pelo financeiro: visão geral com fluxo de caixa e lançamentos, e consultas por intervalo.",
     },
     cardTitle: "Financeiro",
     cardDescription:
@@ -275,9 +275,9 @@ export const areas: readonly Area[] = [
       "Pagamentos registrados nas pré-vendas alimentam os indicadores comerciais de meta e comissão. O módulo financeiro organiza vendas, entradas, saídas e chargebacks em uma visão própria. Pagamentos jurídicos podem ser sincronizados com o financeiro.",
     blocks: [
       {
-        title: "Lançamentos do período",
+        title: "Caixa, contas e lançamentos na mesma tela",
         paragraph:
-          "Entradas, saídas e chargebacks tratados como categorias próprias, com forma de pagamento e vínculo ao cliente. A importação de planilha Excel resolve a entrada de dado que vem de fora.",
+          "A visão geral abre com o saldo do mês, o que há a receber e a pagar e o fluxo de caixa dos últimos meses. Abaixo, cada lançamento — com categoria, forma de pagamento e vínculo ao cliente — abre num painel ao lado, sem sair da lista. Entradas, saídas e chargebacks são categorias próprias, e a importação de planilha Excel resolve o dado que vem de fora.",
         items: [
           "Entradas, saídas e vendas por período",
           "Chargebacks como lançamento próprio, não como estorno solto",
@@ -385,10 +385,10 @@ export const areas: readonly Area[] = [
     navLabel: "Gestão e segurança",
     demo: {
       workspace: "Gestão",
-      inicial: "Empresa",
+      inicial: "Gestão",
       titulo: "Use a gestão do seu ambiente aqui mesmo.",
       legenda:
-        "Navegue pela gestão: configuração da empresa, usuários, painel, backups e logs de auditoria.",
+        "Navegue pela gestão: visão geral, equipe, configuração da empresa, backups e auditoria — pelo menu ou pelas abas do topo.",
     },
     cardTitle: "Gestão e segurança",
     cardDescription:

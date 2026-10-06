@@ -38,6 +38,13 @@ export const tourSteps: readonly TourStep[] = [
     highlight: "carga-consultor",
   },
   {
+    screen: "atendimento",
+    department: "Comercial",
+    title: "O WhatsApp chega já atendido",
+    text: "Quem chama no WhatsApp da empresa é recebido pela IA, que colhe o essencial e passa a conversa para a equipe com uma nota do que foi dito.",
+    highlight: "nota-ia",
+  },
+  {
     screen: "cliente",
     department: "Comercial",
     title: "O cliente é criado",

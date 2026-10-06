@@ -1,33 +1,33 @@
 {
   "distribuicao-leads": {
     "width": 2048,
-    "height": 995,
-    "blur": "data:image/webp;base64,UklGRjIAAABXRUJQVlA4ICYAAACwAQCdASoQAAgAA8BmJaQAAxf+9ugQAP7yYaYV4hnjuvPtAAAAAA=="
+    "height": 1002,
+    "blur": "data:image/webp;base64,UklGRjgAAABXRUJQVlA4ICwAAADwAQCdASoQAAgAA8BmJYwC7AEPSrHVaAAA/opi3ey8AQLHOJYsNqARCvRQAA=="
   },
   "pipeline": {
     "width": 2048,
-    "height": 995,
-    "blur": "data:image/webp;base64,UklGRi4AAABXRUJQVlA4ICIAAAAwAQCdASoQAAgAA8BmJaQAA3AA/vG/68BbX78MZUYeSQAA"
+    "height": 1002,
+    "blur": "data:image/webp;base64,UklGRjgAAABXRUJQVlA4ICwAAACQAQCdASoQAAgAA8BmJZQAAudFtmAA/opi3evegUWYsR/CYjBElH9V4gAAAA=="
   },
   "esteira-juridica": {
     "width": 2048,
     "height": 995,
-    "blur": "data:image/webp;base64,UklGRi4AAABXRUJQVlA4ICIAAACwAQCdASoQAAgAA8BmJaQAAxf/TBEAAP7yYaYV4h6BYAAA"
+    "blur": "data:image/webp;base64,UklGRjQAAABXRUJQVlA4ICgAAACQAQCdASoQAAgAA8BmJZQAAudP4OAA/opi3euy4ZIU6nUS0HkfE4AA"
   },
   "painel-comercial": {
     "width": 2048,
-    "height": 1147,
-    "blur": "data:image/webp;base64,UklGRjAAAABXRUJQVlA4ICQAAACwAQCdASoQAAkAA8BmJZwAAxf+5/AAAP7yYaYV4heRNyAAAAA="
+    "height": 1046,
+    "blur": "data:image/webp;base64,UklGRjYAAABXRUJQVlA4ICoAAADQAQCdASoQAAgAA8BmJZQAAu19igm9AAD+T77tvZjHIYhGVf3znEQAAAA="
   },
   "relatorio-pdf": {
     "width": 2048,
     "height": 1862,
-    "blur": "data:image/webp;base64,UklGRjIAAABXRUJQVlA4ICYAAACwAQCdASoQAA8AA8BmJZwAAueFB8AAAP7x3PWUwwzxByRDO2EAAA=="
+    "blur": "data:image/webp;base64,UklGRjIAAABXRUJQVlA4ICYAAADQAQCdASoQAA8AA8BmJZwAAueF4IQEAAD+8dz1lMMLPZJ79sIAAA=="
   },
   "imagem-resumo": {
     "width": 2048,
     "height": 1534,
-    "blur": "data:image/webp;base64,UklGRjYAAABXRUJQVlA4ICoAAACQAQCdASoQAAwAA8BmJZwAAud7WCAA/fB/PPfc3c2mwuhF6iBaTvmEAAA="
+    "blur": "data:image/webp;base64,UklGRjYAAABXRUJQVlA4ICoAAACwAQCdASoQAAwAA8BmJZwAAud7Z9wgAP3wfzz33N3Npr2QeeZyfMIAAAA="
   },
   "portal-cliente": {
     "width": 2048,
@@ -36,7 +36,7 @@
   },
   "academy": {
     "width": 2048,
-    "height": 995,
-    "blur": "data:image/webp;base64,UklGRi4AAABXRUJQVlA4ICIAAAAwAQCdASoQAAgAA8BmJZwAA3AA/vG/6nW6VyghLuUKrOAA"
+    "height": 1171,
+    "blur": "data:image/webp;base64,UklGRjIAAABXRUJQVlA4ICYAAACQAQCdASoQAAkAA8BmJZQAApz7xgAA/k++7b1+cZ3UGkwH1XiAAA=="
   }
 }
