@@ -1,5 +1,4 @@
 import { ArrowRight } from "lucide-react";
-import { PainelComercial } from "@/components/demo/screens-comercial";
 import { ParallaxLayer, Reveal } from "@/components/motion/motion";
 import {
   Eyebrow,
@@ -7,6 +6,7 @@ import {
   Section,
   SectionTitle,
 } from "@/components/site/primitives";
+import { AcaoPrincipal, AcaoSecundaria, TopoProduto } from "@/components/site/topo-produto";
 import { benefitStrip, hero, problems, trial } from "@/content/site";
 import {
   CONTACT_ANCHOR,
@@ -19,178 +19,77 @@ export function Hero() {
   const testeHref = whatsappLink(trial.whatsappMessage);
 
   return (
-    <section
-      id="topo"
-      className="relative isolate min-h-[94vh] overflow-hidden bg-ink-950"
-    >
-      {/* Camada 1 — a cena. Fotografia de ambiente, não de interface: a
-          interface real entra depois, por cima, como réplica em HTML. */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 overflow-hidden"
-      >
-        <ParallaxLayer speed={0.1} className="absolute inset-0">
-          <picture>
-            <source
-              media="(max-width: 640px)"
-              type="image/avif"
-              srcSet="/img/hero/cena-mobile.avif"
-            />
-            <source
-              media="(max-width: 640px)"
-              type="image/webp"
-              srcSet="/img/hero/cena-mobile.webp"
-            />
-            {/* O maior arquivo tem 1672px porque essa e a largura do
-                original da cena. Declarar 2560w serviria um arquivo
-                ampliado por interpolacao: mesmo borrao, mais bytes. Quem
-                trocar a foto por uma maior, atualize os tres numeros. */}
-            <source type="image/avif" srcSet="/img/hero/cena-1672.avif" />
-            <source
-              type="image/webp"
-              srcSet="/img/hero/cena-1280.webp 1280w, /img/hero/cena-1672.webp 1672w"
-              sizes="100vw"
-            />
-            <img
-              src="/img/hero/cena-1672.webp"
-              alt=""
-              width={1672}
-              height={716}
-              fetchPriority="high"
-              decoding="async"
-              className="hero-scene h-[112vh] w-full object-cover"
-            />
-          </picture>
-        </ParallaxLayer>
-
-        {/* Camada 2 — escurecimento. O texto fica sobre o terço escuro da
-            esquerda, que a própria fotografia já reserva. */}
-        <div className="absolute inset-0 bg-gradient-to-r from-ink-950 via-ink-950/85 to-ink-950/35" />
-        <div className="absolute inset-0 bg-gradient-to-t from-ink-950 via-ink-950/20 to-ink-950/70" />
-
-        {/* Camada 3 — a interface surgindo por baixo, em perspectiva. A
-            máscara dissolve a borda esquerda: sem ela o painel invade a
-            coluna do texto e engole o subtítulo. */}
-        <div
-          className="hero-panel absolute -bottom-[8%] right-[-8%] hidden w-[54%] lg:block xl:w-[52%]"
-          style={{
-            maskImage: "linear-gradient(to right, transparent, black 22%)",
-            WebkitMaskImage:
-              "linear-gradient(to right, transparent, black 22%)",
-          }}
-        >
-          <div className="overflow-hidden rounded-lg border border-ink-700 shadow-[0_40px_120px_rgba(0,0,0,0.65)]">
-            <PainelComercial />
-          </div>
-        </div>
-
-        {/* Varredura de luz: só no desktop. Em tela estreita ela não é
-            percebida e ainda empurrava a largura da página. */}
-        <div className="absolute inset-y-0 left-0 hidden w-[40%] overflow-hidden sm:block">
-          <div className="scan-line h-full w-24 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-        </div>
-      </div>
-
-      <div className="relative mx-auto flex min-h-[94vh] w-full max-w-6xl flex-col justify-center px-5 pb-28 pt-32 sm:px-8 sm:pt-36">
-        {/* Cascata em CSS puro: nada aqui espera pelo JavaScript. */}
-        <div className="max-w-xl lg:max-w-[34rem] xl:max-w-2xl">
-          <div className="hero-in">
-            <Eyebrow>{hero.eyebrow}</Eyebrow>
-          </div>
-
-          <div
-            className="hero-in"
-            style={{ "--delay": "70ms" } as React.CSSProperties}
+    <TopoProduto
+      produto="crm"
+      eyebrow={hero.eyebrow}
+      titulo={hero.title}
+      subtitulo={hero.subtitle}
+      garantias={hero.trustChips}
+      nota={hero.trustLine}
+      acoes={
+        <>
+          <AcaoPrincipal href={ctaHref}>
+            {hero.primaryCta}
+            <ArrowRight aria-hidden="true" className="h-4 w-4" />
+          </AcaoPrincipal>
+          <AcaoSecundaria href={testeHref}>{hero.secondaryCta}</AcaoSecundaria>
+          <a
+            href="#demonstrativo"
+            className="hidden items-center justify-center gap-2 px-1 py-3.5 text-sm font-semibold text-fog-300 underline-offset-4 transition-colors hover:text-white hover:underline sm:inline-flex"
           >
-            <h1 className="font-display mt-6 text-4xl leading-[1.05] font-semibold text-white sm:text-5xl lg:text-6xl">
-              {hero.title}
-            </h1>
-          </div>
-
-          <div
-            className="hero-in"
-            style={{ "--delay": "150ms" } as React.CSSProperties}
-          >
-            <p className="measure mt-6 text-lg leading-relaxed text-fog-300">
-              {hero.subtitle}
-            </p>
-          </div>
-
-          <div
-            className="hero-in"
-            style={{ "--delay": "220ms" } as React.CSSProperties}
-          >
-            <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
-              <a
-                href={ctaHref}
-                {...(ctaHref.startsWith("http")
-                  ? { target: "_blank", rel: "noopener noreferrer" }
-                  : {})}
-                className="sweep inline-flex items-center justify-center gap-2 rounded-lg bg-brand-500 px-6 py-3.5 text-sm font-semibold text-white"
-              >
-                <span className="relative z-10 inline-flex items-center gap-2">
-                  {hero.primaryCta}
-                  <ArrowRight aria-hidden="true" className="h-4 w-4" />
-                </span>
-              </a>
-              <a
-                href={testeHref}
-                {...(testeHref.startsWith("http")
-                  ? { target: "_blank", rel: "noopener noreferrer" }
-                  : {})}
-                className="inline-flex items-center justify-center gap-2 rounded-lg border border-ink-700 px-6 py-3.5 text-sm font-semibold text-white transition-colors hover:border-fog-600"
-              >
-                {hero.secondaryCta}
-              </a>
-              <a
-                href="#demonstrativo"
-                className="inline-flex items-center justify-center gap-2 px-1 py-3.5 text-sm font-semibold text-fog-300 underline-offset-4 transition-colors hover:text-white hover:underline"
-              >
-                {hero.tertiaryCta}
-              </a>
-            </div>
-          </div>
-
-          {/* Faixa de confiança: só afirmações verificáveis no produto. */}
-          <div
-            className="hero-in"
-            style={{ "--delay": "260ms" } as React.CSSProperties}
-          >
-            <ul className="mt-7 flex flex-wrap gap-x-2 gap-y-2">
-              {hero.trustChips.map((chip) => (
-                <li
-                  key={chip}
-                  className="rounded border border-ink-700 bg-ink-900/60 px-2.5 py-1 text-[12px] text-fog-300"
-                >
-                  {chip}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div
-            className="hero-in"
-            style={{ "--delay": "330ms" } as React.CSSProperties}
-          >
-            <p className="mt-7 flex max-w-md items-start gap-2.5 text-[13px] leading-relaxed text-fog-500">
-              <span
-                aria-hidden="true"
-                className="mt-[0.62em] h-px w-5 shrink-0 bg-brand-500"
+            {hero.tertiaryCta}
+          </a>
+        </>
+      }
+      fundo={
+        <>
+          {/* A cena: fotografia de ambiente, bem ao fundo. A interface de
+              verdade vem por cima, na composição do computador e do celular. */}
+          <ParallaxLayer speed={0.1} className="absolute inset-0">
+            <picture>
+              <source
+                media="(max-width: 640px)"
+                type="image/avif"
+                srcSet="/img/hero/cena-mobile.avif"
               />
-              {hero.trustLine}
-            </p>
-          </div>
-        </div>
-      </div>
+              <source
+                media="(max-width: 640px)"
+                type="image/webp"
+                srcSet="/img/hero/cena-mobile.webp"
+              />
+              {/* O maior arquivo tem 1672px porque essa e a largura do
+                  original da cena. Declarar 2560w serviria um arquivo
+                  ampliado por interpolacao: mesmo borrao, mais bytes. Quem
+                  trocar a foto por uma maior, atualize os tres numeros. */}
+              <source type="image/avif" srcSet="/img/hero/cena-1672.avif" />
+              <source
+                type="image/webp"
+                srcSet="/img/hero/cena-1280.webp 1280w, /img/hero/cena-1672.webp 1672w"
+                sizes="100vw"
+              />
+              <img
+                src="/img/hero/cena-1672.webp"
+                alt=""
+                width={1672}
+                height={716}
+                decoding="async"
+                className="hero-scene h-[112vh] w-full object-cover"
+              />
+            </picture>
+          </ParallaxLayer>
 
-      {/* Indicação de que há mais abaixo: um fio que pulsa, sem seta piscando. */}
-      <div
-        aria-hidden="true"
-        className="absolute bottom-8 left-1/2 hidden -translate-x-1/2 sm:block"
-      >
-        <span className="scroll-cue block h-10 w-px bg-gradient-to-b from-fog-500 to-transparent" />
-      </div>
-    </section>
+          {/* Escurecimento: o texto fica legível e a foto vira atmosfera. */}
+          <div className="absolute inset-0 bg-gradient-to-r from-ink-950 via-ink-950/90 to-ink-950/55" />
+          <div className="absolute inset-0 bg-gradient-to-t from-ink-950 via-ink-950/30 to-ink-950/75" />
+
+          {/* Varredura de luz: só no desktop. Em tela estreita ela não é
+              percebida e ainda empurrava a largura da página. */}
+          <div className="absolute inset-y-0 left-0 hidden w-[40%] overflow-hidden sm:block">
+            <div className="scan-line h-full w-24 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+          </div>
+        </>
+      }
+    />
   );
 }
 

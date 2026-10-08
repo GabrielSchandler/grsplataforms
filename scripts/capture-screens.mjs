@@ -40,6 +40,27 @@ const EXPORT_DIR = path.join(ROOT, ".next-capture");
 const somenteOg = process.argv.includes("--og");
 
 /**
+ * `--hero` gera só as imagens da cena do topo de cada produto (a tela no
+ * computador e no celular), em public/img/hero. Mesmo motivo do `--og`.
+ */
+const somenteHero = process.argv.includes("--hero");
+const HERO_DIR = path.join(ROOT, "public", "img", "hero");
+
+/**
+ * [rota de captura, o que fotografar dentro dela, largura final em px].
+ * As do computador são cortadas em 16:10 a partir do canto de cima; as do
+ * celular já saem no tamanho da tela (390x800).
+ */
+const cenasDoTopo = [
+  ["produto-crm", "#alvo", 1600],
+  ["produto-crm-celular", "#alvo", 720],
+  ["produto-focus", "#alvo [data-palco-rolagem]", 1600],
+  ["produto-focus-celular", "#alvo", 720],
+  ["produto-chat", "#alvo .chat-app", 1600],
+  ["produto-chat-celular", "#alvo", 720],
+];
+
+/**
  * Só entram aqui as telas que aparecem como imagem em alguma página. As
  * demais existem apenas dentro do demo navegável, onde são renderizadas ao
  * vivo — gerar imagem delas seria peso no repositório sem nenhum uso.
@@ -125,7 +146,7 @@ async function main() {
 
   // Remove imagens de telas que não existem mais, para o repositório não
   // acumular arquivo órfão que ninguém referencia.
-  const existentes = somenteOg ? [] : await readdir(OUT_DIR).catch(() => []);
+  const existentes = somenteOg || somenteHero ? [] : await readdir(OUT_DIR).catch(() => []);
   for (const arquivo of existentes) {
     const id = arquivo.replace(/\.webp$/, "");
     if (!screens.includes(id)) {
@@ -158,7 +179,7 @@ async function main() {
       deviceScaleFactor: 2,
     });
 
-    for (const id of somenteOg ? [] : screens) {
+    for (const id of somenteOg || somenteHero ? [] : screens) {
       await page.goto(`${BASE}/capturas/${id}/`, { waitUntil: "load", timeout: 30000 });
       await page.waitForSelector("#alvo", { timeout: 15000 });
       await page.evaluate(() => document.fonts.ready);
@@ -185,10 +206,38 @@ async function main() {
       console.log(`  ${id.padEnd(20)} ${(size / 1024).toFixed(0)} KB  ${info.width}x${info.height}`);
     }
 
+    // A cena do topo de cada produto. Fica em WebP porque é a maior imagem
+    // da primeira dobra.
+    for (const [id, alvo, largura] of somenteOg ? [] : cenasDoTopo) {
+      await page.goto(`${BASE}/capturas/${id}/`, { waitUntil: "load", timeout: 30000 });
+      await page.waitForSelector(alvo, { timeout: 15000 });
+      await page.evaluate(() => document.fonts.ready);
+      // As réplicas do Focus e do Chat se medem depois de montar.
+      await page.waitForTimeout(900);
+
+      const bruta = await page.locator(alvo).first().screenshot({ type: "png" });
+      const arquivo = path.join(HERO_DIR, `${id}.webp`);
+      let imagem = sharp(bruta);
+
+      if (!id.endsWith("-celular")) {
+        const { width, height } = await sharp(bruta).metadata();
+        imagem = imagem.extract({
+          left: 0,
+          top: 0,
+          width,
+          height: Math.min(height, Math.round((width * 10) / 16)),
+        });
+      }
+
+      const info = await imagem.resize({ width: largura }).webp({ quality: 82 }).toFile(arquivo);
+      const { size } = await stat(arquivo);
+      console.log(`  ${id.padEnd(24)} ${(size / 1024).toFixed(0)} KB  ${info.width}x${info.height}`);
+    }
+
     // Open Graph em PNG: formato que todo agregador aceita sem discussão.
     // Uma por produto — a do CRM mostra o painel comercial; a do Focus, o
     // painel de produtividade.
-    for (const [rota, arquivo] of [
+    for (const [rota, arquivo] of somenteHero ? [] : [
       ["og", "og.png"],
       ["og-focus", "og-focus.png"],
       ["og-chat", "og-chat.png"],
@@ -210,7 +259,7 @@ async function main() {
   }
 
   // O componente lê estas dimensões para reservar o espaço da imagem.
-  if (!somenteOg)
+  if (!somenteOg && !somenteHero)
     await writeFile(
     path.join(ROOT, "src", "content", "screenshot-sizes.json"),
     `${JSON.stringify(manifest, null, 2)}\n`,

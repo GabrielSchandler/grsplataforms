@@ -1,6 +1,10 @@
 import { notFound } from "next/navigation";
+import { CelularChat } from "@/components/chat/demo/celular-chat";
+import { SistemaChat } from "@/components/chat/demo/sistema-chat";
 import { ConversaHero } from "@/components/chat/secoes";
+import { CelularCrm } from "@/components/demo/celular-crm";
 import { PainelComercial } from "@/components/demo/screens-comercial";
+import { PainelFocus } from "@/components/focus/demo/painel-focus";
 import { screenMap } from "@/components/demo/screen-map";
 import { PreviaPainel } from "@/components/focus/topo";
 import { LogoMark } from "@/components/site/logo";
@@ -26,11 +30,77 @@ export function generateStaticParams() {
     { id: "og" },
     { id: "og-focus" },
     { id: "og-chat" },
+    // A cena do topo de cada produto: a tela no computador e no celular.
+    ...Object.keys(cenasDoTopo).map((id) => ({ id })),
   ];
 }
 
 export const metadata = {
   robots: { index: false, follow: false },
+};
+
+/**
+ * Moldura da tela de celular: a barra de status em cima e o aplicativo
+ * embaixo. A câmera do aparelho é desenhada pelo site, por cima desta faixa.
+ */
+function TelaCelular({ children, fundo = "bg-white" }: { children: React.ReactNode; fundo?: string }) {
+  return (
+    <div id="alvo" className={`flex h-[800px] w-[390px] flex-col overflow-hidden ${fundo}`}>
+      <div className="flex h-11 shrink-0 items-end justify-between px-7 pb-1.5 text-[13px] font-semibold text-slate-900">
+        <span>14:41</span>
+        <span className="flex items-end gap-[3px]">
+          <span className="h-1.5 w-[3px] rounded-sm bg-slate-900" />
+          <span className="h-2 w-[3px] rounded-sm bg-slate-900" />
+          <span className="h-2.5 w-[3px] rounded-sm bg-slate-900" />
+          <span className="h-3 w-[3px] rounded-sm bg-slate-900" />
+          <span className="ml-1.5 h-3 w-6 rounded-[4px] border border-slate-900 p-px">
+            <span className="block h-full w-[70%] rounded-[2px] bg-slate-900" />
+          </span>
+        </span>
+      </div>
+      <div className="min-h-0 flex-1">{children}</div>
+    </div>
+  );
+}
+
+/**
+ * As seis imagens da cena do topo (`CenaProduto`). São as mesmas réplicas das
+ * demonstrações, paradas na primeira tela. `npm run capture -- --hero` gera só
+ * estas.
+ */
+const cenasDoTopo: Record<string, () => React.ReactNode> = {
+  "produto-crm": () => (
+    <div id="alvo" className="w-[1180px] overflow-hidden [&>div]:min-h-[738px]">
+      <PainelComercial />
+    </div>
+  ),
+  "produto-crm-celular": () => (
+    <TelaCelular>
+      <CelularCrm />
+    </TelaCelular>
+  ),
+  "produto-focus": () => (
+    <div id="alvo" className={`w-[1240px] ${fonteFocus.variable} ${fonteFocusMono.variable}`}>
+      <PainelFocus layout="desktop" sincronizarUrl={false} />
+    </div>
+  ),
+  "produto-focus-celular": () => (
+    <div className={`${fonteFocus.variable} ${fonteFocusMono.variable}`}>
+      <TelaCelular fundo="bg-[#f6f7f9]">
+        <PainelFocus layout="celular" sincronizarUrl={false} />
+      </TelaCelular>
+    </div>
+  ),
+  "produto-chat": () => (
+    <div id="alvo" className="w-[1136px]">
+      <SistemaChat />
+    </div>
+  ),
+  "produto-chat-celular": () => (
+    <TelaCelular>
+      <CelularChat />
+    </TelaCelular>
+  ),
 };
 
 function OpenGraphCard() {
@@ -163,6 +233,12 @@ export default async function CapturePage({ params }: { params: Promise<{ id: st
 
   if (id === "og-chat") {
     return <OpenGraphChatCard />;
+  }
+
+  const cena = cenasDoTopo[id];
+
+  if (cena) {
+    return <div className="bg-ink-950 p-6">{cena()}</div>;
   }
 
   const screen = screenMap[id];

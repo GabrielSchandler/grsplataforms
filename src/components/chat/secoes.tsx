@@ -16,6 +16,7 @@ import { MolduraFeixe } from "@/components/efeitos/feixe-borda";
 import { Reveal, Spotlight } from "@/components/motion/motion";
 import { DemoForm } from "@/components/site/demo-form";
 import { Eyebrow, Lead, Section, SectionTitle } from "@/components/site/primitives";
+import { AcaoPrincipal, AcaoSecundaria, TopoProduto } from "@/components/site/topo-produto";
 import {
   chatCampanhas,
   chatDemo,
@@ -45,84 +46,44 @@ function externo(href: string) {
    ------------------------------------------------------------------------- */
 
 /**
- * A cena da direita é a conversa que a página inteira acompanha: a mesma
- * Carla que aparece na demonstração, atendida pela IA e assumida pela Marina.
+ * A cena da direita é a central de verdade, no computador e no celular, com a
+ * conversa que a página inteira acompanha: a Carla, atendida pela IA.
  */
 export function HeroChat() {
   const testeHref = whatsappLink(chatMensagens.teste);
 
   return (
-    <section id="topo" className="relative isolate overflow-hidden bg-ink-950">
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-        <div
-          className="padrao-pontos absolute inset-0 opacity-70"
-          style={{
-            maskImage: "radial-gradient(70% 60% at 68% 35%, black, transparent)",
-            WebkitMaskImage: "radial-gradient(70% 60% at 68% 35%, black, transparent)",
-          }}
-        />
-        {/* Roxo e ciano são as cores do Chat: roxo é tudo que é da IA, ciano é
-            a ação humana. Aqui aparecem só como atmosfera atrás da conversa. */}
-        <div className="absolute -right-24 top-10 h-[520px] w-[520px] rounded-full bg-violet-500/10 blur-[120px]" />
-        <div className="absolute right-1/4 top-1/2 h-[420px] w-[420px] rounded-full bg-cyan-500/10 blur-[120px]" />
-      </div>
-
-      <div className="relative mx-auto grid min-h-[86vh] w-full max-w-6xl items-center gap-12 px-5 pb-24 pt-32 sm:px-8 sm:pt-36 lg:grid-cols-[minmax(0,1fr)_400px]">
-        <div className="max-w-xl">
-          <div className="hero-in">
-            <Eyebrow>{chatHero.eyebrow}</Eyebrow>
-          </div>
-
-          <div className="hero-in" style={{ "--delay": "70ms" } as React.CSSProperties}>
-            <h1 className="font-display mt-6 text-4xl leading-[1.05] font-semibold text-white sm:text-5xl lg:text-[3.2rem]">
-              {chatHero.title}
-            </h1>
-          </div>
-
-          <div className="hero-in" style={{ "--delay": "150ms" } as React.CSSProperties}>
-            <p className="measure mt-6 text-lg leading-relaxed text-fog-300">{chatHero.subtitle}</p>
-          </div>
-
-          <div className="hero-in" style={{ "--delay": "220ms" } as React.CSSProperties}>
-            <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
-              <a
-                href={testeHref}
-                {...externo(testeHref)}
-                className="sweep inline-flex items-center justify-center gap-2 rounded-lg bg-brand-500 px-6 py-3.5 text-sm font-semibold text-white"
-              >
-                <span className="relative z-10 inline-flex items-center gap-2">
-                  {chatHero.primaryCta}
-                  <ArrowRight aria-hidden="true" className="h-4 w-4" />
-                </span>
-              </a>
-              <a
-                href="#central"
-                className="inline-flex items-center justify-center gap-2 rounded-lg border border-ink-700 px-6 py-3.5 text-sm font-semibold text-white transition-colors hover:border-fog-600"
-              >
-                {chatHero.secondaryCta}
-              </a>
-            </div>
-          </div>
-
-          <div className="hero-in" style={{ "--delay": "260ms" } as React.CSSProperties}>
-            <ul className="mt-7 flex flex-wrap gap-x-2 gap-y-2">
-              {chatHero.chips.map((chip) => (
-                <li
-                  key={chip}
-                  className="rounded border border-ink-700 bg-ink-900/60 px-2.5 py-1 text-[12px] text-fog-300"
-                >
-                  {chip}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-
-        <div className="hero-in hidden lg:block" style={{ "--delay": "320ms" } as React.CSSProperties}>
-          <ConversaHero />
-        </div>
-      </div>
-    </section>
+    <TopoProduto
+      produto="chat"
+      eyebrow={chatHero.eyebrow}
+      titulo={chatHero.title}
+      subtitulo={chatHero.subtitle}
+      garantias={chatHero.chips}
+      acoes={
+        <>
+          <AcaoPrincipal href={testeHref}>
+            {chatHero.primaryCta}
+            <ArrowRight aria-hidden="true" className="h-4 w-4" />
+          </AcaoPrincipal>
+          <AcaoSecundaria href="#central">{chatHero.secondaryCta}</AcaoSecundaria>
+        </>
+      }
+      fundo={
+        <>
+          <div
+            className="padrao-pontos absolute inset-0 opacity-70"
+            style={{
+              maskImage: "radial-gradient(70% 60% at 68% 35%, black, transparent)",
+              WebkitMaskImage: "radial-gradient(70% 60% at 68% 35%, black, transparent)",
+            }}
+          />
+          {/* Roxo e ciano são as cores do Chat: roxo é tudo que é da IA, ciano é
+              a ação humana. Aqui aparecem só como atmosfera atrás da central. */}
+          <div className="absolute -right-24 top-10 h-[520px] w-[520px] rounded-full bg-violet-500/10 blur-[120px]" />
+          <div className="absolute right-1/4 top-1/2 h-[420px] w-[420px] rounded-full bg-cyan-500/10 blur-[120px]" />
+        </>
+      }
+    />
   );
 }
 
