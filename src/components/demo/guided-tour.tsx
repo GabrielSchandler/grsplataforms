@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { ArrowLeft, ArrowRight, Pause, Play, RotateCcw } from "lucide-react";
 import { DemoNavContext } from "./chrome";
-import { ScaledStage, LARGURA_BASE } from "./scaled-stage";
+import { ATRIBUTO_ROLAGEM, ScaledStage, LARGURA_BASE } from "./scaled-stage";
 import { screenMap } from "./screen-map";
 import { tourDepartments, tourSteps } from "@/content/tour";
 import { useAntesDaPintura } from "@/lib/use-antes-da-pintura";
@@ -162,7 +162,6 @@ export function TourGuiado({
   const [legenda, setLegenda] = useState<{ top: number; left: number } | null>(null);
 
   const palcoRef = useRef<HTMLDivElement>(null);
-  const roloRef = useRef<HTMLDivElement>(null);
   // O palco encolhe em tela estreita; as medidas do realce precisam voltar
   // para a escala natural, senão o anel sai menor que o alvo.
   const escalaRef = useRef(1);
@@ -251,9 +250,11 @@ export function TourGuiado({
         }),
       );
 
-      const rolo = roloRef.current;
+      // No celular o palco não encolhe até virar miniatura: ele desliza de
+      // lado. O tour leva o destaque para o meio da vista, na escala vigente.
+      const rolo = palco.closest<HTMLElement>(`[${ATRIBUTO_ROLAGEM}]`);
       if (rolo) {
-        const centro = anel.left + anel.width / 2 - rolo.clientWidth / 2;
+        const centro = (anel.left + anel.width / 2) * escala - rolo.clientWidth / 2;
         rolo.scrollTo({ left: Math.max(0, centro), behavior: "smooth" });
       }
     }, 300);
@@ -283,8 +284,11 @@ export function TourGuiado({
 
   return (
     <div onMouseEnter={() => setTocando(false)}>
-      {/* Trilha por grupo, acima da cena */}
-      <div className="scroll-x flex items-end gap-3 pb-1 sm:gap-4">
+      {/* Trilha por grupo, acima da cena. `relative` não é enfeite: os rótulos
+          de leitor de tela dos botões são absolutos, e sem um ancestral
+          posicionado eles escapam da faixa rolável e alargam a página inteira
+          no celular (a home chegava a 430px numa tela de 390). */}
+      <div className="scroll-x relative flex items-end gap-3 pb-1 sm:gap-4">
         {grupos.map((grupo) => {
           const doGrupo = etapas
             .map((etapa, posicao) => ({ etapa, posicao }))
@@ -332,7 +336,6 @@ export function TourGuiado({
 
       {/* A cena: tela do sistema, escurecimento, realce e legenda */}
       <div
-        ref={roloRef}
         className="mt-4 overflow-hidden rounded-lg border border-ink-700 bg-ink-900 p-2"
         onKeyDown={(evento) => {
           if (evento.key === "ArrowRight") {

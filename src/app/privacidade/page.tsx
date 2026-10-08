@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { Footer } from "@/components/site/footer";
+import { Header } from "@/components/site/header";
 import { privacidade } from "@/content/privacidade";
 
 export const metadata: Metadata = {
@@ -14,8 +15,11 @@ export const metadata: Metadata = {
 export default function PrivacidadePage() {
   return (
     <>
+      {/* Mesmo cabeçalho do resto do site, com os três produtos à vista: quem
+          chega aqui pelo rodapé não pode ficar numa página sem saída. */}
+      <Header marca />
       <main id="conteudo" className="bg-ink-950">
-        <div className="mx-auto w-full max-w-3xl px-5 py-20 sm:px-8 sm:py-28">
+        <div className="mx-auto w-full max-w-3xl px-5 pb-20 pt-36 sm:px-8 sm:pb-28 sm:pt-40">
           <Link
             href="/"
             className="inline-flex items-center gap-2 text-sm font-medium text-fog-400 transition hover:text-white"

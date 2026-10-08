@@ -28,6 +28,7 @@ import {
   chatOferta,
   chatPilares,
   chatProblema,
+  chatRotina,
   chatTelas,
 } from "@/content/chat";
 import { whatsappLink } from "@/lib/site-config";
@@ -453,6 +454,36 @@ export function SecaoCampanhas() {
             <p className="mt-3 text-[15px] leading-relaxed text-fog-600">{chatCampanhas.nota.texto}</p>
           </div>
         </Reveal>
+      </div>
+    </Section>
+  );
+}
+
+/* -------------------------------------------------------------------------
+   A rotina da equipe — retornos, respostas rápidas, metas e relatórios
+   ------------------------------------------------------------------------- */
+
+export function SecaoRotina() {
+  return (
+    <Section id="rotina" tone="light">
+      <Reveal>
+        <Eyebrow tone="light">{chatRotina.eyebrow}</Eyebrow>
+        <SectionTitle className="max-w-3xl text-ink-950">{chatRotina.title}</SectionTitle>
+        <Lead tone="light">{chatRotina.intro}</Lead>
+      </Reveal>
+
+      <div className="mt-12 grid gap-x-10 gap-y-9 sm:grid-cols-2 lg:grid-cols-3">
+        {chatRotina.itens.map((item, indice) => (
+          <Reveal
+            key={item.titulo}
+            as="article"
+            delay={(indice % 3) * 110}
+            className="border-t border-fog-200 pt-5"
+          >
+            <h3 className="text-[17px] font-semibold leading-snug text-ink-950">{item.titulo}</h3>
+            <p className="mt-2.5 text-[15px] leading-relaxed text-fog-600">{item.texto}</p>
+          </Reveal>
+        ))}
       </div>
     </Section>
   );

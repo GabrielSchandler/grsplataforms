@@ -9,6 +9,7 @@ import {
   SecaoImplantacaoChat,
   SecaoOfertaChat,
   SecaoPerguntasChat,
+  SecaoRotina,
   SecaoProblemaChat,
   SecaoTelas,
 } from "@/components/chat/secoes";
@@ -82,6 +83,7 @@ const dadosEstruturados = {
         "Assumir, transferir, concluir, reabrir e devolver a conversa para a IA",
         "Notas internas, respostas rápidas e nota de voz gravada na própria central",
         "Supervisão das filas, com conversas sem responsável e clientes aguardando",
+        "Retornos agendados, meta de resposta em horário útil e relatórios de atendimento por equipe",
         "Campanhas com variáveis, variações A/B, janela de horário, intervalo entre envios e limite diário",
         "Importação de leads de planilha do Google Sheets sem duplicar",
         "Mais de um número de WhatsApp e mais de uma equipe na mesma central",
@@ -141,6 +143,7 @@ export default function PaginaChat() {
         <SecaoTelas />
         <SecaoIa />
         <SecaoCampanhas />
+        <SecaoRotina />
         <SecaoImplantacaoChat />
         <SecaoOfertaChat />
         <SecaoPerguntasChat />

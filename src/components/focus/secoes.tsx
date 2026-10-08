@@ -140,8 +140,12 @@ export function SecaoRespostas() {
               <CartaoResposta key={cartao.pergunta} cartao={cartao} />
             ))}
 
-            {/* A grade fecha com uma chamada em vez de uma célula vazia. */}
-            <Reveal delay={180} className="lg:col-span-2">
+            {/* A grade fecha com uma chamada em vez de uma célula vazia: ela
+                ocupa o que sobrar da última linha, quantos cartões houver. */}
+            <Reveal
+              delay={180}
+              className={["lg:col-span-3", "lg:col-span-2", ""][demais.length % 3]}
+            >
               <button
                 type="button"
                 onClick={() => abrirTelaDoFocus("visao")}

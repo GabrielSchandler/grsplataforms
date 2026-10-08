@@ -258,6 +258,21 @@ export const atendimento = {
       description:
         "Conversas e grupos entre os funcionários, com arquivo, áudio e resposta citando a mensagem, sem sair do sistema.",
     },
+    {
+      title: "Áudio, foto e documento na mesma tela",
+      description:
+        "O consultor grava o áudio ali mesmo e envia foto, vídeo ou documento pelo clipe, colando ou arrastando o arquivo. Dá para buscar dentro da conversa e responder citando a mensagem.",
+    },
+    {
+      title: "Aviso de mensagem nova",
+      description:
+        "Som, aviso na tela e contador no sino quando o cliente escreve, também para quem está em outra tela do sistema. Clicar no aviso abre a conversa.",
+    },
+    {
+      title: "No computador e no celular",
+      description:
+        "Em tela pequena, a lista e a conversa viram duas telas e o menu abre por um botão. O consultor acompanha o atendimento fora da mesa.",
+    },
   ],
   demoNote:
     "Esta é a tela de atendimento, com dados fictícios. Clique nas abas Meus, Outros e IA e abra as conversas.",
@@ -385,6 +400,11 @@ export const faq = {
       question: "O sistema conversa com o que já uso?",
       answer:
         "Em dois pontos que aparecem no dia a dia: o e-mail sai pela conta corporativa da própria empresa, conectada ao sistema, então a mensagem chega ao cliente com o seu domínio e não com o de um remetente estranho; e os documentos gerados podem ser enviados ao cliente por WhatsApp, através de integração configurada pela empresa. A entrada de leads também lê planilhas, de forma incremental.",
+    },
+    {
+      question: "Como o WhatsApp da empresa entra no sistema?",
+      answer:
+        "O administrador abre a tela de números de WhatsApp e lê um QR Code com o celular da empresa, do mesmo jeito que se conecta o WhatsApp num computador. A partir daí as conversas daquele número chegam ao atendimento, e dá para iniciar uma conversa nova digitando o número do cliente.",
     },
     {
       question: "Se eu sair, levo meus dados comigo?",

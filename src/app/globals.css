@@ -112,6 +112,18 @@
   scrollbar-width: thin;
 }
 
+/* Palco da réplica quando desliza de lado no celular (scaled-stage.tsx): sem
+   barra de rolagem, que comeria a base da tela — o aviso "Arraste para o
+   lado" faz o papel dela. */
+.palco-desliza {
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+}
+
+.palco-desliza::-webkit-scrollbar {
+  display: none;
+}
+
 /* ==========================================================================
    Sistema de movimento
    --------------------------------------------------------------------------

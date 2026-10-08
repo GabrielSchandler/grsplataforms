@@ -30,7 +30,8 @@
   /* Uma primeira dobra com leitura contínua, sem altura de desktop. */
   .pagina-focus .focus-abertura {
     min-height: auto;
-    padding: 6.5rem var(--respiro-mobile) 2.75rem;
+    /* 8.75rem: o cabeçalho do celular ganhou a faixa dos três produtos. */
+    padding: 8.75rem var(--respiro-mobile) 2.75rem;
   }
 
   .pagina-focus .focus-abertura h1 {
@@ -249,13 +250,9 @@
   .pagina-focus footer { padding-bottom: calc(5.5rem + env(safe-area-inset-bottom)); }
 }
 
-@media (min-width: 360px) and (max-width: 639px) {
-  .pagina-focus > header > div > div:first-child { gap: 0.5rem; }
-  .pagina-focus > header > div [aria-label="Produtos NewSec"] { display: flex; }
-  .pagina-focus > header > div [aria-label="Produtos NewSec"] a {
-    min-height: 2.75rem;
-    display: flex;
-    align-items: center;
-    padding-inline: 0.5rem;
-  }
+/* O seletor CRM · Focus · Chat no celular deixou de ser regra só desta página:
+   desde 08/10/2026 o cabeçalho do site mostra a faixa dos três produtos em
+   todas elas (header.tsx). */
+@media (max-width: 1023px) {
+  .pagina-focus > header > [data-faixa-produtos] { padding-top: 0; }
 }

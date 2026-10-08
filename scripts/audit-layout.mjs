@@ -71,6 +71,7 @@ const chatSections = [
   "telas",
   "ia",
   "campanhas",
+  "rotina",
   "implantacao",
   "teste",
   "perguntas",

@@ -155,6 +155,12 @@ export const focusRespostas = {
         "Equipe por equipe, com o índice médio por pessoa — um time de três se compara com um de dez — e a composição do expediente de cada uma, lado a lado.",
     },
     {
+      tela: "pessoas",
+      pergunta: "Como foi o dia de cada pessoa?",
+      resposta:
+        "A linha do tempo mostra o dia hora a hora: o que foi tempo produtivo, o que ficou parado, quando a tela estava bloqueada e quando a máquina estava desligada. Ao lado, os aplicativos mais usados e o histórico dos outros dias.",
+    },
+    {
       tela: "aplicativos",
       pergunta: "O sistema que a empresa paga está sendo usado?",
       resposta:
@@ -319,6 +325,16 @@ export const focusFaq = {
       question: "Por que o índice de produtividade parece baixo?",
       answer:
         "Porque a régua é o expediente inteiro previsto na escala, não só o tempo em que a máquina estava em uso. Tela bloqueada, tempo parado e máquina desligada dentro do expediente contam contra, e o tempo em ferramentas que a empresa classificou como neutras não conta a favor. O número mostra quanto do expediente pago virou trabalho em ferramenta produtiva — não é nota de desempenho.",
+    },
+    {
+      question: "Quem decide o que conta como produtivo?",
+      answer:
+        "A sua empresa. Os aplicativos e sites que as estações usaram aparecem numa lista em Administração, e você classifica cada um como produtivo, neutro ou improdutivo. O que ainda não foi classificado fica fora do índice, e o painel avisa quantos estão nessa situação.",
+    },
+    {
+      question: "E quem trabalha em horário diferente do resto da empresa?",
+      answer:
+        "A escala de expediente tem três níveis: a padrão da empresa, a de uma equipe e a de uma pessoa, cada uma com entrada, saída e intervalo por dia da semana. Vale sempre a mais específica, então o plantão de sábado ou o turno da tarde é medido contra o horário dele, não contra o da empresa.",
     },
     {
       question: "Isso vira controle de ponto?",

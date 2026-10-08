@@ -214,6 +214,51 @@ export const chatCampanhas = {
   },
 };
 
+/**
+ * O que a equipe usa entre uma conversa e outra. Tudo aqui é tela que existe
+ * no produto (Retornos, Respostas rápidas, Relatórios, Contatos e
+ * Configurações > Atendimento). O relatório agrega por equipe: nada de
+ * "desempenho por atendente".
+ */
+export const chatRotina = {
+  eyebrow: "A rotina da equipe",
+  title: "O que acontece depois da primeira resposta.",
+  intro:
+    "Atender bem não é só responder rápido uma vez. É não esquecer de voltar, não redigitar a mesma frase e saber se o prazo combinado está sendo cumprido.",
+  itens: [
+    {
+      titulo: "Retornos agendados",
+      texto:
+        "Cada atendente vê quem precisa contatar e quando, com os vencidos em destaque e a última mensagem do cliente à mão. Marcar o retorno como feito não encerra a conversa.",
+    },
+    {
+      titulo: "Respostas rápidas",
+      texto:
+        "Textos prontos, encontrados por nome ou atalho e compartilhados com a equipe ou com a empresa toda. Entram na conversa como rascunho: o atendente revisa antes de enviar.",
+    },
+    {
+      titulo: "Meta de resposta em horário útil",
+      texto:
+        "Você define em quantos minutos o cliente deve ser respondido, e o prazo só corre dentro do expediente, descontando intervalos e feriados. Quem escreve dois minutos antes de fechar não vira atraso da equipe.",
+    },
+    {
+      titulo: "Relatórios por equipe",
+      texto:
+        "Tempo até a primeira resposta humana, respostas dentro da meta e conversas concluídas no período, ao lado das filas e pendências do momento. A tela mostra o critério de cada número.",
+    },
+    {
+      titulo: "Ficha do contato",
+      texto:
+        "Etiquetas, responsável, última interação e os campos que você criar. Para cada campo, você escreve como a IA deve perguntar, e a resposta do cliente fica guardada na ficha.",
+    },
+    {
+      titulo: "O cliente voltou? A conversa reabre",
+      texto:
+        "Se você ligar essa regra, o atendimento concluído é retomado quando o cliente escreve de novo, com o histórico inteiro e sem começar do zero.",
+    },
+  ],
+};
+
 export const chatImplantacao = {
   eyebrow: "Implantação",
   title: "Do QR Code à primeira conversa atendida.",

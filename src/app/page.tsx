@@ -43,6 +43,7 @@ const structuredData = {
       featureList: [
         "Isolamento lógico dos dados, aplicado no banco de dados",
         "Atendimento por WhatsApp dentro do sistema, com IA no primeiro contato e passagem para a equipe",
+        "Envio de áudio, foto, vídeo e documento pelo atendimento, com aviso de mensagem nova",
         "Chat interno entre os funcionários",
         "Distribuição de leads com importação incremental de planilhas",
         "Pipeline comercial em Kanban",

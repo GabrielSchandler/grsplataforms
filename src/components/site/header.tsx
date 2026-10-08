@@ -34,6 +34,9 @@ const porProduto = {
   chat: { links: chatNav.links, cta: chatNav.cta, mensagem: chatMensagens.teste },
 } as const;
 
+/** Página da marca não tem menu de seções. Constante, para não mudar a cada renderização. */
+const SEM_LINKS: readonly { label: string; href: string }[] = [];
+
 /** Destaca o item do menu conforme a seção que está na tela. */
 function useSecaoAtiva(ids: string[]) {
   const chave = ids.join(",");
@@ -74,7 +77,17 @@ function useSecaoAtiva(ids: string[]) {
   return ativa;
 }
 
-function SeletorProduto({ atual, className = "" }: { atual: ProdutoId; className?: string }) {
+function SeletorProduto({
+  atual,
+  className = "",
+  largo = false,
+}: {
+  /** `null` nas páginas da marca (privacidade): os três aparecem, nenhum marcado. */
+  atual: ProdutoId | null;
+  className?: string;
+  /** No celular os três dividem a largura da faixa, com área de toque maior. */
+  largo?: boolean;
+}) {
   return (
     <div
       role="group"
@@ -89,9 +102,12 @@ function SeletorProduto({ atual, className = "" }: { atual: ProdutoId; className
             key={produto.id}
             href={produto.href}
             aria-current={ativo ? "true" : undefined}
+            aria-label={ativo ? `${produto.nome} (você está aqui)` : produto.nome}
             title={produto.descricao}
-            className={`rounded-md px-2.5 py-1 text-xs font-semibold transition-colors ${
-              ativo ? "bg-ink-800 text-white" : "text-fog-400 hover:text-white"
+            className={`rounded-md px-2.5 py-1 text-center text-xs font-semibold transition-colors ${
+              largo ? "flex-1 py-1.5" : ""
+            } ${
+              ativo ? "bg-white text-ink-950" : "text-fog-300 hover:text-white"
             }`}
           >
             {produto.curto}
@@ -102,7 +118,17 @@ function SeletorProduto({ atual, className = "" }: { atual: ProdutoId; className
   );
 }
 
-export function Header({ produto = "crm" }: { produto?: ProdutoId }) {
+export function Header({
+  produto = "crm",
+  marca = false,
+}: {
+  produto?: ProdutoId;
+  /**
+   * Página da marca, e não de um produto (privacidade): o cabeçalho mostra os
+   * três produtos sem marcar nenhum e não lista as seções de um deles.
+   */
+  marca?: boolean;
+}) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [pastHero, setPastHero] = useState(false);
@@ -111,7 +137,8 @@ export function Header({ produto = "crm" }: { produto?: ProdutoId }) {
   const ehFocus = produto === "focus";
   // Focus e Chat são páginas únicas: o menu aponta para seções, não para rotas.
   const paginaUnica = produto !== "crm";
-  const { links } = porProduto[produto];
+  const links = marca ? SEM_LINKS : porProduto[produto].links;
+  const produtoAtual = marca ? null : produto;
 
   // `trailingSlash` deixa o caminho como "/comercial/"; a comparação ignora
   // a barra final para o item certo ficar marcado.
@@ -141,7 +168,7 @@ export function Header({ produto = "crm" }: { produto?: ProdutoId }) {
     ? whatsappLink(porProduto[produto].mensagem)
     : primaryCtaHref(porProduto[produto].mensagem);
   const ctaRotulo = porProduto[produto].cta;
-  const inicio = produtos.find((item) => item.id === produto)?.href ?? "/";
+  const inicio = marca ? "/" : (produtos.find((item) => item.id === produto)?.href ?? "/");
 
   return (
     <header
@@ -156,7 +183,7 @@ export function Header({ produto = "crm" }: { produto?: ProdutoId }) {
           <Link href={inicio} aria-label={`${siteConfig.brandName} — página inicial`}>
             <Logo />
           </Link>
-          <SeletorProduto atual={produto} className="hidden lg:flex" />
+          <SeletorProduto atual={produtoAtual} className="hidden lg:flex" />
         </div>
 
         <nav aria-label="Seções do site" className="hidden items-center gap-4 lg:flex xl:gap-5">
@@ -229,20 +256,20 @@ export function Header({ produto = "crm" }: { produto?: ProdutoId }) {
         </div>
       </div>
 
+      {/* No celular os três produtos ficam à vista, numa faixa logo abaixo do
+          logo. Dentro do menu, quem chega pelo CRM não descobria que existem
+          o Focus e o Chat sem abrir o hambúrguer ou rolar até o rodapé. */}
+      <div data-faixa-produtos className="px-5 pb-3 sm:px-8 lg:hidden">
+        <SeletorProduto atual={produtoAtual} largo />
+      </div>
+
       {open ? (
         <nav
           id="menu-mobile"
           aria-label="Menu"
           className="border-t border-ink-800 bg-ink-950 px-5 py-4 lg:hidden"
         >
-          <div className="mb-3">
-            <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-fog-500">
-              Produtos
-            </p>
-            <SeletorProduto atual={produto} />
-          </div>
-
-          <ul className="space-y-1 border-t border-ink-800 pt-3">
+          <ul className="space-y-1">
             {links.map((link) => (
               <li key={link.href}>
                 <Link
