@@ -702,3 +702,361 @@
     transparent 100%
   );
 }
+
+/* ==========================================================================
+   Cena 3D do topo dos produtos (site/cena-produto.tsx → Cena3D)
+   --------------------------------------------------------------------------
+   Três variáveis movem tudo, escritas por `CenaMovimento`:
+     --p   rolagem (0 = repouso; 1 = saindo por cima; negativo = vindo de baixo)
+     --mx  --my   ponteiro, de -1 a 1 (só com mouse)
+   Sem JavaScript elas valem 0 e a cena fica na pose de repouso.
+
+   Pose de repouso: --rx/--ry/--rz. A janela inclina para trás e a borda
+   direita se afasta — ela "olha" para o texto e a parte cortada pela borda
+   da página encolhe. Ao rolar, a cena se endireita.
+
+   Só transform e opacity mudam com o movimento. Nada aqui usa `filter` nem
+   `opacity` < 1 dentro do 3D: os dois achatam a perspectiva no navegador.
+   ========================================================================== */
+
+.c3 {
+  --p: 0;
+  --mx: 0;
+  --my: 0;
+  --rx: 9deg;
+  --ry: 13deg;
+  --rz: -1.5deg;
+  --d: 9px; /* espessura da janela */
+  --cz: 46px; /* distância do celular até a janela */
+  --ty: 0%; /* quanto a cena "fica para trás" na rolagem */
+  position: relative;
+  perspective: 1600px;
+  perspective-origin: 35% 35%;
+}
+
+@media (min-width: 1024px) {
+  .c3 {
+    --rx: 8deg;
+    --ry: 17deg;
+    --rz: -1.5deg;
+    --d: 22px;
+    --cz: 90px;
+    --ty: 9%;
+    perspective: 2200px;
+  }
+}
+
+.c3-entrada,
+.c3-palco,
+.c3-janela,
+.c3-celular-pos,
+.c3-celular {
+  transform-style: preserve-3d;
+}
+
+/* O giro é feito em torno do canto de baixo à esquerda (onde fica o
+   celular), e não do centro: assim a janela inteira só vai para trás (z ≤ 0)
+   e o celular, sempre à frente dela, nunca a atravessa. Girando pelo centro,
+   a borda esquerda da janela vinha ~110px para a frente e cortava o celular. */
+.c3-palco {
+  transform-origin: 0% 100%;
+  transform: translate3d(0, calc(var(--p) * var(--ty)), 0)
+    rotateX(calc(var(--rx) * (1 - var(--p) * 0.9) - var(--my) * 2.5deg))
+    rotateY(calc(var(--ry) * (1 - var(--p) * 0.8) + var(--mx) * 4deg))
+    rotateZ(calc(var(--rz) * (1 - var(--p))));
+  will-change: transform;
+}
+
+/* --- Janela -------------------------------------------------------------- */
+
+.c3-janela {
+  position: relative;
+}
+
+.c3-frente {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+  background: var(--color-ink-900);
+}
+
+/* Fundo da peça: a placa de trás, com a sombra longa e a contraluz. */
+.c3-fundo {
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+  background: #060608;
+  transform: translateZ(calc(var(--d) * -1));
+  box-shadow:
+    0 60px 120px -20px rgba(0, 0, 0, 0.9),
+    0 24px 48px -8px rgba(0, 0, 0, 0.55),
+    46px -26px 110px -34px var(--c3-contraluz),
+    0 0 90px -10px rgba(190, 200, 255, 0.1);
+}
+
+/* Espessura: cinco placas paralelas entre a frente e o fundo, do metal claro
+   (perto da frente, onde pega a luz) ao escuro. Na perspectiva elas aparecem
+   como a borda maciça da peça.
+
+   Não usar faces perpendiculares (rotateX/rotateY de 90°) aqui: o navegador
+   ordena a profundidade cortando tudo pelo plano infinito de cada face, e o
+   celular — que passa da borda de baixo e da esquerda da janela — aparecia
+   fatiado na linha da borda. Placas paralelas não cortam nada. */
+.c3-placa {
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+  pointer-events: none;
+  transform: translateZ(calc(var(--d) * var(--i) / -6));
+  background: color-mix(in srgb, #5a5f6b calc(100% - var(--i) * 18%), #0b0b0d);
+}
+
+/* Luz sobre o vidro. O tom é tão leve que a tela não perde contraste. */
+.c3-tom {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 60% 45% at 8% 0%, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 70%),
+    linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.06) 0%,
+    rgba(255, 255, 255, 0) 32%,
+    rgba(10, 12, 24, 0) 60%,
+    rgba(10, 12, 24, 0.11) 100%
+  );
+}
+
+.c3-vidro {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+/* Faixa de reflexo: uma luz larga e suave, inclinada, que corre pelo vidro
+   com a rolagem e com o ponteiro. */
+.c3-reflexo {
+  position: absolute;
+  top: -40%;
+  bottom: -40%;
+  left: -70%;
+  width: 70%;
+  background: linear-gradient(
+    100deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.05) 30%,
+    rgba(255, 255, 255, 0.2) 47%,
+    rgba(255, 255, 255, 0.05) 55%,
+    rgba(255, 255, 255, 0) 78%
+  );
+  transform: translate3d(calc(55% + var(--p) * 150% + var(--mx) * 22%), 0, 0) rotate(12deg);
+  will-change: transform;
+}
+
+/* Aro: o fio de luz na quina da peça (forte em cima, fraco à esquerda) e um
+   filete da contraluz do lado direito. */
+.c3-aro {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: 8px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    inset 1px 0 0 rgba(255, 255, 255, 0.1),
+    inset -1px 0 0 color-mix(in srgb, var(--c3-contraluz) 70%, transparent),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.07);
+}
+
+/* Sombra do celular sobre a tela: deslocada para baixo e para a direita
+   (a luz vem de cima e da esquerda). Quando o celular se afasta da janela,
+   ela abre, clareia e fica para trás. */
+.c3-sombra-celular {
+  position: absolute;
+  left: -6%;
+  top: 22%;
+  width: 46%;
+  height: 100%;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 50% 50% at 40% 50%,
+    rgba(5, 8, 20, 0.34),
+    rgba(5, 8, 20, 0.14) 55%,
+    rgba(5, 8, 20, 0) 100%
+  );
+  transform: translate3d(calc(var(--p) * 6%), calc(var(--p) * 10%), 0) scale(calc(1 + var(--p) * 0.18));
+  opacity: calc(1 - var(--p) * 0.45);
+}
+
+@media (min-width: 1024px) {
+  .c3-sombra-celular {
+    left: -8%;
+    top: 34%;
+    width: 38%;
+  }
+}
+
+/* Sombra de contato, no "chão" debaixo da cena. */
+.c3-chao {
+  position: absolute;
+  left: 4%;
+  right: -4%;
+  bottom: -12%;
+  height: 22%;
+  pointer-events: none;
+  background: radial-gradient(
+    closest-side,
+    rgba(0, 0, 0, 0.75),
+    rgba(0, 0, 0, 0.35) 55%,
+    rgba(0, 0, 0, 0)
+  );
+  transform: translate3d(0, calc(var(--p) * 30%), 0) scale(calc(1 + var(--p) * 0.22), calc(1 + var(--p) * 0.12));
+  opacity: calc(0.9 - var(--p) * 0.5);
+}
+
+/* --- Celular ------------------------------------------------------------- */
+
+.c3-celular-pos {
+  position: absolute;
+  left: -7%;
+  top: 20%;
+  width: 31%;
+}
+
+@media (min-width: 1024px) {
+  .c3-celular-pos {
+    top: auto;
+    bottom: -9%;
+    left: -5%;
+    width: 25%;
+  }
+}
+
+/* Mais perto de quem olha que a janela; ao rolar, sobe mais rápido e se
+   descola ainda mais, girando um pouco para o lado da luz. */
+.c3-celular {
+  position: relative;
+  transform: translate3d(0, calc(var(--p) * -16%), calc(var(--cz) + var(--p) * var(--cz) * 0.7))
+    rotateY(calc(var(--p) * -9deg - var(--mx) * 3deg))
+    rotateX(calc(var(--my) * 2deg))
+    rotateZ(calc(var(--p) * 2.5deg));
+  will-change: transform;
+}
+
+/* O corpo: aro de metal (o degradê faz o brilho nas quinas da luz) e, dentro
+   dele, a moldura preta de vidro. */
+.c3-cel-corpo {
+  position: relative;
+  border-radius: 14% / 6.6%;
+  padding: 1.6%;
+  background: linear-gradient(
+    140deg,
+    #8a909c 0%,
+    #3a3d45 10%,
+    #16171b 32%,
+    #0c0d10 60%,
+    #2a2d35 86%,
+    #6b717e 100%
+  );
+  /* Espessura em 2D: o aro "extrudado" para baixo e para a direita (o lado
+     oposto à luz), depois a sombra longa e a contraluz. Placas separadas em
+     3D davam erro de ordenação de profundidade no Chrome (a borda da janela
+     atravessava o celular). */
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+    1px 1.5px 0 #2a2c33,
+    2px 3px 0 #1f2127,
+    3px 4.5px 0 #16171c,
+    4px 6px 0 #0e0f12,
+    0 46px 70px -16px rgba(0, 0, 0, 0.9),
+    0 14px 26px -6px rgba(0, 0, 0, 0.6),
+    22px -10px 50px -20px var(--c3-contraluz);
+}
+
+.c3-cel-moldura {
+  position: relative;
+  border-radius: 12.6% / 6%;
+  padding: 3.2%;
+  background: #030304;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+.c3-cel-tela {
+  position: relative;
+  aspect-ratio: 390 / 800;
+  overflow: hidden;
+  border-radius: 10% / 4.9%;
+  background: #fff;
+}
+
+/* Botões laterais: saem do aro, mais claros em cima (luz de cima). */
+.c3-botao {
+  position: absolute;
+  width: max(2px, 1.3%);
+  border-radius: 2px;
+  background: linear-gradient(to bottom, #6b717e, #23252b);
+}
+
+.c3-botao-acao {
+  left: -0.9%;
+  top: 15%;
+  height: 4.5%;
+}
+
+.c3-botao-vol1 {
+  left: -0.9%;
+  top: 22%;
+  height: 8%;
+}
+
+.c3-botao-vol2 {
+  left: -0.9%;
+  top: 32%;
+  height: 8%;
+}
+
+.c3-botao-lado {
+  right: -0.9%;
+  top: 25%;
+  height: 12%;
+  background: linear-gradient(to bottom, #4a4f5b, #15161a);
+}
+
+/* No celular o reflexo é mais estreito e corre em sentido próprio. */
+.c3-vidro-cel .c3-reflexo {
+  left: -90%;
+  width: 90%;
+  transform: translate3d(calc(70% + var(--p) * 120% + var(--mx) * 30%), 0, 0) rotate(18deg);
+}
+
+/* --- Entrada ------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: no-preference) {
+  .c3-entrada {
+    animation: c3-entra 1500ms var(--ease-out-quint) 240ms both;
+  }
+
+  .c3-celular-pos {
+    animation: c3-celular-entra 1500ms var(--ease-out-quint) 480ms both;
+  }
+}
+
+@keyframes c3-entra {
+  from {
+    transform: translate3d(6%, 7%, -260px) rotateX(16deg) rotateY(24deg);
+  }
+  to {
+    transform: none;
+  }
+}
+
+/* O celular entra pela frente (z positivo), nunca por trás da janela. */
+@keyframes c3-celular-entra {
+  from {
+    transform: translate3d(-10%, 26%, 70px) rotateY(-10deg);
+  }
+  to {
+    transform: none;
+  }
+}
